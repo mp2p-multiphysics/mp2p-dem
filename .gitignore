@@ -1,0 +1,12 @@
+# folders to igore
+.vscode/
+input/
+output/
+*.dSYM/
+
+# files to ignore
+.DS_Store
+*.cpp
+*.py
+*.csv
+dem_test
