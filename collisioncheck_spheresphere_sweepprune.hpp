@@ -173,6 +173,10 @@ VectorPairInt CollisionCheckSphereSphereSweepPrune::broad_search(SpherePositionV
             for (int i = 0; i < num_active - 1; i++)
             {
                 std::pair<int, int> pair_sub = {indx_active_x_vec[i], indx_i};
+                if (indx_active_x_vec[i] > indx_i)
+                {
+                    pair_sub = {indx_i, indx_active_x_vec[i]};
+                }
                 indx_checkpair_x_vec.push_back(pair_sub);             
             }
 
@@ -275,8 +279,6 @@ VectorPairInt CollisionCheckSphereSphereSweepPrune::broad_search(SpherePositionV
         if (is_overlap_z)
         {
             indx_checkpair_xyz_vec.push_back(pair_sub);
-            std::pair<int, int> pair_sub2 = {pair_sub.second, pair_sub.first};
-            indx_checkpair_xyz_vec.push_back(pair_sub2);
         }
         
     }

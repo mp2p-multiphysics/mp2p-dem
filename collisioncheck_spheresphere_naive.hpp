@@ -29,13 +29,7 @@ VectorPairInt CollisionCheckSphereSphereNaive::broad_search(SpherePositionVeloci
 
     // iterate through particle i
     for (int indx_i = 0; indx_i < sphere_pvs.num_particle; indx_i++){
-    for (int indx_j = 0; indx_j < sphere_pvs.num_particle; indx_j++){
-
-        // skip self-collisions
-        if (indx_i == indx_j)
-        {
-            continue;
-        }
+    for (int indx_j = indx_i + 1; indx_j < sphere_pvs.num_particle; indx_j++){
 
         // add collision pair
         std::pair<int, int> pair_sub = {indx_i, indx_j};

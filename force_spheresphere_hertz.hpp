@@ -272,7 +272,7 @@ void ForceSphereSphereHertz::calculate_force_moment(
 
     // update collision matrix
     smat_set_value(relative_velocity_tangent_smat, id_i, id_j, relvel_tang_ij_mag);
-
+    
     // add forces and moments
     sphere_fms.force_sum_x_vec[indx_i] += fce_coll_x_ij;
     sphere_fms.force_sum_y_vec[indx_i] += fce_coll_y_ij;
@@ -280,6 +280,16 @@ void ForceSphereSphereHertz::calculate_force_moment(
     sphere_fms.moment_sum_x_vec[indx_i] += mom_coll_x_ij + mom_fric_x_ij;
     sphere_fms.moment_sum_y_vec[indx_i] += mom_coll_y_ij + mom_fric_y_ij;
     sphere_fms.moment_sum_z_vec[indx_i] += mom_coll_z_ij + mom_fric_z_ij;
+
+    // apply Newton's third law to get forces on j
+    // collision force and friction moment are negated
+    // collion moment remains the same
+    sphere_fms.force_sum_x_vec[indx_j] += -fce_coll_x_ij;
+    sphere_fms.force_sum_y_vec[indx_j] += -fce_coll_y_ij;
+    sphere_fms.force_sum_z_vec[indx_j] += -fce_coll_z_ij;
+    sphere_fms.moment_sum_x_vec[indx_j] += mom_coll_x_ij - mom_fric_x_ij;
+    sphere_fms.moment_sum_y_vec[indx_j] += mom_coll_y_ij - mom_fric_y_ij;
+    sphere_fms.moment_sum_z_vec[indx_j] += mom_coll_z_ij - mom_fric_z_ij;
 
 }
 
