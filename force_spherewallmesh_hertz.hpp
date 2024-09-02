@@ -2,7 +2,7 @@
 #define FORCE_SPHEREWALLMESH_HERTZ
 #include <map>
 #include <vector>
-#include "collisioncheck_spherewallmesh_naive.hpp"
+#include "collisioncheck_spherewallmesh_sweepprune.hpp"
 #include "container_function.hpp"
 #include "container_sphere.hpp"
 #include "container_typedef.hpp"
@@ -27,7 +27,7 @@ class ForceSphereWallMeshHertz
     MatrixDouble friction_coefficient_rolling_mat;
 
     // collision checker
-    CollisionCheckSphereWallMeshNaive collision_check;
+    CollisionCheckSphereWallMeshSweepPrune collision_check;
 
     // functions
     void add_force_moment(
@@ -49,6 +49,8 @@ class ForceSphereWallMeshHertz
         MatrixDouble friction_coefficient_rolling_mat_in
     )
     {
+        
+        // input parameters
         radius_vec = radius_vec_in;
         spring_constant_normal_mat = spring_constant_normal_mat_in;
         spring_constant_tangent_mat = spring_constant_tangent_mat_in;
@@ -56,6 +58,10 @@ class ForceSphereWallMeshHertz
         damping_coefficient_tangent_mat = damping_coefficient_tangent_mat_in;
         friction_coefficient_sliding_mat = friction_coefficient_sliding_mat_in;
         friction_coefficient_rolling_mat = friction_coefficient_rolling_mat_in;
+
+        // set collision checker
+        collision_check.set_input_parameter(radius_vec);
+
     }
 
     private:
