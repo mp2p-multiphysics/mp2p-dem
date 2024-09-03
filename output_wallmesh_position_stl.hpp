@@ -1,6 +1,7 @@
 #ifndef OUTPUT_WALLMESH_POSITION_STL
 #define OUTPUT_WALLMESH_POSITION_STL
 #include <fstream>
+#include <sstream>
 #include <vector>
 #include "container_wallmesh.hpp"
 
