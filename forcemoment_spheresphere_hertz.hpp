@@ -28,7 +28,7 @@ class ForceMomentSphereSphereHertz
     CollisionCheckSphereSphereSweepPrune collision_check;
 
     // functions
-    void add_force_moment(
+    void add_forcemoment(
         SphereForceMomentStruct &sphere_fms,
         SparseMatrixIntegrable &overlap_tangent_smat,
         SpherePositionVelocityStruct &sphere_pvs
@@ -69,7 +69,7 @@ class ForceMomentSphereSphereHertz
     private:
 
     // functions
-    void calculate_force_moment(
+    void calculate_forcemoment(
         SphereForceMomentStruct &sphere_fms,
         SparseMatrixIntegrable &overlap_tangent_smat,
         SpherePositionVelocityStruct &sphere_pvs,
@@ -78,7 +78,7 @@ class ForceMomentSphereSphereHertz
 
 };
 
-void ForceMomentSphereSphereHertz::add_force_moment(
+void ForceMomentSphereSphereHertz::add_forcemoment(
     SphereForceMomentStruct &sphere_fms,
     SparseMatrixIntegrable &overlap_tangent_smat,
     SpherePositionVelocityStruct &sphere_pvs
@@ -97,13 +97,13 @@ void ForceMomentSphereSphereHertz::add_force_moment(
         int indx_j = collision_pair.second;
 
         // calculate forces
-        calculate_force_moment(sphere_fms, overlap_tangent_smat, sphere_pvs, indx_i, indx_j);
+        calculate_forcemoment(sphere_fms, overlap_tangent_smat, sphere_pvs, indx_i, indx_j);
         
     }
 
 }
 
-void ForceMomentSphereSphereHertz::calculate_force_moment(
+void ForceMomentSphereSphereHertz::calculate_forcemoment(
     SphereForceMomentStruct &sphere_fms,
     SparseMatrixIntegrable &overlap_tangent_smat,
     SpherePositionVelocityStruct &sphere_pvs,

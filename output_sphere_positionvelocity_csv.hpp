@@ -1,14 +1,60 @@
-#ifndef OUTPUT_SPHERE_CSV
-#define OUTPUT_SPHERE_CSV
+#ifndef OUTPUT_SPHERE_POSITIONVELOCITY_CSV
+#define OUTPUT_SPHERE_POSITIONVELOCITY_CSV
 #include <fstream>
+#include <sstream>
 #include <vector>
 #include "container_sphere.hpp"
 
-void output_sphere_csv(SpherePositionVelocityStruct sphere_pvs, std::string file_out_base_str, int ts)
+class OutputSpherePositionVelocityCSV
 {
 
+    public:
+
+    // variables
+    std::string file_out_base_str;
+    std::vector<std::string> file_out_base_vec;
+
+    // functions
+    void output_positionvelocity(SpherePositionVelocityStruct &sphere_pvs, int ts);
+
+    // default constructor
+    OutputSpherePositionVelocityCSV ()
+    {
+
+    }
+
+    // constructor
+    OutputSpherePositionVelocityCSV (std::string file_out_base_str_in)
+    {
+
+        // store variables
+        file_out_base_str = file_out_base_str_in;
+
+        // split filename at '*'
+        // will be replaced with timestep later
+        std::stringstream file_out_base_stream(file_out_base_str);
+        std::string string_sub;
+        while(std::getline(file_out_base_stream, string_sub, '*'))
+        {
+            file_out_base_vec.push_back(string_sub);
+        }
+
+    }
+
+};
+
+void OutputSpherePositionVelocityCSV::output_positionvelocity(SpherePositionVelocityStruct &sphere_pvs, int ts)
+{
+
+    // create output filename
+    // replace '*' with timestep
+    std::string file_out_str = file_out_base_vec[0];
+    for (int i = 1; i < file_out_base_vec.size(); i++)
+    {
+        file_out_str += std::to_string(ts) + file_out_base_vec[i];
+    }
+
     // initialize output file
-    std::string file_out_str = file_out_base_str + std::to_string(ts) + ".csv";
     std::ofstream file_out_stream(file_out_str);
 
     // write output data

@@ -1,11 +1,11 @@
-#ifndef INPUT_SPHERE_CSV
-#define INPUT_SPHERE_CSV
+#ifndef INITIALIZE_SPHERE_POSITIONVELOCITY_CSV
+#define INITIALIZE_SPHERE_POSITIONVELOCITY_CSV
 #include <fstream>
 #include <sstream>
 #include <vector>
 #include "container_sphere.hpp"
 
-SpherePositionVelocityStruct input_sphere_csv(std::string file_in_str, double scale_length = 1.)
+SpherePositionVelocityStruct initialize_sphere_positionvelocity_csv(std::string file_in_str, double scale_length = 1.)
 {
 
     // read file with particle positions and velocities

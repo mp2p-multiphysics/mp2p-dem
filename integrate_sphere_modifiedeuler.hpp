@@ -15,7 +15,7 @@ class IntegrateSphereModifiedEuler
     double dt;
 
     // functions
-    void integrate_position_velocity
+    void integrate_positionvelocity
     (
         SpherePositionVelocityStruct &sphere_pvs,  
         SphereForceMomentStruct sphere_fms
@@ -37,7 +37,7 @@ class IntegrateSphereModifiedEuler
 
 };
 
-void IntegrateSphereModifiedEuler::integrate_position_velocity
+void IntegrateSphereModifiedEuler::integrate_positionvelocity
 (
     SpherePositionVelocityStruct &sphere_pvs,   
     SphereForceMomentStruct sphere_fms

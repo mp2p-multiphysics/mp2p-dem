@@ -31,7 +31,7 @@ class ForceMomentSphereWallMeshHertz
     CollisionCheckSphereWallMeshSweepPrune collision_check;
 
     // functions
-    void add_force_moment(
+    void add_forcemoment(
         SphereForceMomentStruct &sphere_fms,
         SparseMatrixIntegrable &overlap_tangent_smat,
         SpherePositionVelocityStruct &sphere_pvs,
@@ -65,7 +65,7 @@ class ForceMomentSphereWallMeshHertz
     }
 
     private:
-    void calculate_force_moment(
+    void calculate_forcemoment(
         SphereForceMomentStruct &sphere_fms,
         SparseMatrixIntegrable &overlap_tangent_smat,
         SpherePositionVelocityStruct &sphere_pvs,
@@ -106,7 +106,7 @@ class ForceMomentSphereWallMeshHertz
 
 };
 
-void ForceMomentSphereWallMeshHertz::add_force_moment(
+void ForceMomentSphereWallMeshHertz::add_forcemoment(
     SphereForceMomentStruct &sphere_fms,
     SparseMatrixIntegrable &overlap_tangent_smat,
     SpherePositionVelocityStruct &sphere_pvs,
@@ -126,13 +126,13 @@ void ForceMomentSphereWallMeshHertz::add_force_moment(
         int indx_k = collision_pair.second;
 
         // calculate forces
-        calculate_force_moment(sphere_fms, overlap_tangent_smat, sphere_pvs, wallmesh_pvs, indx_i, indx_k);
+        calculate_forcemoment(sphere_fms, overlap_tangent_smat, sphere_pvs, wallmesh_pvs, indx_i, indx_k);
         
     }
 
 }
 
-void ForceMomentSphereWallMeshHertz::calculate_force_moment(
+void ForceMomentSphereWallMeshHertz::calculate_forcemoment(
     SphereForceMomentStruct &sphere_fms,
     SparseMatrixIntegrable &overlap_tangent_smat,
     SpherePositionVelocityStruct &sphere_pvs,

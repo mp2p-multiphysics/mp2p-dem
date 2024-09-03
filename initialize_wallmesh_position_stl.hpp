@@ -1,11 +1,11 @@
-#ifndef INPUT_WALLMESH_STL
-#define INPUT_WALLMESH_STL
+#ifndef INITIALIZE_WALLMESH_POSITION_STL
+#define INITIALIZE_WALLMESH_POSITION_STL
 #include <fstream>
 #include <sstream>
 #include <vector>
 #include "container_wallmesh.hpp"
 
-WallMeshPositionVelocityStruct input_wallmesh_stl(std::string file_in_str, int type_int, double scale_length = 1.)
+WallMeshPositionVelocityStruct initialize_wallmesh_position_stl(std::string file_in_str, int type_int, double scale_length = 1.)
 {
 
     // read file with particle positions and velocities
