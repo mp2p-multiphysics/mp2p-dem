@@ -13,7 +13,7 @@ class IntegrateWallMeshEuler
     double dt;
 
     // functions
-    void update_position_velocity(WallMeshPositionVelocityStruct &wallmesh_pvs);
+    void integrate_position_velocity(WallMeshPositionVelocityStruct &wallmesh_pvs);
 
     // default constructor
     IntegrateWallMeshEuler()
@@ -30,7 +30,7 @@ class IntegrateWallMeshEuler
 };
 
 
-void IntegrateWallMeshEuler::update_position_velocity(WallMeshPositionVelocityStruct &wallmesh_pvs)
+void IntegrateWallMeshEuler::integrate_position_velocity(WallMeshPositionVelocityStruct &wallmesh_pvs)
 {
 
     // get wall velocities

@@ -1,6 +1,7 @@
 #ifndef INTEGRATE_SPARSEMATRIX_MODIFIEDEULER
 #define INTEGRATE_SPARSEMATRIX_MODIFIEDEULER
 #include <vector>
+#include "container_smat_integrable.hpp"
 #include "container_typedef.hpp"
 
 class IntegrateSparseMatrixEuler
@@ -12,15 +13,9 @@ class IntegrateSparseMatrixEuler
     double dt;
 
     // functions
-    void update_with_time_derivative
+    void integrate_u
     (
-        SparseMatrixDouble &smat,
-        SparseMatrixDouble &differential_smat_over_dt      
-    );
-    void update_with_smat_derivative
-    (
-        SparseMatrixDouble &smat,
-        SparseMatrixDouble &differential_smat
+        SparseMatrixIntegrable &smat
     );
 
     // default constructor
@@ -37,15 +32,14 @@ class IntegrateSparseMatrixEuler
 
 };
 
-void IntegrateSparseMatrixEuler::update_with_time_derivative
+void IntegrateSparseMatrixEuler::integrate_u
 (
-    SparseMatrixDouble &smat,
-    SparseMatrixDouble &differential_smat_over_dt      
+    SparseMatrixIntegrable &smat  
 )
 {
 
     // update sparse matrix
-    for (auto &overlap_pair : differential_smat_over_dt)
+    for (auto &overlap_pair : smat.dudt)
     {
 
         // get key (particles) and value (differential overlap)
@@ -53,29 +47,7 @@ void IntegrateSparseMatrixEuler::update_with_time_derivative
         double value = overlap_pair.second;
 
         // increment tangential overlap
-        smat[key] += value * dt;
-
-    }
-
-}
-
-void IntegrateSparseMatrixEuler::update_with_smat_derivative
-(
-    SparseMatrixDouble &smat,
-    SparseMatrixDouble &differential_smat
-)
-{
-
-    // update sparse matrix
-    for (auto &overlap_pair : differential_smat)
-    {
-
-        // get key (particles) and value (differential overlap)
-        std::pair<int, int> key = overlap_pair.first;
-        double value = overlap_pair.second;
-
-        // increment tangential overlap
-        smat[key] += value;
+        smat.u[key] += value * dt;
 
     }
 

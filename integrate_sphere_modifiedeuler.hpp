@@ -2,7 +2,6 @@
 #define INTEGRATE_SPHERE_MODIFIEDEULER
 #include <vector>
 #include "container_sphere.hpp"
-#include "container_struct.hpp"
 #include "container_typedef.hpp"
 
 class IntegrateSphereModifiedEuler
@@ -16,7 +15,7 @@ class IntegrateSphereModifiedEuler
     double dt;
 
     // functions
-    void update_position_velocity
+    void integrate_position_velocity
     (
         SpherePositionVelocityStruct &sphere_pvs,  
         SphereForceMomentStruct sphere_fms
@@ -38,7 +37,7 @@ class IntegrateSphereModifiedEuler
 
 };
 
-void IntegrateSphereModifiedEuler::update_position_velocity
+void IntegrateSphereModifiedEuler::integrate_position_velocity
 (
     SpherePositionVelocityStruct &sphere_pvs,   
     SphereForceMomentStruct sphere_fms

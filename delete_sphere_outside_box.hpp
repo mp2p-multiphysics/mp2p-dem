@@ -3,7 +3,7 @@
 #include <vector>
 #include "container_sphere.hpp"
 
-class BoundaryDomain
+class DeleteSphereOutsideBox
 {
 
     public:
@@ -19,16 +19,16 @@ class BoundaryDomain
     double boundary_max_z = 0.;
 
     // functions
-    void remove_outofbounds_sphere(SpherePositionVelocityStruct &sphere_pvs);
+    void delete_sphere(SpherePositionVelocityStruct &sphere_pvs);
 
     // default constructor
-    BoundaryDomain()
+    DeleteSphereOutsideBox()
     {
 
     }
 
     // constructor
-    BoundaryDomain(double boundary_min_x_in, double boundary_min_y_in, double boundary_min_z_in, double boundary_max_x_in, double boundary_max_y_in, double boundary_max_z_in)
+    DeleteSphereOutsideBox(double boundary_min_x_in, double boundary_min_y_in, double boundary_min_z_in, double boundary_max_x_in, double boundary_max_y_in, double boundary_max_z_in)
     {
         
         // coordinates of lower point
@@ -45,7 +45,7 @@ class BoundaryDomain
     
 };
 
-void BoundaryDomain::remove_outofbounds_sphere(SpherePositionVelocityStruct &sphere_pvs)
+void DeleteSphereOutsideBox::delete_sphere(SpherePositionVelocityStruct &sphere_pvs)
 {
 
     // delete particles outside of simulation box

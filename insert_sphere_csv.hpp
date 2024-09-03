@@ -5,7 +5,34 @@
 #include <vector>
 #include "container_sphere.hpp"
 
-void insert_sphere_csv(SpherePositionVelocityStruct &sphere_pvs, std::string file_in_str, double scale_length = 1.)
+class InsertSphereCSV
+{
+
+    public:
+
+    // variables
+    std::string file_in_str;
+    double scale_length;
+
+    // functions
+    void insert_sphere(SpherePositionVelocityStruct &sphere_pvs);
+
+    // default constructor
+    InsertSphereCSV()
+    {
+
+    }
+
+    // constructor
+    InsertSphereCSV(std::string file_in_str_in, double scale_length_in = 1.)
+    {
+        file_in_str = file_in_str_in;
+        scale_length = scale_length_in;
+    }
+
+};
+
+void InsertSphereCSV::insert_sphere(SpherePositionVelocityStruct &sphere_pvs)
 {
 
     // read file with particle positions and velocities

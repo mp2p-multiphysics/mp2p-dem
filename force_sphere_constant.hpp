@@ -14,7 +14,7 @@ class ForceSphereConstant
     double force_z;
 
     // functions
-    void add_force_moment(SphereForceMomentStruct &sphere_fms);
+    void add_force(SphereForceMomentStruct &sphere_fms);
 
     // default constructor
     ForceSphereConstant()
@@ -32,7 +32,7 @@ class ForceSphereConstant
 
 };
 
-void ForceSphereConstant::add_force_moment(SphereForceMomentStruct &sphere_fms)
+void ForceSphereConstant::add_force(SphereForceMomentStruct &sphere_fms)
 {
 
     // add forces
