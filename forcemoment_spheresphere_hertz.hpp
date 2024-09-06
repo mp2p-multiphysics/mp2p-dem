@@ -3,13 +3,16 @@
 #include <map>
 #include <utility>
 #include <vector>
-#include "collisioncheck_spheresphere_sweepprune.hpp"
+#include "collisioncheck_spheresphere_naive.hpp"
+#include "collisioncheck_spheresphere_sweep_1dx.hpp"
+#include "collisioncheck_spheresphere_sweep_1dy.hpp"
+#include "collisioncheck_spheresphere_sweep_1dz.hpp"
 #include "container_function.hpp"
 #include "container_smat_integrable.hpp"
 #include "container_sphere.hpp"
 #include "container_typedef.hpp"
 
-
+template <class CollisionCheckSphereSphere>
 class ForceMomentSphereSphereHertz
 {
 
@@ -25,7 +28,7 @@ class ForceMomentSphereSphereHertz
     MatrixDouble friction_coefficient_rolling_mat;
 
     // collision checker
-    CollisionCheckSphereSphereSweepPrune collision_check;
+    CollisionCheckSphereSphere collision_check;
 
     // functions
     void add_forcemoment(
@@ -48,11 +51,10 @@ class ForceMomentSphereSphereHertz
         MatrixDouble damping_coefficient_normal_mat_in,
         MatrixDouble damping_coefficient_tangent_mat_in,
         MatrixDouble friction_coefficient_sliding_mat_in,
-        MatrixDouble friction_coefficient_rolling_mat_in
+        MatrixDouble friction_coefficient_rolling_mat_in,
+        CollisionCheckSphereSphere collision_check_in
     )
     {
-        
-        // input parameters
         radius_vec = radius_vec_in;
         spring_constant_normal_mat = spring_constant_normal_mat_in;
         spring_constant_tangent_mat = spring_constant_tangent_mat_in;
@@ -60,10 +62,7 @@ class ForceMomentSphereSphereHertz
         damping_coefficient_tangent_mat = damping_coefficient_tangent_mat_in;
         friction_coefficient_sliding_mat = friction_coefficient_sliding_mat_in;
         friction_coefficient_rolling_mat = friction_coefficient_rolling_mat_in;
-
-        // set collision checker
-        collision_check.set_input_parameter(radius_vec);
-
+        collision_check = collision_check_in;
     }
 
     private:
@@ -78,7 +77,8 @@ class ForceMomentSphereSphereHertz
 
 };
 
-void ForceMomentSphereSphereHertz::add_forcemoment(
+template <class CollisionCheckSphereSphere>
+void ForceMomentSphereSphereHertz<CollisionCheckSphereSphere>::add_forcemoment(
     SphereForceMomentStruct &sphere_fms,
     SparseMatrixIntegrable &overlap_tangent_smat,
     SpherePositionVelocityStruct &sphere_pvs
@@ -103,7 +103,8 @@ void ForceMomentSphereSphereHertz::add_forcemoment(
 
 }
 
-void ForceMomentSphereSphereHertz::calculate_forcemoment(
+template <class CollisionCheckSphereSphere>
+void ForceMomentSphereSphereHertz<CollisionCheckSphereSphere>::calculate_forcemoment(
     SphereForceMomentStruct &sphere_fms,
     SparseMatrixIntegrable &overlap_tangent_smat,
     SpherePositionVelocityStruct &sphere_pvs,

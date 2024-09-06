@@ -2,14 +2,17 @@
 #define FORCEMOMENT_SPHEREWALLMESH_HERTZ
 #include <map>
 #include <vector>
-#include "collisioncheck_spherewallmesh_sweepprune.hpp"
+#include "collisioncheck_spherewallmesh_naive.hpp"
+#include "collisioncheck_spherewallmesh_sweep_1dx.hpp"
+#include "collisioncheck_spherewallmesh_sweep_1dy.hpp"
+#include "collisioncheck_spherewallmesh_sweep_1dz.hpp"
 #include "container_function.hpp"
 #include "container_smat_integrable.hpp"
 #include "container_sphere.hpp"
 #include "container_typedef.hpp"
 #include "container_wallmesh.hpp"
 
-
+template <class CollisionCheckSphereWallMesh>
 class ForceMomentSphereWallMeshHertz
 {
 
@@ -28,7 +31,7 @@ class ForceMomentSphereWallMeshHertz
     MatrixDouble friction_coefficient_rolling_mat;
 
     // collision checker
-    CollisionCheckSphereWallMeshSweepPrune collision_check;
+    CollisionCheckSphereWallMesh collision_check;
 
     // functions
     void add_forcemoment(
@@ -46,11 +49,10 @@ class ForceMomentSphereWallMeshHertz
         MatrixDouble damping_coefficient_normal_mat_in,
         MatrixDouble damping_coefficient_tangent_mat_in,
         MatrixDouble friction_coefficient_sliding_mat_in,
-        MatrixDouble friction_coefficient_rolling_mat_in
+        MatrixDouble friction_coefficient_rolling_mat_in,
+        CollisionCheckSphereWallMesh collision_check_in
     )
     {
-        
-        // input parameters
         radius_vec = radius_vec_in;
         spring_constant_normal_mat = spring_constant_normal_mat_in;
         spring_constant_tangent_mat = spring_constant_tangent_mat_in;
@@ -58,10 +60,7 @@ class ForceMomentSphereWallMeshHertz
         damping_coefficient_tangent_mat = damping_coefficient_tangent_mat_in;
         friction_coefficient_sliding_mat = friction_coefficient_sliding_mat_in;
         friction_coefficient_rolling_mat = friction_coefficient_rolling_mat_in;
-
-        // set collision checker
-        collision_check.set_input_parameter(radius_vec);
-
+        collision_check = collision_check_in;
     }
 
     private:
@@ -106,7 +105,8 @@ class ForceMomentSphereWallMeshHertz
 
 };
 
-void ForceMomentSphereWallMeshHertz::add_forcemoment(
+template <class CollisionCheckSphereWallMesh>
+void ForceMomentSphereWallMeshHertz<CollisionCheckSphereWallMesh>::add_forcemoment(
     SphereForceMomentStruct &sphere_fms,
     SparseMatrixIntegrable &overlap_tangent_smat,
     SpherePositionVelocityStruct &sphere_pvs,
@@ -132,7 +132,8 @@ void ForceMomentSphereWallMeshHertz::add_forcemoment(
 
 }
 
-void ForceMomentSphereWallMeshHertz::calculate_forcemoment(
+template <class CollisionCheckSphereWallMesh>
+void ForceMomentSphereWallMeshHertz<CollisionCheckSphereWallMesh>::calculate_forcemoment(
     SphereForceMomentStruct &sphere_fms,
     SparseMatrixIntegrable &overlap_tangent_smat,
     SpherePositionVelocityStruct &sphere_pvs,
@@ -366,7 +367,8 @@ void ForceMomentSphereWallMeshHertz::calculate_forcemoment(
 
 }
 
-bool ForceMomentSphereWallMeshHertz::check_possible_collision(
+template <class CollisionCheckSphereWallMesh>
+bool ForceMomentSphereWallMeshHertz<CollisionCheckSphereWallMesh>::check_possible_collision(
     SpherePositionVelocityStruct &sphere_pvs,
     WallMeshPositionVelocityStruct &wallmesh_pvs,
     int indx_i, int indx_k
@@ -444,7 +446,8 @@ bool ForceMomentSphereWallMeshHertz::check_possible_collision(
 
 }
 
-void ForceMomentSphereWallMeshHertz::check_face_collision(
+template <class CollisionCheckSphereWallMesh>
+void ForceMomentSphereWallMeshHertz<CollisionCheckSphereWallMesh>::check_face_collision(
     bool &is_face_collision, 
     double &pos_contact_x, double &pos_contact_y, double &pos_contact_z,
     SpherePositionVelocityStruct &sphere_pvs,
@@ -550,7 +553,8 @@ void ForceMomentSphereWallMeshHertz::check_face_collision(
 
 }
 
-void ForceMomentSphereWallMeshHertz::check_edge_collision(
+template <class CollisionCheckSphereWallMesh>
+void ForceMomentSphereWallMeshHertz<CollisionCheckSphereWallMesh>::check_edge_collision(
     bool &is_edge_collision,
     double &pos_contact_x, double &pos_contact_y, double &pos_contact_z,
     SpherePositionVelocityStruct &sphere_pvs,
@@ -640,7 +644,8 @@ void ForceMomentSphereWallMeshHertz::check_edge_collision(
     
 }
 
-void ForceMomentSphereWallMeshHertz::check_vertex_collision(
+template <class CollisionCheckSphereWallMesh>
+void ForceMomentSphereWallMeshHertz<CollisionCheckSphereWallMesh>::check_vertex_collision(
     bool &is_vertex_collision,
     double &pos_contact_x, double &pos_contact_y, double &pos_contact_z,
     SpherePositionVelocityStruct &sphere_pvs,
@@ -718,7 +723,8 @@ void ForceMomentSphereWallMeshHertz::check_vertex_collision(
     
 }
 
-void ForceMomentSphereWallMeshHertz::calculate_velocity_contact(
+template <class CollisionCheckSphereWallMesh>
+void ForceMomentSphereWallMeshHertz<CollisionCheckSphereWallMesh>::calculate_velocity_contact(
     double &vel_contact_x, double &vel_contact_y, double &vel_contact_z,
     WallMeshPositionVelocityStruct &wallmesh_pvs,
     double pos_contact_x, double pos_contact_y, double pos_contact_z
