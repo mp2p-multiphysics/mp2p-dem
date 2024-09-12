@@ -11,6 +11,7 @@ class CollisionCheckSphereSphereNaive
     public:
 
     // functions
+    void set_input(VectorDouble &radius_vec_in);
     VectorPairInt broad_search(SpherePositionVelocityStruct &sphere_pvs);
 
     // default constructor
@@ -20,6 +21,11 @@ class CollisionCheckSphereSphereNaive
     }
 
 };
+
+void CollisionCheckSphereSphereNaive::set_input(VectorDouble &radius_vec_in)
+{
+    // not needed for naive search
+}
 
 VectorPairInt CollisionCheckSphereSphereNaive::broad_search(SpherePositionVelocityStruct &sphere_pvs)
 {

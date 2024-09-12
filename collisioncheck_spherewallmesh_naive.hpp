@@ -12,6 +12,7 @@ class CollisionCheckSphereWallMeshNaive
     public:
 
     // functions
+    void set_input(VectorDouble &radius_vec_in);
     VectorPairInt broad_search(SpherePositionVelocityStruct &sphere_pvs, WallMeshPositionVelocityStruct &wallmesh_pvs);
 
     // default constructor
@@ -21,6 +22,11 @@ class CollisionCheckSphereWallMeshNaive
     }
 
 };
+
+void CollisionCheckSphereWallMeshNaive::set_input(VectorDouble &radius_vec_in)
+{
+    // not needed for naive search
+}
 
 VectorPairInt CollisionCheckSphereWallMeshNaive::broad_search(SpherePositionVelocityStruct &sphere_pvs, WallMeshPositionVelocityStruct &wallmesh_pvs)
 {

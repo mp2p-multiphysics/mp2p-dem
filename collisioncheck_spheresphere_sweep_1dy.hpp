@@ -16,6 +16,7 @@ class CollisionCheckSphereSphereSweep1Dy
     double enlarge_factor;
 
     // functions
+    void set_input(VectorDouble &radius_vec_in);
     VectorPairInt broad_search(SpherePositionVelocityStruct &sphere_pvs);
 
     // default constructor
@@ -45,6 +46,14 @@ class CollisionCheckSphereSphereSweep1Dy
     void sort_pair_insertion(VectorPairIntDouble &pair_vec);
 
 };
+
+void CollisionCheckSphereSphereSweep1Dy::set_input(VectorDouble &radius_vec_in)
+{
+
+    // set input variables
+    radius_vec = radius_vec_in;
+
+}
 
 VectorPairInt CollisionCheckSphereSphereSweep1Dy::broad_search(SpherePositionVelocityStruct &sphere_pvs)
 {

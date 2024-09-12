@@ -49,10 +49,11 @@ class ForceMomentSphereWallMeshHertz
         MatrixDouble damping_coefficient_normal_mat_in,
         MatrixDouble damping_coefficient_tangent_mat_in,
         MatrixDouble friction_coefficient_sliding_mat_in,
-        MatrixDouble friction_coefficient_rolling_mat_in,
-        CollisionCheckSphereWallMesh collision_check_in
+        MatrixDouble friction_coefficient_rolling_mat_in
     )
     {
+        
+         // store variables
         radius_vec = radius_vec_in;
         spring_constant_normal_mat = spring_constant_normal_mat_in;
         spring_constant_tangent_mat = spring_constant_tangent_mat_in;
@@ -60,7 +61,10 @@ class ForceMomentSphereWallMeshHertz
         damping_coefficient_tangent_mat = damping_coefficient_tangent_mat_in;
         friction_coefficient_sliding_mat = friction_coefficient_sliding_mat_in;
         friction_coefficient_rolling_mat = friction_coefficient_rolling_mat_in;
-        collision_check = collision_check_in;
+
+        // initialize collision checker
+        collision_check.set_input(radius_vec);
+
     }
 
     private:

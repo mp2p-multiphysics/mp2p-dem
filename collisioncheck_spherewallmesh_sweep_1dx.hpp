@@ -16,6 +16,7 @@ class CollisionCheckSphereWallMeshSweep1Dx
     double enlarge_factor;
 
     // functions
+    void set_input(VectorDouble &radius_vec_in);
     VectorPairInt broad_search(SpherePositionVelocityStruct &sphere_pvs, WallMeshPositionVelocityStruct &wallmesh_pvs);
 
     // default constructor
@@ -45,6 +46,14 @@ class CollisionCheckSphereWallMeshSweep1Dx
     void sort_pair_insertion(VectorPairIntDouble &pair_vec);
 
 };
+
+void CollisionCheckSphereWallMeshSweep1Dx::set_input(VectorDouble &radius_vec_in)
+{
+
+    // set input variables
+    radius_vec = radius_vec_in;
+
+}
 
 VectorPairInt CollisionCheckSphereWallMeshSweep1Dx::broad_search(SpherePositionVelocityStruct &sphere_pvs, WallMeshPositionVelocityStruct &wallmesh_pvs)
 {
