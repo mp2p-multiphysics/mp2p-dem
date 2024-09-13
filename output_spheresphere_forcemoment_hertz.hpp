@@ -1,5 +1,5 @@
-#ifndef OUTPUT_PRECOLLISIONPOSITIONVELOCITY_FORCEMOMENT_SPHERESPHERE_HERTZ
-#define OUTPUT_PRECOLLISIONPOSITIONVELOCITY_FORCEMOMENT_SPHERESPHERE_HERTZ
+#ifndef OUTPUT_SPHERESPHERE_FORCEMOMENT_HERTZ
+#define OUTPUT_SPHERESPHERE_FORCEMOMENT_HERTZ
 #include <fstream>
 #include <map>
 #include <sstream>
@@ -15,7 +15,7 @@
 #include "container_typedef.hpp"
 
 template <class CollisionCheckSphereSphere>
-class OutputPreCollisionPositionVelocityForceMomentSphereSphereHertz
+class OutputSphereSphereForceMomentHertz
 {
 
     public:
@@ -28,8 +28,11 @@ class OutputPreCollisionPositionVelocityForceMomentSphereSphereHertz
     MatrixDouble damping_coefficient_tangent_mat;
     MatrixDouble friction_coefficient_sliding_mat;
     MatrixDouble friction_coefficient_rolling_mat;
-    std::string file_out_str;
-    std::ofstream file_out_stream;
+
+    // output files - pre-collision position and velocity
+    bool write_precollision_positionvelocity;
+    std::string file_precollision_positionvelocity_str;
+    std::ofstream file_precollision_positionvelocity_stream;
 
     // collision checker
     CollisionCheckSphereSphere collision_check;
@@ -43,13 +46,13 @@ class OutputPreCollisionPositionVelocityForceMomentSphereSphereHertz
     );
 
     // default constructor
-    OutputPreCollisionPositionVelocityForceMomentSphereSphereHertz()
+    OutputSphereSphereForceMomentHertz()
     {
 
     }
 
     // constructor
-    OutputPreCollisionPositionVelocityForceMomentSphereSphereHertz(
+    OutputSphereSphereForceMomentHertz(
         VectorDouble radius_vec_in,
         MatrixDouble spring_constant_normal_mat_in,
         MatrixDouble spring_constant_tangent_mat_in,
@@ -57,7 +60,7 @@ class OutputPreCollisionPositionVelocityForceMomentSphereSphereHertz
         MatrixDouble damping_coefficient_tangent_mat_in,
         MatrixDouble friction_coefficient_sliding_mat_in,
         MatrixDouble friction_coefficient_rolling_mat_in,
-        std::string file_out_str_in
+        std::string file_precollision_positionvelocity_str_in
     )
     {
         
@@ -69,14 +72,15 @@ class OutputPreCollisionPositionVelocityForceMomentSphereSphereHertz
         damping_coefficient_tangent_mat = damping_coefficient_tangent_mat_in;
         friction_coefficient_sliding_mat = friction_coefficient_sliding_mat_in;
         friction_coefficient_rolling_mat = friction_coefficient_rolling_mat_in;
-        file_out_str = file_out_str_in;
+        file_precollision_positionvelocity_str = file_precollision_positionvelocity_str_in;
 
         // initialize collision checker
         collision_check.set_input(radius_vec);
 
-        // initialize output file
-        file_out_stream.open(file_out_str);
-        file_out_stream << "ts,id_i,id_j,type_i,type_j,pos_x_i,pos_y_i,pos_z_i,pos_x_j,pos_y_j,pos_z_j,vel_x_i,vel_y_i,vel_z_i,vel_x_j,vel_y_j,vel_z_j,angpos_x_i,angpos_y_i,angpos_z_i,angpos_x_j,angpos_y_j,angpos_z_j,angvel_x_i,angvel_y_i,angvel_z_i,angvel_x_j,angvel_y_j,angvel_z_j\n";
+        // initialize output file - pre-collision position and velocity
+        write_precollision_positionvelocity = !(file_precollision_positionvelocity_str == "");  // "" -> no output
+        file_precollision_positionvelocity_stream.open(file_precollision_positionvelocity_str);
+        file_precollision_positionvelocity_stream << "ts,id_i,id_j,type_i,type_j,pos_x_i,pos_y_i,pos_z_i,pos_x_j,pos_y_j,pos_z_j,vel_x_i,vel_y_i,vel_z_i,vel_x_j,vel_y_j,vel_z_j,angpos_x_i,angpos_y_i,angpos_z_i,angpos_x_j,angpos_y_j,angpos_z_j,angvel_x_i,angvel_y_i,angvel_z_i,angvel_x_j,angvel_y_j,angvel_z_j\n";
 
     }
 
@@ -93,7 +97,7 @@ class OutputPreCollisionPositionVelocityForceMomentSphereSphereHertz
 };
 
 template <class CollisionCheckSphereSphere>
-void OutputPreCollisionPositionVelocityForceMomentSphereSphereHertz<CollisionCheckSphereSphere>::add_forcemoment(
+void OutputSphereSphereForceMomentHertz<CollisionCheckSphereSphere>::add_forcemoment(
     SphereForceMomentStruct &sphere_fms,
     SparseMatrixIntegrable &overlap_tangent_smat,
     SpherePositionVelocityStruct &sphere_pvs,
@@ -120,7 +124,7 @@ void OutputPreCollisionPositionVelocityForceMomentSphereSphereHertz<CollisionChe
 }
 
 template <class CollisionCheckSphereSphere>
-void OutputPreCollisionPositionVelocityForceMomentSphereSphereHertz<CollisionCheckSphereSphere>::calculate_forcemoment(
+void OutputSphereSphereForceMomentHertz<CollisionCheckSphereSphere>::calculate_forcemoment(
     SphereForceMomentStruct &sphere_fms,
     SparseMatrixIntegrable &overlap_tangent_smat,
     SpherePositionVelocityStruct &sphere_pvs,
@@ -182,37 +186,37 @@ void OutputPreCollisionPositionVelocityForceMomentSphereSphereHertz<CollisionChe
 
     // write data on collision pair if no collision on previous timestep
     // when this method is called for the first time after a collision, overlap_tang_ij_mag = 0
-    if (overlap_tang_ij_mag == 0.)
+    if (write_precollision_positionvelocity && overlap_tang_ij_mag == 0.)
     {
-        file_out_stream << ts << ",";
-        file_out_stream << id_i << ",";
-        file_out_stream << id_j << ",";
-        file_out_stream << type_i << ",";
-        file_out_stream << type_j << ",";
-        file_out_stream << pos_x_i << ",";
-        file_out_stream << pos_y_i << ",";
-        file_out_stream << pos_z_i << ",";
-        file_out_stream << pos_x_j << ",";
-        file_out_stream << pos_y_j << ",";
-        file_out_stream << pos_z_j << ",";
-        file_out_stream << vel_x_i << ",";
-        file_out_stream << vel_y_i << ",";
-        file_out_stream << vel_z_i << ",";
-        file_out_stream << vel_x_j << ",";
-        file_out_stream << vel_y_j << ",";
-        file_out_stream << vel_z_j << ",";
-        file_out_stream << sphere_pvs.angularposition_x_vec[indx_i] << ",";
-        file_out_stream << sphere_pvs.angularposition_y_vec[indx_i] << ",";
-        file_out_stream << sphere_pvs.angularposition_z_vec[indx_i] << ",";
-        file_out_stream << sphere_pvs.angularposition_x_vec[indx_j] << ",";
-        file_out_stream << sphere_pvs.angularposition_y_vec[indx_j] << ",";
-        file_out_stream << sphere_pvs.angularposition_z_vec[indx_j] << ",";
-        file_out_stream << angvel_x_i << ",";
-        file_out_stream << angvel_y_i << ",";
-        file_out_stream << angvel_z_i << ",";
-        file_out_stream << angvel_x_j << ",";
-        file_out_stream << angvel_y_j << ",";
-        file_out_stream << angvel_z_j << "\n";
+        file_precollision_positionvelocity_stream << ts << ",";
+        file_precollision_positionvelocity_stream << id_i << ",";
+        file_precollision_positionvelocity_stream << id_j << ",";
+        file_precollision_positionvelocity_stream << type_i << ",";
+        file_precollision_positionvelocity_stream << type_j << ",";
+        file_precollision_positionvelocity_stream << pos_x_i << ",";
+        file_precollision_positionvelocity_stream << pos_y_i << ",";
+        file_precollision_positionvelocity_stream << pos_z_i << ",";
+        file_precollision_positionvelocity_stream << pos_x_j << ",";
+        file_precollision_positionvelocity_stream << pos_y_j << ",";
+        file_precollision_positionvelocity_stream << pos_z_j << ",";
+        file_precollision_positionvelocity_stream << vel_x_i << ",";
+        file_precollision_positionvelocity_stream << vel_y_i << ",";
+        file_precollision_positionvelocity_stream << vel_z_i << ",";
+        file_precollision_positionvelocity_stream << vel_x_j << ",";
+        file_precollision_positionvelocity_stream << vel_y_j << ",";
+        file_precollision_positionvelocity_stream << vel_z_j << ",";
+        file_precollision_positionvelocity_stream << sphere_pvs.angularposition_x_vec[indx_i] << ",";
+        file_precollision_positionvelocity_stream << sphere_pvs.angularposition_y_vec[indx_i] << ",";
+        file_precollision_positionvelocity_stream << sphere_pvs.angularposition_z_vec[indx_i] << ",";
+        file_precollision_positionvelocity_stream << sphere_pvs.angularposition_x_vec[indx_j] << ",";
+        file_precollision_positionvelocity_stream << sphere_pvs.angularposition_y_vec[indx_j] << ",";
+        file_precollision_positionvelocity_stream << sphere_pvs.angularposition_z_vec[indx_j] << ",";
+        file_precollision_positionvelocity_stream << angvel_x_i << ",";
+        file_precollision_positionvelocity_stream << angvel_y_i << ",";
+        file_precollision_positionvelocity_stream << angvel_z_i << ",";
+        file_precollision_positionvelocity_stream << angvel_x_j << ",";
+        file_precollision_positionvelocity_stream << angvel_y_j << ",";
+        file_precollision_positionvelocity_stream << angvel_z_j << "\n";
     }
 
     // calculate normal vector

@@ -1,6 +1,9 @@
-#ifndef OUTPUT_COLLISIONFORCEMOMENT_FORCEMOMENT_SPHEREWALLMESH_HERTZ
-#define OUTPUT_COLLISIONFORCEMOMENT_FORCEMOMENT_SPHEREWALLMESH_HERTZ
+#ifndef OUTPUT_SPHEREWALLMESH_FORCEMOMENT_HERTZ
+#define OUTPUT_SPHEREWALLMESH_FORCEMOMENT_HERTZ
+#include <fstream>
 #include <map>
+#include <sstream>
+#include <utility>
 #include <vector>
 #include "collisioncheck_spherewallmesh_naive.hpp"
 #include "collisioncheck_spherewallmesh_sweep_1dx.hpp"
@@ -13,7 +16,7 @@
 #include "container_wallmesh.hpp"
 
 template <class CollisionCheckSphereWallMesh>
-class OutputCollisionForceMomentForceMomentSphereWallMeshHertz
+class OutputSphereWallMeshForceMomentHertz
 {
 
     public:
@@ -29,8 +32,16 @@ class OutputCollisionForceMomentForceMomentSphereWallMeshHertz
     MatrixDouble damping_coefficient_tangent_mat;
     MatrixDouble friction_coefficient_sliding_mat;
     MatrixDouble friction_coefficient_rolling_mat;
-    std::string file_out_str;
-    std::ofstream file_out_stream;
+
+    // output files - pre-collision position and velocity
+    bool write_precollision_positionvelocity;
+    std::string file_precollision_positionvelocity_str;
+    std::ofstream file_precollision_positionvelocity_stream;
+
+    // output files - wallmesh force and moment
+    bool write_wallmesh_forcemoment;
+    std::string file_wallmesh_forcemoment_str;
+    std::ofstream file_wallmesh_forcemoment_stream;
     double pos_reference_x;
     double pos_reference_y;
     double pos_reference_z;
@@ -48,7 +59,7 @@ class OutputCollisionForceMomentForceMomentSphereWallMeshHertz
     );
 
     // constructor
-    OutputCollisionForceMomentForceMomentSphereWallMeshHertz(
+    OutputSphereWallMeshForceMomentHertz(
         VectorDouble radius_vec_in,
         MatrixDouble spring_constant_normal_mat_in,
         MatrixDouble spring_constant_tangent_mat_in,
@@ -56,14 +67,15 @@ class OutputCollisionForceMomentForceMomentSphereWallMeshHertz
         MatrixDouble damping_coefficient_tangent_mat_in,
         MatrixDouble friction_coefficient_sliding_mat_in,
         MatrixDouble friction_coefficient_rolling_mat_in,
-        std::string file_out_str_in,
-        double pos_reference_x,
-        double pos_reference_y,
-        double pos_reference_z
+        std::string file_precollision_positionvelocity_str_in,
+        std::string file_wallmesh_forcemoment_str_in,
+        double pos_reference_x_in,
+        double pos_reference_y_in,
+        double pos_reference_z_in
     )
     {
         
-         // store variables
+        // store variables
         radius_vec = radius_vec_in;
         spring_constant_normal_mat = spring_constant_normal_mat_in;
         spring_constant_tangent_mat = spring_constant_tangent_mat_in;
@@ -71,27 +83,35 @@ class OutputCollisionForceMomentForceMomentSphereWallMeshHertz
         damping_coefficient_tangent_mat = damping_coefficient_tangent_mat_in;
         friction_coefficient_sliding_mat = friction_coefficient_sliding_mat_in;
         friction_coefficient_rolling_mat = friction_coefficient_rolling_mat_in;
-        file_out_str = file_out_str_in;
-        pos_reference_x = pos_reference_x_in;
-        pos_reference_y = pos_reference_y_in;
-        pos_reference_z = pos_reference_z_in;
+        file_precollision_positionvelocity_str = file_precollision_positionvelocity_str_in;
+        file_wallmesh_forcemoment_str = file_wallmesh_forcemoment_str_in;
+        pos_reference_x_in = pos_reference_x;
+        pos_reference_y_in = pos_reference_y;
+        pos_reference_z_in = pos_reference_z;
 
         // initialize collision checker
         collision_check.set_input(radius_vec);
 
-        // initialize output file
-        file_out_stream.open(file_out_str);
-        file_out_stream << "ts,id_i,id_k,type_i,type_k,pos_x_i,pos_y_i,pos_z_i,pos_x_k,pos_y_k,pos_z_k,vel_x_i,vel_y_i,vel_z_i,vel_x_k,vel_y_k,vel_z_k,angpos_x_i,angpos_y_i,angpos_z_i,angvel_x_i,angvel_y_i,angvel_z_i\n";
+        // initialize output file - precollision position and velocity
+        write_precollision_positionvelocity = !(file_precollision_positionvelocity_str == "");  // "" -> no output
+        file_precollision_positionvelocity_stream.open(file_precollision_positionvelocity_str);
+        file_precollision_positionvelocity_stream << "ts,id_i,id_k,type_i,type_k,pos_x_i,pos_y_i,pos_z_i,pos_x_k,pos_y_k,pos_z_k,vel_x_i,vel_y_i,vel_z_i,vel_x_k,vel_y_k,vel_z_k,angpos_x_i,angpos_y_i,angpos_z_i,angvel_x_i,angvel_y_i,angvel_z_i\n";
+
+        // initialize output file - wallmesh force and moment
+        write_wallmesh_forcemoment = !(file_wallmesh_forcemoment_str == "");  // "" -> no output
+        file_wallmesh_forcemoment_stream.open(file_wallmesh_forcemoment_str);
+        file_wallmesh_forcemoment_stream << "ts,id_i,id_k,type_i,type_k,pos_x_i,pos_y_i,pos_z_i,pos_x_k,pos_y_k,pos_z_k,vel_x_i,vel_y_i,vel_z_i,vel_x_k,vel_y_k,vel_z_k,angpos_x_i,angpos_y_i,angpos_z_i,angvel_x_i,angvel_y_i,angvel_z_i\n";
 
     }
 
     private:
     void calculate_forcemoment(
         SphereForceMomentStruct &sphere_fms,
+        SphereForceMomentStruct &wallmesh_fms,
         SparseMatrixIntegrable &overlap_tangent_smat,
         SpherePositionVelocityStruct &sphere_pvs,
         WallMeshPositionVelocityStruct &wallmesh_pvs,
-        int indx_i, int indx_k
+        int indx_i, int indx_k, int ts
     );
     bool check_possible_collision(
         SpherePositionVelocityStruct &sphere_pvs,
@@ -128,7 +148,7 @@ class OutputCollisionForceMomentForceMomentSphereWallMeshHertz
 };
 
 template <class CollisionCheckSphereWallMesh>
-void OutputCollisionForceMomentForceMomentSphereWallMeshHertz<CollisionCheckSphereWallMesh>::add_forcemoment(
+void OutputSphereWallMeshForceMomentHertz<CollisionCheckSphereWallMesh>::add_forcemoment(
     SphereForceMomentStruct &sphere_fms,
     SparseMatrixIntegrable &overlap_tangent_smat,
     SpherePositionVelocityStruct &sphere_pvs,
@@ -136,7 +156,10 @@ void OutputCollisionForceMomentForceMomentSphereWallMeshHertz<CollisionCheckSphe
     int ts
 )
 {
-    
+
+    // initialize forces and moments on wallmesh
+    SphereForceMomentStruct wallmesh_fms = sphere_fms_fill(sphere_fms.num_particle);
+
     // generate preliminary list of collision pairs
     VectorPairInt collision_vec = collision_check.broad_search(sphere_pvs, wallmesh_pvs);
 
@@ -149,58 +172,65 @@ void OutputCollisionForceMomentForceMomentSphereWallMeshHertz<CollisionCheckSphe
         int indx_k = collision_pair.second;
 
         // calculate forces
-        calculate_forcemoment(sphere_fms, overlap_tangent_smat, sphere_pvs, wallmesh_pvs, indx_i, indx_k, ts);
+        calculate_forcemoment(sphere_fms, wallmesh_fms, overlap_tangent_smat, sphere_pvs, wallmesh_pvs, indx_i, indx_k, ts);
         
     }
 
-    // initialize forces on wallmesh
-    double frc_x_ki = 0.; 
-    double frc_y_ki = 0.; 
-    double frc_z_ki = 0.; 
-    double mom_x_ki = 0.;
-    double mom_y_ki = 0.;
-    double mom_z_ki = 0.;
-
-    // update positions and velocities
-    for (int indx_i = 0; indx_i < wallmesh_fms.num_particle; indx_i++)
+    // write data on forces on wallmesh
+    if (write_wallmesh_forcemoment)
     {
-        
-        // calculate number of contacts for averaging
-        int num_contact = wallmesh_fms.num_contact_vec[indx_i];
-        double inv_num_contact = 0.;
-        if (num_contact != 0)
+
+        // initialize forces on wallmesh
+        double frc_x_ki = 0.; 
+        double frc_y_ki = 0.; 
+        double frc_z_ki = 0.; 
+        double mom_x_ki = 0.;
+        double mom_y_ki = 0.;
+        double mom_z_ki = 0.;
+
+        // update positions and velocities
+        for (int indx_i = 0; indx_i < wallmesh_fms.num_particle; indx_i++)
         {
-            inv_num_contact = 1./(double) num_contact;
+            
+            // calculate number of contacts for averaging
+            int num_contact = wallmesh_fms.num_contact_vec[indx_i];
+            double inv_num_contact = 0.;
+            if (num_contact != 0)
+            {
+                inv_num_contact = 1./(double) num_contact;
+            }
+
+            // calculate net forces and moments
+            frc_x_ki += wallmesh_fms.force_sum_x_vec[indx_i] + inv_num_contact*wallmesh_fms.force_average_x_vec[indx_i];
+            frc_y_ki += wallmesh_fms.force_sum_y_vec[indx_i] + inv_num_contact*wallmesh_fms.force_average_y_vec[indx_i];
+            frc_z_ki += wallmesh_fms.force_sum_z_vec[indx_i] + inv_num_contact*wallmesh_fms.force_average_z_vec[indx_i];
+            mom_x_ki += wallmesh_fms.moment_sum_x_vec[indx_i] + inv_num_contact*wallmesh_fms.moment_average_x_vec[indx_i];
+            mom_y_ki += wallmesh_fms.moment_sum_y_vec[indx_i] + inv_num_contact*wallmesh_fms.moment_average_y_vec[indx_i];
+            mom_z_ki += wallmesh_fms.moment_sum_z_vec[indx_i] + inv_num_contact*wallmesh_fms.moment_average_z_vec[indx_i];
+
         }
 
-        // calculate net forces and moments
-        frc_x_ki += wallmesh_fms.force_sum_x_vec[indx_i] + inv_num_contact*wallmesh_fms.force_average_x_vec[indx_i];
-        frc_y_ki += wallmesh_fms.force_sum_y_vec[indx_i] + inv_num_contact*wallmesh_fms.force_average_y_vec[indx_i];
-        frc_z_ki += wallmesh_fms.force_sum_z_vec[indx_i] + inv_num_contact*wallmesh_fms.force_average_z_vec[indx_i];
-        mom_x_ki += wallmesh_fms.moment_sum_x_vec[indx_i] + inv_num_contact*wallmesh_fms.moment_average_x_vec[indx_i];
-        mom_y_ki += wallmesh_fms.moment_sum_y_vec[indx_i] + inv_num_contact*wallmesh_fms.moment_average_y_vec[indx_i];
-        mom_z_ki += wallmesh_fms.moment_sum_z_vec[indx_i] + inv_num_contact*wallmesh_fms.moment_average_z_vec[indx_i];
+        // write to file
+        file_wallmesh_forcemoment_stream << ts << ",";
+        file_wallmesh_forcemoment_stream << frc_x_ki << ",";
+        file_wallmesh_forcemoment_stream << frc_y_ki << ",";
+        file_wallmesh_forcemoment_stream << frc_z_ki << ",";
+        file_wallmesh_forcemoment_stream << mom_x_ki << ",";
+        file_wallmesh_forcemoment_stream << mom_y_ki << ",";
+        file_wallmesh_forcemoment_stream << mom_z_ki << "\n";
 
     }
-
-    // write to file
-    file_out_stream << ts << ",";
-    file_out_stream << frc_x_ki << ",";
-    file_out_stream << frc_y_ki << ",";
-    file_out_stream << frc_z_ki << ",";
-    file_out_stream << mom_x_ki << ",";
-    file_out_stream << mom_y_ki << ",";
-    file_out_stream << mom_z_ki << "\n";
 
 }
 
 template <class CollisionCheckSphereWallMesh>
-void OutputCollisionForceMomentForceMomentSphereWallMeshHertz<CollisionCheckSphereWallMesh>::calculate_forcemoment(
+void OutputSphereWallMeshForceMomentHertz<CollisionCheckSphereWallMesh>::calculate_forcemoment(
     SphereForceMomentStruct &sphere_fms,
+    SphereForceMomentStruct &wallmesh_fms,
     SparseMatrixIntegrable &overlap_tangent_smat,
     SpherePositionVelocityStruct &sphere_pvs,
     WallMeshPositionVelocityStruct &wallmesh_pvs,
-    int indx_i, int indx_k
+    int indx_i, int indx_k, int ts
 )
 {
 
@@ -299,6 +329,34 @@ void OutputCollisionForceMomentForceMomentSphereWallMeshHertz<CollisionCheckSphe
 
     // get tangential overlap
     double overlap_tang_ik_mag = smat_get_value(overlap_tangent_smat.u, id_i, id_k);
+
+    // write data on collision pair if no collision on previous timestep
+    if (write_precollision_positionvelocity && overlap_tang_ik_mag == 0.)
+    {
+        file_precollision_positionvelocity_stream << ts << ",";
+        file_precollision_positionvelocity_stream << id_i << ",";
+        file_precollision_positionvelocity_stream << id_k << ",";
+        file_precollision_positionvelocity_stream << type_i << ",";
+        file_precollision_positionvelocity_stream << type_k << ",";
+        file_precollision_positionvelocity_stream << pos_x_i << ",";
+        file_precollision_positionvelocity_stream << pos_y_i << ",";
+        file_precollision_positionvelocity_stream << pos_z_i << ",";
+        file_precollision_positionvelocity_stream << cont_x_ik << ",";
+        file_precollision_positionvelocity_stream << cont_y_ik << ",";
+        file_precollision_positionvelocity_stream << cont_z_ik << ",";
+        file_precollision_positionvelocity_stream << vel_x_i << ",";
+        file_precollision_positionvelocity_stream << vel_y_i << ",";
+        file_precollision_positionvelocity_stream << vel_z_i << ",";
+        file_precollision_positionvelocity_stream << vel_x_k << ",";
+        file_precollision_positionvelocity_stream << vel_y_k << ",";
+        file_precollision_positionvelocity_stream << vel_z_k << ",";
+        file_precollision_positionvelocity_stream << sphere_pvs.angularposition_x_vec[indx_i] << ",";
+        file_precollision_positionvelocity_stream << sphere_pvs.angularposition_y_vec[indx_i] << ",";
+        file_precollision_positionvelocity_stream << sphere_pvs.angularposition_z_vec[indx_i] << ",";
+        file_precollision_positionvelocity_stream << angvel_x_i << ",";
+        file_precollision_positionvelocity_stream << angvel_y_i << ",";
+        file_precollision_positionvelocity_stream << angvel_z_i << "\n";
+    }
 
     // calculate relative velocity vector
     double relvel_x_ik = rad_i*(angvel_y_i*norm_z_ik - angvel_z_i*norm_y_ik) + vel_x_i - vel_x_k;
@@ -405,19 +463,37 @@ void OutputCollisionForceMomentForceMomentSphereWallMeshHertz<CollisionCheckSphe
     // update collision matrix
     smat_set_value(overlap_tangent_smat.dudt, id_i, id_k, relvel_tang_ik_mag);
 
+    // get lever arm from centroid to particle
+    double dpos_ref_cont_x = cont_x_ik - pos_reference_x;
+    double dpos_ref_cont_y = cont_y_ik - pos_reference_y;
+    double dpos_ref_cont_z = cont_z_ik - pos_reference_z;
+
     // face collision -> add to total force
     // edge or vertex collision -> add to average force
     if (is_face_collision)
     {
+        
+        // forces on spheres
         sphere_fms.force_sum_x_vec[indx_i] += fce_coll_x_ik;
         sphere_fms.force_sum_y_vec[indx_i] += fce_coll_y_ik;
         sphere_fms.force_sum_z_vec[indx_i] += fce_coll_z_ik;
         sphere_fms.moment_sum_x_vec[indx_i] += mom_coll_x_ik + mom_fric_x_ik;
         sphere_fms.moment_sum_y_vec[indx_i] += mom_coll_y_ik + mom_fric_y_ik;
         sphere_fms.moment_sum_z_vec[indx_i] += mom_coll_z_ik + mom_fric_z_ik;
+   
+        // forces on wallmesh
+        wallmesh_fms.force_sum_x_vec[indx_i] -= fce_coll_x_ik;
+        wallmesh_fms.force_sum_y_vec[indx_i] -= fce_coll_y_ik;
+        wallmesh_fms.force_sum_z_vec[indx_i] -= fce_coll_z_ik;
+        wallmesh_fms.moment_sum_x_vec[indx_i] -= +dpos_ref_cont_y*fce_coll_z_ik - dpos_ref_cont_z*fce_coll_y_ik;
+        wallmesh_fms.moment_sum_y_vec[indx_i] -= -dpos_ref_cont_x*fce_coll_z_ik + dpos_ref_cont_z*fce_coll_x_ik;
+        wallmesh_fms.moment_sum_z_vec[indx_i] -= +dpos_ref_cont_x*fce_coll_y_ik - dpos_ref_cont_y*fce_coll_x_ik;
+
     }
     else if (is_edge_collision || is_vertex_collision)
     {
+        
+        // forces on spheres
         sphere_fms.force_average_x_vec[indx_i] += fce_coll_x_ik;
         sphere_fms.force_average_y_vec[indx_i] += fce_coll_y_ik;
         sphere_fms.force_average_z_vec[indx_i] += fce_coll_z_ik;
@@ -425,12 +501,22 @@ void OutputCollisionForceMomentForceMomentSphereWallMeshHertz<CollisionCheckSphe
         sphere_fms.moment_average_y_vec[indx_i] += mom_coll_y_ik + mom_fric_y_ik;
         sphere_fms.moment_average_z_vec[indx_i] += mom_coll_z_ik + mom_fric_z_ik;
         sphere_fms.num_contact_vec[indx_i]++;  // increment contact count
+    
+        // forces on wallmesh
+        wallmesh_fms.force_average_x_vec[indx_i] -= fce_coll_x_ik;
+        wallmesh_fms.force_average_y_vec[indx_i] -= fce_coll_y_ik;
+        wallmesh_fms.force_average_z_vec[indx_i] -= fce_coll_z_ik;
+        wallmesh_fms.moment_sum_x_vec[indx_i] -= +dpos_ref_cont_y*fce_coll_z_ik - dpos_ref_cont_z*fce_coll_y_ik;
+        wallmesh_fms.moment_sum_y_vec[indx_i] -= -dpos_ref_cont_x*fce_coll_z_ik + dpos_ref_cont_z*fce_coll_x_ik;
+        wallmesh_fms.moment_sum_z_vec[indx_i] -= +dpos_ref_cont_x*fce_coll_y_ik - dpos_ref_cont_y*fce_coll_x_ik;
+        wallmesh_fms.num_contact_vec[indx_i]++;  // increment contact count
+
     }
 
 }
 
 template <class CollisionCheckSphereWallMesh>
-bool OutputCollisionForceMomentForceMomentSphereWallMeshHertz<CollisionCheckSphereWallMesh>::check_possible_collision(
+bool OutputSphereWallMeshForceMomentHertz<CollisionCheckSphereWallMesh>::check_possible_collision(
     SpherePositionVelocityStruct &sphere_pvs,
     WallMeshPositionVelocityStruct &wallmesh_pvs,
     int indx_i, int indx_k
@@ -509,7 +595,7 @@ bool OutputCollisionForceMomentForceMomentSphereWallMeshHertz<CollisionCheckSphe
 }
 
 template <class CollisionCheckSphereWallMesh>
-void OutputCollisionForceMomentForceMomentSphereWallMeshHertz<CollisionCheckSphereWallMesh>::check_face_collision(
+void OutputSphereWallMeshForceMomentHertz<CollisionCheckSphereWallMesh>::check_face_collision(
     bool &is_face_collision, 
     double &pos_contact_x, double &pos_contact_y, double &pos_contact_z,
     SpherePositionVelocityStruct &sphere_pvs,
@@ -616,7 +702,7 @@ void OutputCollisionForceMomentForceMomentSphereWallMeshHertz<CollisionCheckSphe
 }
 
 template <class CollisionCheckSphereWallMesh>
-void OutputCollisionForceMomentForceMomentSphereWallMeshHertz<CollisionCheckSphereWallMesh>::check_edge_collision(
+void OutputSphereWallMeshForceMomentHertz<CollisionCheckSphereWallMesh>::check_edge_collision(
     bool &is_edge_collision,
     double &pos_contact_x, double &pos_contact_y, double &pos_contact_z,
     SpherePositionVelocityStruct &sphere_pvs,
@@ -707,7 +793,7 @@ void OutputCollisionForceMomentForceMomentSphereWallMeshHertz<CollisionCheckSphe
 }
 
 template <class CollisionCheckSphereWallMesh>
-void OutputCollisionForceMomentForceMomentSphereWallMeshHertz<CollisionCheckSphereWallMesh>::check_vertex_collision(
+void OutputSphereWallMeshForceMomentHertz<CollisionCheckSphereWallMesh>::check_vertex_collision(
     bool &is_vertex_collision,
     double &pos_contact_x, double &pos_contact_y, double &pos_contact_z,
     SpherePositionVelocityStruct &sphere_pvs,
@@ -786,7 +872,7 @@ void OutputCollisionForceMomentForceMomentSphereWallMeshHertz<CollisionCheckSphe
 }
 
 template <class CollisionCheckSphereWallMesh>
-void OutputCollisionForceMomentForceMomentSphereWallMeshHertz<CollisionCheckSphereWallMesh>::calculate_velocity_contact(
+void OutputSphereWallMeshForceMomentHertz<CollisionCheckSphereWallMesh>::calculate_velocity_contact(
     double &vel_contact_x, double &vel_contact_y, double &vel_contact_z,
     WallMeshPositionVelocityStruct &wallmesh_pvs,
     double pos_contact_x, double pos_contact_y, double pos_contact_z
