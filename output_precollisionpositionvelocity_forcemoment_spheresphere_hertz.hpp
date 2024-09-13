@@ -1,16 +1,21 @@
-#ifndef OUTPUT_COLLISION_FORCE_SPHERESPHERE_HERTZ
-#define OUTPUT_COLLISION_FORCE_SPHERESPHERE_HERTZ
+#ifndef OUTPUT_PRECOLLISIONPOSITIONVELOCITY_FORCEMOMENT_SPHERESPHERE_HERTZ
+#define OUTPUT_PRECOLLISIONPOSITIONVELOCITY_FORCEMOMENT_SPHERESPHERE_HERTZ
 #include <fstream>
 #include <map>
+#include <sstream>
 #include <utility>
 #include <vector>
-#include "collisioncheck_spheresphere_sweepprune.hpp"
+#include "collisioncheck_spheresphere_naive.hpp"
+#include "collisioncheck_spheresphere_sweep_1dx.hpp"
+#include "collisioncheck_spheresphere_sweep_1dy.hpp"
+#include "collisioncheck_spheresphere_sweep_1dz.hpp"
 #include "container_function.hpp"
+#include "container_smat_integrable.hpp"
 #include "container_sphere.hpp"
 #include "container_typedef.hpp"
 
-
-class OutputCollisionForceSphereSphereHertz
+template <class CollisionCheckSphereSphere>
+class OutputPreCollisionPositionVelocityForceMomentSphereSphereHertz
 {
 
     public:
@@ -23,29 +28,28 @@ class OutputCollisionForceSphereSphereHertz
     MatrixDouble damping_coefficient_tangent_mat;
     MatrixDouble friction_coefficient_sliding_mat;
     MatrixDouble friction_coefficient_rolling_mat;
-    std::string file_out_base_str;
+    std::string file_out_str;
     std::ofstream file_out_stream;
 
     // collision checker
-    CollisionCheckSphereSphereSweepPrune collision_check;
+    CollisionCheckSphereSphere collision_check;
 
     // functions
-    void add_force_moment(
+    void add_forcemoment(
         SphereForceMomentStruct &sphere_fms,
-        SparseMatrixDouble &overlap_tangent_smat,
-        SparseMatrixDouble &relative_velocity_tangent_smat,
+        SparseMatrixIntegrable &overlap_tangent_smat,
         SpherePositionVelocityStruct &sphere_pvs,
         int ts
     );
 
     // default constructor
-    OutputCollisionForceSphereSphereHertz()
+    OutputPreCollisionPositionVelocityForceMomentSphereSphereHertz()
     {
 
     }
 
     // constructor
-    OutputCollisionForceSphereSphereHertz(
+    OutputPreCollisionPositionVelocityForceMomentSphereSphereHertz(
         VectorDouble radius_vec_in,
         MatrixDouble spring_constant_normal_mat_in,
         MatrixDouble spring_constant_tangent_mat_in,
@@ -53,11 +57,11 @@ class OutputCollisionForceSphereSphereHertz
         MatrixDouble damping_coefficient_tangent_mat_in,
         MatrixDouble friction_coefficient_sliding_mat_in,
         MatrixDouble friction_coefficient_rolling_mat_in,
-        std::string file_out_base_str_in
+        std::string file_out_str_in
     )
     {
         
-        // input parameters
+        // store variables
         radius_vec = radius_vec_in;
         spring_constant_normal_mat = spring_constant_normal_mat_in;
         spring_constant_tangent_mat = spring_constant_tangent_mat_in;
@@ -65,13 +69,12 @@ class OutputCollisionForceSphereSphereHertz
         damping_coefficient_tangent_mat = damping_coefficient_tangent_mat_in;
         friction_coefficient_sliding_mat = friction_coefficient_sliding_mat_in;
         friction_coefficient_rolling_mat = friction_coefficient_rolling_mat_in;
-        file_out_base_str = file_out_base_str_in;
+        file_out_str = file_out_str_in;
 
-        // set collision checker
-        collision_check.set_input_parameter(radius_vec);
+        // initialize collision checker
+        collision_check.set_input(radius_vec);
 
         // initialize output file
-        std::string file_out_str = file_out_base_str + ".csv";
         file_out_stream.open(file_out_str);
         file_out_stream << "ts,id_i,id_j,type_i,type_j,pos_x_i,pos_y_i,pos_z_i,pos_x_j,pos_y_j,pos_z_j,vel_x_i,vel_y_i,vel_z_i,vel_x_j,vel_y_j,vel_z_j,angpos_x_i,angpos_y_i,angpos_z_i,angpos_x_j,angpos_y_j,angpos_z_j,angvel_x_i,angvel_y_i,angvel_z_i,angvel_x_j,angvel_y_j,angvel_z_j\n";
 
@@ -80,20 +83,19 @@ class OutputCollisionForceSphereSphereHertz
     private:
 
     // functions
-    void calculate_force_moment(
+    void calculate_forcemoment(
         SphereForceMomentStruct &sphere_fms,
-        SparseMatrixDouble &overlap_tangent_smat,
-        SparseMatrixDouble &relative_velocity_tangent_smat,
+        SparseMatrixIntegrable &overlap_tangent_smat,
         SpherePositionVelocityStruct &sphere_pvs,
         int indx_i, int indx_j, int ts
     );
 
 };
 
-void OutputCollisionForceSphereSphereHertz::add_force_moment(
+template <class CollisionCheckSphereSphere>
+void OutputPreCollisionPositionVelocityForceMomentSphereSphereHertz<CollisionCheckSphereSphere>::add_forcemoment(
     SphereForceMomentStruct &sphere_fms,
-    SparseMatrixDouble &overlap_tangent_smat,
-    SparseMatrixDouble &relative_velocity_tangent_smat,
+    SparseMatrixIntegrable &overlap_tangent_smat,
     SpherePositionVelocityStruct &sphere_pvs,
     int ts
 )
@@ -111,16 +113,16 @@ void OutputCollisionForceSphereSphereHertz::add_force_moment(
         int indx_j = collision_pair.second;
 
         // calculate forces
-        calculate_force_moment(sphere_fms, overlap_tangent_smat, relative_velocity_tangent_smat, sphere_pvs, indx_i, indx_j, ts);
+        calculate_forcemoment(sphere_fms, overlap_tangent_smat, sphere_pvs, indx_i, indx_j, ts);
         
     }
 
 }
 
-void OutputCollisionForceSphereSphereHertz::calculate_force_moment(
+template <class CollisionCheckSphereSphere>
+void OutputPreCollisionPositionVelocityForceMomentSphereSphereHertz<CollisionCheckSphereSphere>::calculate_forcemoment(
     SphereForceMomentStruct &sphere_fms,
-    SparseMatrixDouble &overlap_tangent_smat,
-    SparseMatrixDouble &relative_velocity_tangent_smat,
+    SparseMatrixIntegrable &overlap_tangent_smat,
     SpherePositionVelocityStruct &sphere_pvs,
     int indx_i, int indx_j, int ts
 )
@@ -154,12 +156,9 @@ void OutputCollisionForceSphereSphereHertz::calculate_force_moment(
     // negative or zero normal overlap
     if (overlap_norm_ij_mag <= 0)
     {
-
-        // reset tangential overlap and collision energy
-        smat_prune(overlap_tangent_smat, id_i, id_j);  
-        smat_prune(relative_velocity_tangent_smat, id_i, id_j);
+        smat_prune(overlap_tangent_smat.u, id_i, id_j);  // reset tangential overlap
+        smat_prune(overlap_tangent_smat.dudt, id_i, id_j);
         return;
-
     }
 
     // get particle velocities
@@ -179,7 +178,7 @@ void OutputCollisionForceSphereSphereHertz::calculate_force_moment(
     double angvel_z_j = sphere_pvs.angularvelocity_z_vec[indx_j];
 
     // get tangential overlap
-    double overlap_tang_ij_mag = smat_get_value(overlap_tangent_smat, id_i, id_j);
+    double overlap_tang_ij_mag = smat_get_value(overlap_tangent_smat.u, id_i, id_j);
 
     // write data on collision pair if no collision on previous timestep
     // when this method is called for the first time after a collision, overlap_tang_ij_mag = 0
@@ -321,8 +320,8 @@ void OutputCollisionForceSphereSphereHertz::calculate_force_moment(
     double mom_fric_z_ij = -unit_relangvel_z_ij*helpvar_07;
 
     // update collision matrix
-    smat_set_value(relative_velocity_tangent_smat, id_i, id_j, relvel_tang_ij_mag);
-
+    smat_set_value(overlap_tangent_smat.dudt, id_i, id_j, relvel_tang_ij_mag);
+    
     // add forces and moments
     sphere_fms.force_sum_x_vec[indx_i] += fce_coll_x_ij;
     sphere_fms.force_sum_y_vec[indx_i] += fce_coll_y_ij;
@@ -330,6 +329,16 @@ void OutputCollisionForceSphereSphereHertz::calculate_force_moment(
     sphere_fms.moment_sum_x_vec[indx_i] += mom_coll_x_ij + mom_fric_x_ij;
     sphere_fms.moment_sum_y_vec[indx_i] += mom_coll_y_ij + mom_fric_y_ij;
     sphere_fms.moment_sum_z_vec[indx_i] += mom_coll_z_ij + mom_fric_z_ij;
+
+    // apply Newton's third law to get forces on j
+    // collision force and friction moment are negated
+    // collion moment remains the same
+    sphere_fms.force_sum_x_vec[indx_j] += -fce_coll_x_ij;
+    sphere_fms.force_sum_y_vec[indx_j] += -fce_coll_y_ij;
+    sphere_fms.force_sum_z_vec[indx_j] += -fce_coll_z_ij;
+    sphere_fms.moment_sum_x_vec[indx_j] += mom_coll_x_ij - mom_fric_x_ij;
+    sphere_fms.moment_sum_y_vec[indx_j] += mom_coll_y_ij - mom_fric_y_ij;
+    sphere_fms.moment_sum_z_vec[indx_j] += mom_coll_z_ij - mom_fric_z_ij;
 
 }
 
