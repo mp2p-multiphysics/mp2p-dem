@@ -13,6 +13,7 @@
 #include "container_smat_integrable.hpp"
 #include "container_sphere.hpp"
 #include "container_typedef.hpp"
+#include "container_wallmesh.hpp"
 
 template <class CollisionCheckSphereSphere>
 class OutputSphereSphereForceMomentHertz
@@ -22,12 +23,12 @@ class OutputSphereSphereForceMomentHertz
 
     // variables
     VectorDouble radius_vec;
-    MatrixDouble spring_constant_normal_mat;
-    MatrixDouble spring_constant_tangent_mat;
-    MatrixDouble damping_coefficient_normal_mat;
-    MatrixDouble damping_coefficient_tangent_mat;
-    MatrixDouble friction_coefficient_sliding_mat;
-    MatrixDouble friction_coefficient_rolling_mat;
+    MatrixDouble springconstant_normal_mat;
+    MatrixDouble springconstant_tangent_mat;
+    MatrixDouble dampingcoefficient_normal_mat;
+    MatrixDouble dampingcoefficient_tangent_mat;
+    MatrixDouble frictioncoefficient_sliding_mat;
+    MatrixDouble frictioncoefficient_rolling_mat;
 
     // output files - pre-collision position and velocity
     bool write_precollision_positionvelocity;
@@ -54,24 +55,24 @@ class OutputSphereSphereForceMomentHertz
     // constructor
     OutputSphereSphereForceMomentHertz(
         VectorDouble radius_vec_in,
-        MatrixDouble spring_constant_normal_mat_in,
-        MatrixDouble spring_constant_tangent_mat_in,
-        MatrixDouble damping_coefficient_normal_mat_in,
-        MatrixDouble damping_coefficient_tangent_mat_in,
-        MatrixDouble friction_coefficient_sliding_mat_in,
-        MatrixDouble friction_coefficient_rolling_mat_in,
+        MatrixDouble springconstant_normal_mat_in,
+        MatrixDouble springconstant_tangent_mat_in,
+        MatrixDouble dampingcoefficient_normal_mat_in,
+        MatrixDouble dampingcoefficient_tangent_mat_in,
+        MatrixDouble frictioncoefficient_sliding_mat_in,
+        MatrixDouble frictioncoefficient_rolling_mat_in,
         std::string file_precollision_positionvelocity_str_in
     )
     {
         
         // store variables
         radius_vec = radius_vec_in;
-        spring_constant_normal_mat = spring_constant_normal_mat_in;
-        spring_constant_tangent_mat = spring_constant_tangent_mat_in;
-        damping_coefficient_normal_mat = damping_coefficient_normal_mat_in;
-        damping_coefficient_tangent_mat = damping_coefficient_tangent_mat_in;
-        friction_coefficient_sliding_mat = friction_coefficient_sliding_mat_in;
-        friction_coefficient_rolling_mat = friction_coefficient_rolling_mat_in;
+        springconstant_normal_mat = springconstant_normal_mat_in;
+        springconstant_tangent_mat = springconstant_tangent_mat_in;
+        dampingcoefficient_normal_mat = dampingcoefficient_normal_mat_in;
+        dampingcoefficient_tangent_mat = dampingcoefficient_tangent_mat_in;
+        frictioncoefficient_sliding_mat = frictioncoefficient_sliding_mat_in;
+        frictioncoefficient_rolling_mat = frictioncoefficient_rolling_mat_in;
         file_precollision_positionvelocity_str = file_precollision_positionvelocity_str_in;
 
         // initialize collision checker
@@ -140,10 +141,6 @@ void OutputSphereSphereForceMomentHertz<CollisionCheckSphereSphere>::calculate_f
     int type_i = sphere_pvs.type_vec[indx_i];
     int type_j = sphere_pvs.type_vec[indx_j];
 
-    // get particle radii
-    double rad_i = radius_vec[type_i];
-    double rad_j = radius_vec[type_j];
-
     // get particle positions
     double pos_x_i = sphere_pvs.position_x_vec[indx_i];
     double pos_y_i = sphere_pvs.position_y_vec[indx_i];
@@ -152,13 +149,24 @@ void OutputSphereSphereForceMomentHertz<CollisionCheckSphereSphere>::calculate_f
     double pos_y_j = sphere_pvs.position_y_vec[indx_j];
     double pos_z_j = sphere_pvs.position_z_vec[indx_j];
 
+    // get particle radii
+    double radius_i = radius_vec[type_i];
+    double radius_j = radius_vec[type_j];
+
+    // calculate displacement from center of i to j
+    double delta_pos_x_ij = -pos_x_i + pos_x_j;
+    double delta_pos_y_ij = -pos_y_i + pos_y_j;
+    double delta_pos_z_ij = -pos_z_i + pos_z_j;
+
+    // calculate distance from center of i to j
+    double delta_pos_ij_mag = sqrt(delta_pos_x_ij*delta_pos_x_ij + delta_pos_y_ij*delta_pos_y_ij + delta_pos_z_ij*delta_pos_z_ij);
+
     // calculate normal overlap
-    double dpos_ij_mag = sqrt((pos_x_i - pos_x_j)*(pos_x_i - pos_x_j) + (pos_y_i - pos_y_j)*(pos_y_i - pos_y_j) + (pos_z_i - pos_z_j)*(pos_z_i - pos_z_j));
-    double overlap_norm_ij_mag = rad_i + rad_j - dpos_ij_mag;
+    double overlap_normal_ij_val = -delta_pos_ij_mag + radius_i + radius_j;
 
     // skip if no collision
     // negative or zero normal overlap
-    if (overlap_norm_ij_mag <= 0)
+    if (overlap_normal_ij_val <= 0)
     {
         smat_prune(overlap_tangent_smat.u, id_i, id_j);  // reset tangential overlap
         smat_prune(overlap_tangent_smat.dudt, id_i, id_j);
@@ -181,13 +189,31 @@ void OutputSphereSphereForceMomentHertz<CollisionCheckSphereSphere>::calculate_f
     double angvel_y_j = sphere_pvs.angularvelocity_y_vec[indx_j];
     double angvel_z_j = sphere_pvs.angularvelocity_z_vec[indx_j];
 
+    // get collision properties
+    double springconstant_normal = springconstant_normal_mat[type_i][type_j];
+    double springconstant_tangent = springconstant_tangent_mat[type_i][type_j];
+    double dampingcoefficient_normal = dampingcoefficient_normal_mat[type_i][type_j];
+    double dampingcoefficient_tangent = dampingcoefficient_tangent_mat[type_i][type_j];
+    double frictioncoefficient_sliding = frictioncoefficient_sliding_mat[type_i][type_j];
+    double frictioncoefficient_rolling = frictioncoefficient_rolling_mat[type_i][type_j];
+
     // get tangential overlap
-    double overlap_tang_ij_mag = smat_get_value(overlap_tangent_smat.u, id_i, id_j);
+    double overlap_tangent_ij_val = smat_get_value(overlap_tangent_smat.u, id_i, id_j);
 
     // write data on collision pair if no collision on previous timestep
     // when this method is called for the first time after a collision, overlap_tang_ij_mag = 0
-    if (write_precollision_positionvelocity && overlap_tang_ij_mag == 0.)
+    if (write_precollision_positionvelocity && overlap_tangent_ij_val == 0.)
     {
+
+        // get particle angular positions
+        double angpos_x_i = sphere_pvs.angularvelocity_x_vec[indx_i];
+        double angpos_y_i = sphere_pvs.angularvelocity_y_vec[indx_i];
+        double angpos_z_i = sphere_pvs.angularvelocity_z_vec[indx_i];
+        double angpos_x_j = sphere_pvs.angularvelocity_x_vec[indx_j];
+        double angpos_y_j = sphere_pvs.angularvelocity_y_vec[indx_j];
+        double angpos_z_j = sphere_pvs.angularvelocity_z_vec[indx_j];
+
+        // write to file
         file_precollision_positionvelocity_stream << ts << ",";
         file_precollision_positionvelocity_stream << id_i << ",";
         file_precollision_positionvelocity_stream << id_j << ",";
@@ -205,144 +231,168 @@ void OutputSphereSphereForceMomentHertz<CollisionCheckSphereSphere>::calculate_f
         file_precollision_positionvelocity_stream << vel_x_j << ",";
         file_precollision_positionvelocity_stream << vel_y_j << ",";
         file_precollision_positionvelocity_stream << vel_z_j << ",";
-        file_precollision_positionvelocity_stream << sphere_pvs.angularposition_x_vec[indx_i] << ",";
-        file_precollision_positionvelocity_stream << sphere_pvs.angularposition_y_vec[indx_i] << ",";
-        file_precollision_positionvelocity_stream << sphere_pvs.angularposition_z_vec[indx_i] << ",";
-        file_precollision_positionvelocity_stream << sphere_pvs.angularposition_x_vec[indx_j] << ",";
-        file_precollision_positionvelocity_stream << sphere_pvs.angularposition_y_vec[indx_j] << ",";
-        file_precollision_positionvelocity_stream << sphere_pvs.angularposition_z_vec[indx_j] << ",";
+        file_precollision_positionvelocity_stream << angpos_x_i << ",";
+        file_precollision_positionvelocity_stream << angpos_y_i << ",";
+        file_precollision_positionvelocity_stream << angpos_z_i << ",";
+        file_precollision_positionvelocity_stream << angpos_x_j << ",";
+        file_precollision_positionvelocity_stream << angpos_y_j << ",";
+        file_precollision_positionvelocity_stream << angpos_z_j << ",";
         file_precollision_positionvelocity_stream << angvel_x_i << ",";
         file_precollision_positionvelocity_stream << angvel_y_i << ",";
         file_precollision_positionvelocity_stream << angvel_z_i << ",";
         file_precollision_positionvelocity_stream << angvel_x_j << ",";
         file_precollision_positionvelocity_stream << angvel_y_j << ",";
         file_precollision_positionvelocity_stream << angvel_z_j << "\n";
+
     }
 
     // calculate normal vector
-    double norm_x_ij = (-pos_x_i + pos_x_j)/dpos_ij_mag;
-    double norm_y_ij = (-pos_y_i + pos_y_j)/dpos_ij_mag;
-    double norm_z_ij = (-pos_z_i + pos_z_j)/dpos_ij_mag;
+    double helpvar_01 = 1./delta_pos_ij_mag;
+    double normal_x_ij = delta_pos_x_ij*helpvar_01;
+    double normal_y_ij = delta_pos_y_ij*helpvar_01;
+    double normal_z_ij = delta_pos_z_ij*helpvar_01;
 
-    // calculate relative velocity vector
-    double relvel_x_ij = -norm_y_ij*(angvel_z_i*rad_i + angvel_z_j*rad_j) + norm_z_ij*(angvel_y_i*rad_i + angvel_y_j*rad_j) + vel_x_i - vel_x_j;
-    double relvel_y_ij = norm_x_ij*(angvel_z_i*rad_i + angvel_z_j*rad_j) - norm_z_ij*(angvel_x_i*rad_i + angvel_x_j*rad_j) + vel_y_i - vel_y_j;
-    double relvel_z_ij = -norm_x_ij*(angvel_y_i*rad_i + angvel_y_j*rad_j) + norm_y_ij*(angvel_x_i*rad_i + angvel_x_j*rad_j) + vel_z_i - vel_z_j;
+    // calculate relative velocity
+    double relvel_x_ij = -normal_y_ij*(angvel_z_i*radius_i + angvel_z_j*radius_j) + normal_z_ij*(angvel_y_i*radius_i + angvel_y_j*radius_j) + vel_x_i - vel_x_j;
+    double relvel_y_ij =  normal_x_ij*(angvel_z_i*radius_i + angvel_z_j*radius_j) - normal_z_ij*(angvel_x_i*radius_i + angvel_x_j*radius_j) + vel_y_i - vel_y_j;
+    double relvel_z_ij = -normal_x_ij*(angvel_y_i*radius_i + angvel_y_j*radius_j) + normal_y_ij*(angvel_x_i*radius_i + angvel_x_j*radius_j) + vel_z_i - vel_z_j;
 
-    // calculate normal component of relative velocity vector
-    double helpvar_01 = (relvel_x_ij*(pos_x_i - pos_x_j) + relvel_y_ij*(pos_y_i - pos_y_j) + relvel_z_ij*(pos_z_i - pos_z_j))/(dpos_ij_mag*dpos_ij_mag);
-    double relvel_norm_x_ij = (pos_x_i - pos_x_j)*helpvar_01;
-    double relvel_norm_y_ij = (pos_y_i - pos_y_j)*helpvar_01;
-    double relvel_norm_z_ij = (pos_z_i - pos_z_j)*helpvar_01;
-
-    // calculate tangential component of relative velocity vector
-    double relvel_tang_x_ij = relvel_x_ij - relvel_norm_x_ij;
-    double relvel_tang_y_ij = relvel_y_ij - relvel_norm_y_ij;
-    double relvel_tang_z_ij = relvel_z_ij - relvel_norm_z_ij;
-
-    // calculate tangential vector
-    // tangential vector is zero if relative velocity (tangential component) is zero
-    double helpvar_02 = 1./sqrt(relvel_tang_x_ij*relvel_tang_x_ij + relvel_tang_y_ij*relvel_tang_y_ij + relvel_tang_z_ij*relvel_tang_z_ij);
-    double tang_x_ij = relvel_tang_x_ij*helpvar_02;
-    double tang_y_ij = relvel_tang_y_ij*helpvar_02;
-    double tang_z_ij = relvel_tang_z_ij*helpvar_02;
-    if (relvel_tang_x_ij == 0. && relvel_tang_y_ij == 0. && relvel_tang_z_ij == 0.)
-    {
-        tang_x_ij = 0.;
-        tang_y_ij = 0.;
-        tang_z_ij = 0.;
-    }
+    // calculate magnitude of normal component of relative velocity
+    double relvel_normal_ij_val = normal_x_ij*vel_x_i - normal_x_ij*vel_x_j + normal_y_ij*vel_y_i - normal_y_ij*vel_y_j + normal_z_ij*vel_z_i - normal_z_ij*vel_z_j;
 
     // calculate normal component of relative velocity
-    double relvel_norm_ij_mag = norm_x_ij*relvel_norm_x_ij + norm_y_ij*relvel_norm_y_ij + norm_z_ij*relvel_norm_z_ij;
-
-    // calculate normal component of collision force
-    double helpvar_03 = overlap_norm_ij_mag*spring_constant_normal_mat[type_i][type_j] + relvel_norm_ij_mag*damping_coefficient_normal_mat[type_i][type_j];
-    double fce_coll_norm_x_ij = -norm_x_ij*helpvar_03;
-    double fce_coll_norm_y_ij = -norm_y_ij*helpvar_03;
-    double fce_coll_norm_z_ij = -norm_z_ij*helpvar_03;
+    double relvel_normal_x_ij = normal_x_ij*relvel_normal_ij_val;
+    double relvel_normal_y_ij = normal_y_ij*relvel_normal_ij_val;
+    double relvel_normal_z_ij = normal_z_ij*relvel_normal_ij_val;
 
     // calculate tangential component of relative velocity
-    double relvel_tang_ij_mag = -tang_x_ij*(norm_y_ij*(angvel_z_i*rad_i + angvel_z_j*rad_j) - norm_z_ij*(angvel_y_i*rad_i + angvel_y_j*rad_j) - vel_x_i + vel_x_j) + tang_y_ij*(norm_x_ij*(angvel_z_i*rad_i + angvel_z_j*rad_j) - norm_z_ij*(angvel_x_i*rad_i + angvel_x_j*rad_j) + vel_y_i - vel_y_j) - tang_z_ij*(norm_x_ij*(angvel_y_i*rad_i + angvel_y_j*rad_j) - norm_y_ij*(angvel_x_i*rad_i + angvel_x_j*rad_j) - vel_z_i + vel_z_j);
-    
-    // calculate tangential component of collision force (hertzian contact)
-    double helpvar_04 = overlap_tang_ij_mag*spring_constant_tangent_mat[type_i][type_j] + relvel_tang_ij_mag*damping_coefficient_tangent_mat[type_i][type_j];
-    double fce_coll_tang_x_ij = -tang_x_ij*helpvar_04;
-    double fce_coll_tang_y_ij = -tang_y_ij*helpvar_04;
-    double fce_coll_tang_z_ij = -tang_z_ij*helpvar_04;
+    double relvel_tangent_x_ij = -relvel_normal_x_ij + relvel_x_ij;
+    double relvel_tangent_y_ij = -relvel_normal_y_ij + relvel_y_ij;
+    double relvel_tangent_z_ij = -relvel_normal_z_ij + relvel_z_ij;
 
-    // calculate magnitude of normal and tangential collision forces
-    double fce_coll_norm_ij_mag = sqrt(fce_coll_norm_x_ij*fce_coll_norm_x_ij + fce_coll_norm_y_ij*fce_coll_norm_y_ij + fce_coll_norm_z_ij*fce_coll_norm_z_ij);
-    double fce_coll_tang_ij_mag = sqrt(fce_coll_tang_x_ij*fce_coll_tang_x_ij + fce_coll_tang_y_ij*fce_coll_tang_y_ij + fce_coll_tang_z_ij*fce_coll_tang_z_ij);
+    // calculate tangential vector
+    // tangential vector is zero if tangential component of relative velocity is zero
+    double helpvar_02 = 1./sqrt(relvel_tangent_x_ij*relvel_tangent_x_ij + relvel_tangent_y_ij*relvel_tangent_y_ij + relvel_tangent_z_ij*relvel_tangent_z_ij);
+    double tangent_x_ij = relvel_tangent_x_ij*helpvar_02;
+    double tangent_y_ij = relvel_tangent_y_ij*helpvar_02;
+    double tangent_z_ij = relvel_tangent_z_ij*helpvar_02;
+    if (relvel_tangent_x_ij == 0. && relvel_tangent_y_ij == 0. && relvel_tangent_z_ij == 0.)
+    {
+        tangent_x_ij = 0.;
+        tangent_y_ij = 0.;
+        tangent_z_ij = 0.;
+    }
+
+    // calculate tangential component of relative velocity
+    double relvel_tangent_ij_val = relvel_x_ij*tangent_x_ij + relvel_y_ij*tangent_y_ij + relvel_z_ij*tangent_z_ij;
+
+    // calculate magnitude of normal component of collision force
+    double force_collision_normal_ij_val = -dampingcoefficient_normal*relvel_normal_ij_val - overlap_normal_ij_val*springconstant_normal;
+    double force_collision_normal_ij_mag = abs(force_collision_normal_ij_val);
+
+    // calculate normal component of collision force
+    double force_collision_normal_x_ij = force_collision_normal_ij_val*normal_x_ij;
+    double force_collision_normal_y_ij = force_collision_normal_ij_val*normal_y_ij;
+    double force_collision_normal_z_ij = force_collision_normal_ij_val*normal_z_ij;
+
+    // calculate magnitude of tangential component of collision force
+    double force_collision_tangent_ij_val = -dampingcoefficient_tangent*relvel_tangent_ij_val - overlap_tangent_ij_val*springconstant_tangent;
+    double force_collision_tangent_ij_mag = abs(force_collision_tangent_ij_val);
 
     // recalculate tangential force if it exceeds maximum static friction
-    if (fce_coll_tang_ij_mag > friction_coefficient_sliding_mat[type_i][type_j]*fce_coll_norm_ij_mag)
+    if (force_collision_tangent_ij_mag > frictioncoefficient_sliding*force_collision_normal_ij_mag)
     {
         
         // calcualte signum of tangential overlap
-        double sgn_overlap_tang_ij_mag = 1.;
-        if (overlap_tang_ij_mag < 0.)
+        double signum_overlap_tangent_ij_val = 1.;
+        if (overlap_tangent_ij_val < 0.)
         {
-            sgn_overlap_tang_ij_mag = -1.;
+            signum_overlap_tangent_ij_val = -1.;
         }
         
-        // calculate tangential component of collision force (friction)
-        double helpvar_05 = friction_coefficient_sliding_mat[type_i][type_j]*sgn_overlap_tang_ij_mag*fce_coll_norm_ij_mag;
-        fce_coll_tang_x_ij = -tang_x_ij*helpvar_05;
-        fce_coll_tang_y_ij = -tang_y_ij*helpvar_05;
-        fce_coll_tang_z_ij = -tang_z_ij*helpvar_05;
+        // calculate magnitude of tangential component of collision force (friction)
+        force_collision_tangent_ij_val = -force_collision_normal_ij_mag*frictioncoefficient_sliding*signum_overlap_tangent_ij_val;
 
     }
+
+    // calculate tangential component of collision force
+    double force_collision_tangent_x_ij = force_collision_tangent_ij_val*tangent_x_ij;
+    double force_collision_tangent_y_ij = force_collision_tangent_ij_val*tangent_y_ij;
+    double force_collision_tangent_z_ij = force_collision_tangent_ij_val*tangent_z_ij;
 
     // calculate collision force
-    double fce_coll_x_ij = fce_coll_norm_x_ij + fce_coll_tang_x_ij;
-    double fce_coll_y_ij = fce_coll_norm_y_ij + fce_coll_tang_y_ij;
-    double fce_coll_z_ij = fce_coll_norm_z_ij + fce_coll_tang_z_ij;
-
-    // calculate collision moment
-    double mom_coll_x_ij = rad_i*(-fce_coll_y_ij*norm_z_ij + fce_coll_z_ij*norm_y_ij);
-    double mom_coll_y_ij = rad_i*(fce_coll_x_ij*norm_z_ij - fce_coll_z_ij*norm_x_ij);
-    double mom_coll_z_ij = rad_i*(-fce_coll_x_ij*norm_y_ij + fce_coll_y_ij*norm_x_ij);
-
-    // calculate unit vector pointing to relative angular velocity
-    // unit vector is zero if relative angular velocity is zero
-    double helpvar_06 = 1./sqrt((angvel_x_i - angvel_x_j)*(angvel_x_i - angvel_x_j) + (angvel_y_i - angvel_y_j)*(angvel_y_i - angvel_y_j) + (angvel_z_i - angvel_z_j)*(angvel_z_i - angvel_z_j));
-    double unit_relangvel_x_ij = (angvel_x_i - angvel_x_j)*helpvar_06;
-    double unit_relangvel_y_ij = (angvel_y_i - angvel_y_j)*helpvar_06;
-    double unit_relangvel_z_ij = (angvel_z_i - angvel_z_j)*helpvar_06;
-    if (angvel_x_i - angvel_x_j == 0. && angvel_y_i - angvel_y_j == 0. && angvel_z_i - angvel_z_j == 0.)
-    {
-        unit_relangvel_x_ij = 0.;
-        unit_relangvel_y_ij = 0.;
-        unit_relangvel_z_ij = 0.;
-    }
-
-    // calculate friction moment
-    double helpvar_07 = friction_coefficient_rolling_mat[type_i][type_j]*rad_i*fce_coll_norm_ij_mag;
-    double mom_fric_x_ij = -unit_relangvel_x_ij*helpvar_07;
-    double mom_fric_y_ij = -unit_relangvel_y_ij*helpvar_07;
-    double mom_fric_z_ij = -unit_relangvel_z_ij*helpvar_07;
+    double force_collision_x_ij = force_collision_normal_x_ij + force_collision_tangent_x_ij;
+    double force_collision_y_ij = force_collision_normal_y_ij + force_collision_tangent_y_ij;
+    double force_collision_z_ij = force_collision_normal_z_ij + force_collision_tangent_z_ij;
 
     // update collision matrix
-    smat_set_value(overlap_tangent_smat.dudt, id_i, id_j, relvel_tang_ij_mag);
+    smat_set_value(overlap_tangent_smat.dudt, id_i, id_j, relvel_tangent_ij_val);
     
-    // add forces and moments
-    sphere_fms.force_sum_x_vec[indx_i] += fce_coll_x_ij;
-    sphere_fms.force_sum_y_vec[indx_i] += fce_coll_y_ij;
-    sphere_fms.force_sum_z_vec[indx_i] += fce_coll_z_ij;
-    sphere_fms.moment_sum_x_vec[indx_i] += mom_coll_x_ij + mom_fric_x_ij;
-    sphere_fms.moment_sum_y_vec[indx_i] += mom_coll_y_ij + mom_fric_y_ij;
-    sphere_fms.moment_sum_z_vec[indx_i] += mom_coll_z_ij + mom_fric_z_ij;
+    // add forces on i
+    sphere_fms.force_sum_x_vec[indx_i] += force_collision_x_ij;
+    sphere_fms.force_sum_y_vec[indx_i] += force_collision_y_ij;
+    sphere_fms.force_sum_z_vec[indx_i] += force_collision_z_ij;
 
     // apply Newton's third law to get forces on j
-    // collision force and friction moment are negated
-    // collion moment remains the same
-    sphere_fms.force_sum_x_vec[indx_j] += -fce_coll_x_ij;
-    sphere_fms.force_sum_y_vec[indx_j] += -fce_coll_y_ij;
-    sphere_fms.force_sum_z_vec[indx_j] += -fce_coll_z_ij;
-    sphere_fms.moment_sum_x_vec[indx_j] += mom_coll_x_ij - mom_fric_x_ij;
-    sphere_fms.moment_sum_y_vec[indx_j] += mom_coll_y_ij - mom_fric_y_ij;
-    sphere_fms.moment_sum_z_vec[indx_j] += mom_coll_z_ij - mom_fric_z_ij;
+    sphere_fms.force_sum_x_vec[indx_j] += (-force_collision_x_ij);
+    sphere_fms.force_sum_y_vec[indx_j] += (-force_collision_y_ij);
+    sphere_fms.force_sum_z_vec[indx_j] += (-force_collision_z_ij);
+
+    // calculate collision moment on i
+    double moment_collision_x_ij = radius_i*(-force_collision_tangent_y_ij*normal_z_ij + force_collision_tangent_z_ij*normal_y_ij);
+    double moment_collision_y_ij = radius_i*( force_collision_tangent_x_ij*normal_z_ij - force_collision_tangent_z_ij*normal_x_ij);
+    double moment_collision_z_ij = radius_i*(-force_collision_tangent_x_ij*normal_y_ij + force_collision_tangent_y_ij*normal_x_ij);
+
+    // calculate collision moment on j
+    // same direction for i and j since both collision force and normal vector switch signs
+    double moment_collision_x_ji = radius_j*(-force_collision_tangent_y_ij*normal_z_ij + force_collision_tangent_z_ij*normal_y_ij);
+    double moment_collision_y_ji = radius_j*( force_collision_tangent_x_ij*normal_z_ij - force_collision_tangent_z_ij*normal_x_ij);
+    double moment_collision_z_ji = radius_j*(-force_collision_tangent_x_ij*normal_y_ij + force_collision_tangent_y_ij*normal_x_ij);
+
+    // calculate relative angular velocities of i and j
+    double relangvel_x_ij = -angvel_x_j + angvel_x_i;
+    double relangvel_y_ij = -angvel_y_j + angvel_y_i;
+    double relangvel_z_ij = -angvel_z_j + angvel_z_i;
+
+    // calculate unit vector pointing to relative angular velocity
+    // unit vector is zero if difference between angular velocities is zero
+    double helpvar_03 = 1./sqrt(relangvel_x_ij*relangvel_x_ij + relangvel_y_ij*relangvel_y_ij + relangvel_z_ij*relangvel_z_ij);
+    double axis_x_ij = relangvel_x_ij*helpvar_03;
+    double axis_y_ij = relangvel_y_ij*helpvar_03;
+    double axis_z_ij = relangvel_z_ij*helpvar_03;
+    if (relangvel_x_ij == 0. && relangvel_y_ij == 0. && relangvel_z_ij == 0.)
+    {
+        axis_x_ij = 0.;
+        axis_y_ij = 0.;
+        axis_z_ij = 0.;
+    }
+
+    // calculate effective radius
+    double radius_effective = radius_i*radius_j/(radius_i + radius_j);
+
+    // calculate magnitude of fricion moment
+    double moment_friction_ij_val = -force_collision_normal_ij_mag*frictioncoefficient_rolling*radius_effective;
+
+    // calculate friction moment on i
+    double moment_friction_x_ij = moment_friction_ij_val*axis_x_ij;
+    double moment_friction_y_ij = moment_friction_ij_val*axis_y_ij;
+    double moment_friction_z_ij = moment_friction_ij_val*axis_z_ij;
+
+    // calculate friction moment on j
+    // axis switches signs
+    double moment_friction_x_ji = -moment_friction_ij_val*axis_x_ij;
+    double moment_friction_y_ji = -moment_friction_ij_val*axis_y_ij;
+    double moment_friction_z_ji = -moment_friction_ij_val*axis_z_ij;
+
+    // add moments on i
+    sphere_fms.moment_sum_x_vec[indx_i] += moment_collision_x_ij + moment_friction_x_ij;
+    sphere_fms.moment_sum_y_vec[indx_i] += moment_collision_y_ij + moment_friction_y_ij;
+    sphere_fms.moment_sum_z_vec[indx_i] += moment_collision_z_ij + moment_friction_z_ij;
+
+    // add moments on j
+    sphere_fms.moment_sum_x_vec[indx_j] += moment_collision_x_ji + moment_friction_x_ji;
+    sphere_fms.moment_sum_y_vec[indx_j] += moment_collision_y_ji + moment_friction_y_ji;
+    sphere_fms.moment_sum_z_vec[indx_j] += moment_collision_z_ji + moment_friction_z_ji;
 
 }
 
