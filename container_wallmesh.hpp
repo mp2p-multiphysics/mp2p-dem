@@ -20,13 +20,13 @@ struct WallMeshPositionVelocityStruct
     double velocity_translate_x = 0.;
     double velocity_translate_y = 0.;
     double velocity_translate_z = 0.;
-    double axis_rotate_p1_x = 0.;
-    double axis_rotate_p1_y = 0.;
-    double axis_rotate_p1_z = 0.;
-    double axis_rotate_p2_x = 0.;
-    double axis_rotate_p2_y = 0.;
-    double axis_rotate_p2_z = 0.;
     double angularvelocity_rotate = 0.;
+    double position_rotateaxis_p1_x = 0.;
+    double position_rotateaxis_p1_y = 0.;
+    double position_rotateaxis_p1_z = 0.;
+    double position_rotateaxis_p2_x = 0.;
+    double position_rotateaxis_p2_y = 0.;
+    double position_rotateaxis_p2_z = 0.;
 
 };
 

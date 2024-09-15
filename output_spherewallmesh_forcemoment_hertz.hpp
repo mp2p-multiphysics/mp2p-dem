@@ -926,12 +926,12 @@ void OutputSphereWallMeshForceMomentHertz<CollisionCheckSphereWallMesh>::calcula
     double angvel_rotate = wallmesh_pvs.angularvelocity_rotate;
 
     // get rotation axis points
-    double pos_rotateaxis_p1_x = wallmesh_pvs.axis_rotate_p1_x;
-    double pos_rotateaxis_p1_y = wallmesh_pvs.axis_rotate_p1_y;
-    double pos_rotateaxis_p1_z = wallmesh_pvs.axis_rotate_p1_z;
-    double pos_rotateaxis_p2_x = wallmesh_pvs.axis_rotate_p2_x;
-    double pos_rotateaxis_p2_y = wallmesh_pvs.axis_rotate_p2_y;
-    double pos_rotateaxis_p2_z = wallmesh_pvs.axis_rotate_p2_z;
+    double pos_rotateaxis_p1_x = wallmesh_pvs.position_rotateaxis_p1_x;
+    double pos_rotateaxis_p1_y = wallmesh_pvs.position_rotateaxis_p1_y;
+    double pos_rotateaxis_p1_z = wallmesh_pvs.position_rotateaxis_p1_z;
+    double pos_rotateaxis_p2_x = wallmesh_pvs.position_rotateaxis_p2_x;
+    double pos_rotateaxis_p2_y = wallmesh_pvs.position_rotateaxis_p2_y;
+    double pos_rotateaxis_p2_z = wallmesh_pvs.position_rotateaxis_p2_z;
 
     // axis of rotation is specified using two points: axis P1 and axis P2
     // calculate vector from axis P1 to axis P2 (labeled A1 and A2)

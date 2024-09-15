@@ -69,81 +69,81 @@ void IntegrateWallMeshEuler::integrate_positionvelocity(WallMeshPositionVelocity
     }
 
     // get rotation axis
-    double axis_rotate_p1_x = wallmesh_pvs.axis_rotate_p1_x;
-    double axis_rotate_p1_y = wallmesh_pvs.axis_rotate_p1_y;
-    double axis_rotate_p1_z = wallmesh_pvs.axis_rotate_p1_z;
-    double axis_rotate_p2_x = wallmesh_pvs.axis_rotate_p2_x;
-    double axis_rotate_p2_y = wallmesh_pvs.axis_rotate_p2_y;
-    double axis_rotate_p2_z = wallmesh_pvs.axis_rotate_p2_z;
+    double pos_rotateaxis_p1_x = wallmesh_pvs.position_rotateaxis_p1_x;
+    double pos_rotateaxis_p1_y = wallmesh_pvs.position_rotateaxis_p1_y;
+    double pos_rotateaxis_p1_z = wallmesh_pvs.position_rotateaxis_p1_z;
+    double pos_rotateaxis_p2_x = wallmesh_pvs.position_rotateaxis_p2_x;
+    double pos_rotateaxis_p2_y = wallmesh_pvs.position_rotateaxis_p2_y;
+    double pos_rotateaxis_p2_z = wallmesh_pvs.position_rotateaxis_p2_z;
 
     // axis of rotation is specified using two points: axis P1 and axis P2
     // calculate axis P2 if axis P1 is moved to the origin
-    double axis_rotate_p2_origin_x = -axis_rotate_p1_x + axis_rotate_p2_x;
-    double axis_rotate_p2_origin_y = -axis_rotate_p1_y + axis_rotate_p2_y;
-    double axis_rotate_p2_origin_z = -axis_rotate_p1_z + axis_rotate_p2_z;
+    double rotateaxis_x = -pos_rotateaxis_p1_x + pos_rotateaxis_p2_x;
+    double rotateaxis_y = -pos_rotateaxis_p1_y + pos_rotateaxis_p2_y;
+    double rotateaxis_z = -pos_rotateaxis_p1_z + pos_rotateaxis_p2_z;
 
     // normalize vector along axis of rotation
-    double helpvar_01 = 1./sqrt(axis_rotate_p2_origin_x*axis_rotate_p2_origin_x + axis_rotate_p2_origin_y*axis_rotate_p2_origin_y + axis_rotate_p2_origin_z*axis_rotate_p2_origin_z);
-    double unit_axis_rotate_x = axis_rotate_p2_origin_x*helpvar_01;
-    double unit_axis_rotate_y = axis_rotate_p2_origin_y*helpvar_01;
-    double unit_axis_rotate_z = axis_rotate_p2_origin_z*helpvar_01;
-    if (axis_rotate_p2_origin_x == 0. && axis_rotate_p2_origin_y == 0. && axis_rotate_p2_origin_z == 0.)
+    double helpvar_01 = 1./sqrt(rotateaxis_x*rotateaxis_x + rotateaxis_y*rotateaxis_y + rotateaxis_z*rotateaxis_z);
+    double unit_rotateaxis_x = rotateaxis_x*helpvar_01;
+    double unit_rotateaxis_y = rotateaxis_y*helpvar_01;
+    double unit_rotateaxis_z = rotateaxis_z*helpvar_01;
+    if (rotateaxis_x == 0. && rotateaxis_y == 0. && rotateaxis_z == 0.)
     {
-        unit_axis_rotate_x = 0.;
-        unit_axis_rotate_y = 0.;
-        unit_axis_rotate_z = 0.;
+        unit_rotateaxis_x = 0.;
+        unit_rotateaxis_y = 0.;
+        unit_rotateaxis_z = 0.;
     }
 
     // calculate differential rotation angle
-    double dangpos_rotate = angvel_rotate*dt;
+    double delta_angpos_rotate = angvel_rotate*dt;
 
     // calculate rotation matrix elements
-    double rotate_xx = unit_axis_rotate_x*unit_axis_rotate_x*(1 - cos(dangpos_rotate)) + cos(dangpos_rotate);
-    double rotate_xy = unit_axis_rotate_x*unit_axis_rotate_y*(1 - cos(dangpos_rotate)) - unit_axis_rotate_z*sin(dangpos_rotate);
-    double rotate_xz = unit_axis_rotate_x*unit_axis_rotate_z*(1 - cos(dangpos_rotate)) + unit_axis_rotate_y*sin(dangpos_rotate);
-    double rotate_yx = unit_axis_rotate_x*unit_axis_rotate_y*(1 - cos(dangpos_rotate)) + unit_axis_rotate_z*sin(dangpos_rotate);
-    double rotate_yy = unit_axis_rotate_y*unit_axis_rotate_y*(1 - cos(dangpos_rotate)) + cos(dangpos_rotate);
-    double rotate_yz = -unit_axis_rotate_x*sin(dangpos_rotate) + unit_axis_rotate_y*unit_axis_rotate_z*(1 - cos(dangpos_rotate));
-    double rotate_zx = unit_axis_rotate_x*unit_axis_rotate_z*(1 - cos(dangpos_rotate)) - unit_axis_rotate_y*sin(dangpos_rotate);
-    double rotate_zy = unit_axis_rotate_x*sin(dangpos_rotate) + unit_axis_rotate_y*unit_axis_rotate_z*(1 - cos(dangpos_rotate));
-    double rotate_zz = unit_axis_rotate_z*unit_axis_rotate_z*(1 - cos(dangpos_rotate)) + cos(dangpos_rotate);
+    double rotate_xx = unit_rotateaxis_x*unit_rotateaxis_x*(1 - cos(delta_angpos_rotate)) + cos(delta_angpos_rotate);
+    double rotate_xy = unit_rotateaxis_x*unit_rotateaxis_y*(1 - cos(delta_angpos_rotate)) - unit_rotateaxis_z*sin(delta_angpos_rotate);
+    double rotate_xz = unit_rotateaxis_x*unit_rotateaxis_z*(1 - cos(delta_angpos_rotate)) + unit_rotateaxis_y*sin(delta_angpos_rotate);
+    double rotate_yx = unit_rotateaxis_x*unit_rotateaxis_y*(1 - cos(delta_angpos_rotate)) + unit_rotateaxis_z*sin(delta_angpos_rotate);
+    double rotate_yy = unit_rotateaxis_y*unit_rotateaxis_y*(1 - cos(delta_angpos_rotate)) + cos(delta_angpos_rotate);
+    double rotate_yz = -unit_rotateaxis_x*sin(delta_angpos_rotate) + unit_rotateaxis_y*unit_rotateaxis_z*(1 - cos(delta_angpos_rotate));
+    double rotate_zx = unit_rotateaxis_x*unit_rotateaxis_z*(1 - cos(delta_angpos_rotate)) - unit_rotateaxis_y*sin(delta_angpos_rotate);
+    double rotate_zy = unit_rotateaxis_x*sin(delta_angpos_rotate) + unit_rotateaxis_y*unit_rotateaxis_z*(1 - cos(delta_angpos_rotate));
+    double rotate_zz = unit_rotateaxis_z*unit_rotateaxis_z*(1 - cos(delta_angpos_rotate)) + cos(delta_angpos_rotate);
 
     // iterate for each mesh triangle
     for (int iter_k = 0; iter_k < wallmesh_pvs.num_mesh; iter_k++)
     {
 
         // calculate triangle points if axis P1 is moved to the origin
-        double pos_p1_origin_x = -axis_rotate_p1_x + wallmesh_pvs.position_p1_x_vec[iter_k];
-        double pos_p1_origin_y = -axis_rotate_p1_y + wallmesh_pvs.position_p1_y_vec[iter_k];
-        double pos_p1_origin_z = -axis_rotate_p1_z + wallmesh_pvs.position_p1_z_vec[iter_k];
-        double pos_p2_origin_x = -axis_rotate_p1_x + wallmesh_pvs.position_p2_x_vec[iter_k];
-        double pos_p2_origin_y = -axis_rotate_p1_y + wallmesh_pvs.position_p2_y_vec[iter_k];
-        double pos_p2_origin_z = -axis_rotate_p1_z + wallmesh_pvs.position_p2_z_vec[iter_k];
-        double pos_p3_origin_x = -axis_rotate_p1_x + wallmesh_pvs.position_p3_x_vec[iter_k];
-        double pos_p3_origin_y = -axis_rotate_p1_y + wallmesh_pvs.position_p3_y_vec[iter_k];
-        double pos_p3_origin_z = -axis_rotate_p1_z + wallmesh_pvs.position_p3_z_vec[iter_k];
+        double delta_pos_p1_origin_x = -pos_rotateaxis_p1_x + wallmesh_pvs.position_p1_x_vec[iter_k];
+        double delta_pos_p1_origin_y = -pos_rotateaxis_p1_y + wallmesh_pvs.position_p1_y_vec[iter_k];
+        double delta_pos_p1_origin_z = -pos_rotateaxis_p1_z + wallmesh_pvs.position_p1_z_vec[iter_k];
+        double delta_pos_p2_origin_x = -pos_rotateaxis_p1_x + wallmesh_pvs.position_p2_x_vec[iter_k];
+        double delta_pos_p2_origin_y = -pos_rotateaxis_p1_y + wallmesh_pvs.position_p2_y_vec[iter_k];
+        double delta_pos_p2_origin_z = -pos_rotateaxis_p1_z + wallmesh_pvs.position_p2_z_vec[iter_k];
+        double delta_pos_p3_origin_x = -pos_rotateaxis_p1_x + wallmesh_pvs.position_p3_x_vec[iter_k];
+        double delta_pos_p3_origin_y = -pos_rotateaxis_p1_y + wallmesh_pvs.position_p3_y_vec[iter_k];
+        double delta_pos_p3_origin_z = -pos_rotateaxis_p1_z + wallmesh_pvs.position_p3_z_vec[iter_k];
 
         // rotate the point around the axis of rotation
-        double pos_rotate_p1_origin_x = pos_p1_origin_x*rotate_xx + pos_p1_origin_y*rotate_xy + pos_p1_origin_z*rotate_xz;
-        double pos_rotate_p1_origin_y = pos_p1_origin_x*rotate_yx + pos_p1_origin_y*rotate_yy + pos_p1_origin_z*rotate_yz;
-        double pos_rotate_p1_origin_z = pos_p1_origin_x*rotate_zx + pos_p1_origin_y*rotate_zy + pos_p1_origin_z*rotate_zz;
-        double pos_rotate_p2_origin_x = pos_p2_origin_x*rotate_xx + pos_p2_origin_y*rotate_xy + pos_p2_origin_z*rotate_xz;
-        double pos_rotate_p2_origin_y = pos_p2_origin_x*rotate_yx + pos_p2_origin_y*rotate_yy + pos_p2_origin_z*rotate_yz;
-        double pos_rotate_p2_origin_z = pos_p2_origin_x*rotate_zx + pos_p2_origin_y*rotate_zy + pos_p2_origin_z*rotate_zz;
-        double pos_rotate_p3_origin_x = pos_p3_origin_x*rotate_xx + pos_p3_origin_y*rotate_xy + pos_p3_origin_z*rotate_xz;
-        double pos_rotate_p3_origin_y = pos_p3_origin_x*rotate_yx + pos_p3_origin_y*rotate_yy + pos_p3_origin_z*rotate_yz;
-        double pos_rotate_p3_origin_z = pos_p3_origin_x*rotate_zx + pos_p3_origin_y*rotate_zy + pos_p3_origin_z*rotate_zz;
+        double delta_pos_p1_origin_x_rotate = delta_pos_p1_origin_x*rotate_xx + delta_pos_p1_origin_y*rotate_xy + delta_pos_p1_origin_z*rotate_xz;
+        double delta_pos_p1_origin_y_rotate = delta_pos_p1_origin_x*rotate_yx + delta_pos_p1_origin_y*rotate_yy + delta_pos_p1_origin_z*rotate_yz;
+        double delta_pos_p1_origin_z_rotate = delta_pos_p1_origin_x*rotate_zx + delta_pos_p1_origin_y*rotate_zy + delta_pos_p1_origin_z*rotate_zz;
+        double delta_pos_p2_origin_x_rotate = delta_pos_p2_origin_x*rotate_xx + delta_pos_p2_origin_y*rotate_xy + delta_pos_p2_origin_z*rotate_xz;
+        double delta_pos_p2_origin_y_rotate = delta_pos_p2_origin_x*rotate_yx + delta_pos_p2_origin_y*rotate_yy + delta_pos_p2_origin_z*rotate_yz;
+        double delta_pos_p2_origin_z_rotate = delta_pos_p2_origin_x*rotate_zx + delta_pos_p2_origin_y*rotate_zy + delta_pos_p2_origin_z*rotate_zz;
+        double delta_pos_p3_origin_x_rotate = delta_pos_p3_origin_x*rotate_xx + delta_pos_p3_origin_y*rotate_xy + delta_pos_p3_origin_z*rotate_xz;
+        double delta_pos_p3_origin_y_rotate = delta_pos_p3_origin_x*rotate_yx + delta_pos_p3_origin_y*rotate_yy + delta_pos_p3_origin_z*rotate_yz;
+        double delta_pos_p3_origin_z_rotate = delta_pos_p3_origin_x*rotate_zx + delta_pos_p3_origin_y*rotate_zy + delta_pos_p3_origin_z*rotate_zz;
 
         // undo the translation of axis P1
-        wallmesh_pvs.position_p1_x_vec[iter_k] = axis_rotate_p1_x + pos_rotate_p1_origin_x;
-        wallmesh_pvs.position_p1_y_vec[iter_k] = axis_rotate_p1_y + pos_rotate_p1_origin_y;
-        wallmesh_pvs.position_p1_z_vec[iter_k] = axis_rotate_p1_z + pos_rotate_p1_origin_z;
-        wallmesh_pvs.position_p2_x_vec[iter_k] = axis_rotate_p1_x + pos_rotate_p2_origin_x;
-        wallmesh_pvs.position_p2_y_vec[iter_k] = axis_rotate_p1_y + pos_rotate_p2_origin_y;
-        wallmesh_pvs.position_p2_z_vec[iter_k] = axis_rotate_p1_z + pos_rotate_p2_origin_z;
-        wallmesh_pvs.position_p3_x_vec[iter_k] = axis_rotate_p1_x + pos_rotate_p3_origin_x;
-        wallmesh_pvs.position_p3_y_vec[iter_k] = axis_rotate_p1_y + pos_rotate_p3_origin_y;
-        wallmesh_pvs.position_p3_z_vec[iter_k] = axis_rotate_p1_z + pos_rotate_p3_origin_z;
+        wallmesh_pvs.position_p1_x_vec[iter_k] = pos_rotateaxis_p1_x + delta_pos_p1_origin_x_rotate;
+        wallmesh_pvs.position_p1_y_vec[iter_k] = pos_rotateaxis_p1_y + delta_pos_p1_origin_y_rotate;
+        wallmesh_pvs.position_p1_z_vec[iter_k] = pos_rotateaxis_p1_z + delta_pos_p1_origin_z_rotate;
+        wallmesh_pvs.position_p2_x_vec[iter_k] = pos_rotateaxis_p1_x + delta_pos_p2_origin_x_rotate;
+        wallmesh_pvs.position_p2_y_vec[iter_k] = pos_rotateaxis_p1_y + delta_pos_p2_origin_y_rotate;
+        wallmesh_pvs.position_p2_z_vec[iter_k] = pos_rotateaxis_p1_z + delta_pos_p2_origin_z_rotate;
+        wallmesh_pvs.position_p3_x_vec[iter_k] = pos_rotateaxis_p1_x + delta_pos_p3_origin_x_rotate;
+        wallmesh_pvs.position_p3_y_vec[iter_k] = pos_rotateaxis_p1_y + delta_pos_p3_origin_y_rotate;
+        wallmesh_pvs.position_p3_z_vec[iter_k] = pos_rotateaxis_p1_z + delta_pos_p3_origin_z_rotate;
 
     }
 

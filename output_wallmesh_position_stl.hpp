@@ -74,18 +74,18 @@ void OutputWallMeshPositionSTL::output_position(WallMeshPositionVelocityStruct &
         double pos_p3_z_k = wallmesh_pvs.position_p3_z_vec[indx_k];
 
         // calculate vector facing the "front" of the triangle
-        double frnt_x_ki = (pos_p1_y_k - pos_p2_y_k)*(pos_p1_z_k - pos_p3_z_k) - (pos_p1_y_k - pos_p3_y_k)*(pos_p1_z_k - pos_p2_z_k);
-        double frnt_y_ki = -(pos_p1_x_k - pos_p2_x_k)*(pos_p1_z_k - pos_p3_z_k) + (pos_p1_x_k - pos_p3_x_k)*(pos_p1_z_k - pos_p2_z_k);
-        double frnt_z_ki = (pos_p1_x_k - pos_p2_x_k)*(pos_p1_y_k - pos_p3_y_k) - (pos_p1_x_k - pos_p3_x_k)*(pos_p1_y_k - pos_p2_y_k);
+        double front_x_ki =  (pos_p1_y_k - pos_p2_y_k)*(pos_p1_z_k - pos_p3_z_k) - (pos_p1_y_k - pos_p3_y_k)*(pos_p1_z_k - pos_p2_z_k);
+        double front_y_ki = -(pos_p1_x_k - pos_p2_x_k)*(pos_p1_z_k - pos_p3_z_k) + (pos_p1_x_k - pos_p3_x_k)*(pos_p1_z_k - pos_p2_z_k);
+        double front_z_ki =  (pos_p1_x_k - pos_p2_x_k)*(pos_p1_y_k - pos_p3_y_k) - (pos_p1_x_k - pos_p3_x_k)*(pos_p1_y_k - pos_p2_y_k);
 
         // calculate front facing normal vector
-        double helpvar_01 = 1./sqrt(frnt_x_ki*frnt_x_ki + frnt_y_ki*frnt_y_ki + frnt_z_ki*frnt_z_ki);
-        double norm_frnt_x_ki = frnt_x_ki*helpvar_01;
-        double norm_frnt_y_ki = frnt_y_ki*helpvar_01;
-        double norm_frnt_z_ki = frnt_z_ki*helpvar_01;
+        double helpvar_01 = 1./sqrt(front_x_ki*front_x_ki + front_y_ki*front_y_ki + front_z_ki*front_z_ki);
+        double norm_front_x_ki = front_x_ki*helpvar_01;
+        double norm_front_y_ki = front_y_ki*helpvar_01;
+        double norm_front_z_ki = front_z_ki*helpvar_01;
 
         // write lines in file
-        file_out_stream << "facet normal " << norm_frnt_x_ki << " " << norm_frnt_y_ki  << " " << norm_frnt_z_ki << "\n";
+        file_out_stream << "facet normal " << norm_front_x_ki << " " << norm_front_y_ki  << " " << norm_front_z_ki << "\n";
         file_out_stream << "  outer loop\n";
         file_out_stream << "    vertex " << pos_p1_x_k << " " << pos_p1_y_k << " " << pos_p1_z_k << "\n";
         file_out_stream << "    vertex " << pos_p2_x_k << " " << pos_p2_y_k << " " << pos_p2_z_k << "\n";

@@ -9,14 +9,14 @@ class DeleteSphereOutsideBox
     public:
 
     // lower point
-    double boundary_min_x = 0.;
-    double boundary_min_y = 0.;
-    double boundary_min_z = 0.;
+    double box_min_x = 0.;
+    double box_min_y = 0.;
+    double box_min_z = 0.;
 
     // upper point
-    double boundary_max_x = 0.;
-    double boundary_max_y = 0.;
-    double boundary_max_z = 0.;
+    double box_max_x = 0.;
+    double box_max_y = 0.;
+    double box_max_z = 0.;
 
     // functions
     void delete_sphere(SpherePositionVelocityStruct &sphere_pvs);
@@ -28,18 +28,22 @@ class DeleteSphereOutsideBox
     }
 
     // constructor
-    DeleteSphereOutsideBox(double boundary_min_x_in, double boundary_min_y_in, double boundary_min_z_in, double boundary_max_x_in, double boundary_max_y_in, double boundary_max_z_in)
+    DeleteSphereOutsideBox
+    (
+        double box_min_x_in, double box_min_y_in, double box_min_z_in,
+        double box_max_x_in, double box_max_y_in, double box_max_z_in
+    )
     {
         
         // coordinates of lower point
-        boundary_min_x = boundary_min_x_in;
-        boundary_min_y = boundary_min_y_in;
-        boundary_min_z = boundary_min_z_in;
+        box_min_x = box_min_x_in;
+        box_min_y = box_min_y_in;
+        box_min_z = box_min_z_in;
 
         // coordinates of upper point
-        boundary_max_x = boundary_max_x_in;
-        boundary_max_y = boundary_max_y_in;
-        boundary_max_z = boundary_max_z_in;        
+        box_max_x = box_max_x_in;
+        box_max_y = box_max_y_in;
+        box_max_z = box_max_z_in;        
 
     }
     
@@ -59,9 +63,9 @@ void DeleteSphereOutsideBox::delete_sphere(SpherePositionVelocityStruct &sphere_
 
         // skip if within bounding box
         if (
-            pos_x_i >= boundary_min_x && pos_x_i <= boundary_max_x &&
-            pos_y_i >= boundary_min_y && pos_y_i <= boundary_max_y &&
-            pos_z_i >= boundary_min_z && pos_z_i <= boundary_max_z
+            pos_x_i >= box_min_x && pos_x_i <= box_max_x &&
+            pos_y_i >= box_min_y && pos_y_i <= box_max_y &&
+            pos_z_i >= box_min_z && pos_z_i <= box_max_z
         )
         {
             continue;
