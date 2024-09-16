@@ -30,4 +30,30 @@ struct WallMeshPositionVelocityStruct
 
 };
 
+void wallmesh_set_velocity_translate(
+    WallMeshPositionVelocityStruct &wallmesh_pvs,
+    double velocity_translate_x, double velocity_translate_y, double velocity_translate_z
+)
+{
+    wallmesh_pvs.velocity_translate_x = velocity_translate_x;
+    wallmesh_pvs.velocity_translate_y = velocity_translate_y;
+    wallmesh_pvs.velocity_translate_z = velocity_translate_z;
+}
+
+void wallmesh_set_angularvelocity_rotate(
+    WallMeshPositionVelocityStruct &wallmesh_pvs,
+    double angularvelocity_rotate,
+    double position_rotateaxis_p1_x, double position_rotateaxis_p1_y, double position_rotateaxis_p1_z,
+    double position_rotateaxis_p2_x, double position_rotateaxis_p2_y, double position_rotateaxis_p2_z
+)
+{
+    wallmesh_pvs.angularvelocity_rotate = angularvelocity_rotate;
+    wallmesh_pvs.position_rotateaxis_p1_x = position_rotateaxis_p1_x;
+    wallmesh_pvs.position_rotateaxis_p1_y = position_rotateaxis_p1_y;
+    wallmesh_pvs.position_rotateaxis_p1_z = position_rotateaxis_p1_z;
+    wallmesh_pvs.position_rotateaxis_p2_x = position_rotateaxis_p2_x;
+    wallmesh_pvs.position_rotateaxis_p2_y = position_rotateaxis_p2_y;
+    wallmesh_pvs.position_rotateaxis_p2_z = position_rotateaxis_p2_z;
+}
+
 #endif

@@ -1,55 +1,57 @@
-#ifndef BOUNDARY_DOMAIN
-#define BOUNDARY_DOMAIN
+#ifndef DELETE_SPHERE_CYLINDERX_INSIDE
+#define DELETE_SPHERE_CYLINDERX_INSIDE
 #include <vector>
 #include "container_sphere.hpp"
 
-class DeleteSphereOutsideBox
+class DeleteSphereCylinderxInside
 {
 
     public:
 
-    // lower point
-    double box_min_x = 0.;
-    double box_min_y = 0.;
-    double box_min_z = 0.;
+    // particle radius
+    VectorDouble radius_vec;
 
-    // upper point
-    double box_max_x = 0.;
-    double box_max_y = 0.;
-    double box_max_z = 0.;
+    // geometry
+    double cylinder_center_y = 0.;
+    double cylinder_center_z = 0.;
+    double cylinder_min_x = 0.;
+    double cylinder_max_x = 0.;
+    double cylinder_radius = 0.;
 
     // functions
     void delete_sphere(SpherePositionVelocityStruct &sphere_pvs);
 
     // default constructor
-    DeleteSphereOutsideBox()
+    DeleteSphereCylinderxInside()
     {
 
     }
 
     // constructor
-    DeleteSphereOutsideBox
+    DeleteSphereCylinderxInside
     (
-        double box_min_x_in, double box_min_y_in, double box_min_z_in,
-        double box_max_x_in, double box_max_y_in, double box_max_z_in
+        VectorDouble radius_vec_in,
+        double cylinder_center_y_in, double cylinder_center_z_in,
+        double cylinder_min_x_in, double cylinder_max_x_in,
+        double cylinder_radius_in
     )
     {
         
-        // coordinates of lower point
-        box_min_x = box_min_x_in;
-        box_min_y = box_min_y_in;
-        box_min_z = box_min_z_in;
+        // particle radius
+        radius_vec = radius_vec_in;
 
-        // coordinates of upper point
-        box_max_x = box_max_x_in;
-        box_max_y = box_max_y_in;
-        box_max_z = box_max_z_in;        
+        // geometry
+        cylinder_center_y = cylinder_center_y_in;
+        cylinder_center_z = cylinder_center_z_in;
+        cylinder_min_x = cylinder_min_x_in;
+        cylinder_max_x = cylinder_max_x_in;
+        cylinder_radius = cylinder_radius_in;
 
     }
     
 };
 
-void DeleteSphereOutsideBox::delete_sphere(SpherePositionVelocityStruct &sphere_pvs)
+void DeleteSphereCylinderxInside::delete_sphere(SpherePositionVelocityStruct &sphere_pvs)
 {
 
     // delete particles outside of simulation box
@@ -61,17 +63,26 @@ void DeleteSphereOutsideBox::delete_sphere(SpherePositionVelocityStruct &sphere_
         double pos_y_i = sphere_pvs.position_y_vec[iter_i];
         double pos_z_i = sphere_pvs.position_z_vec[iter_i];
 
-        // skip if within bounding box
+        // get radius of particles
+        int type_i = sphere_pvs.type_vec[iter_i];
+        double radius_i = radius_vec[type_i];
+
+        // calculate distance of particle from axis
+        double delta_pos_center_axis_y = pos_y_i - cylinder_center_y;
+        double delta_pos_center_axis_z = pos_z_i - cylinder_center_z;        
+        double dist_center_axis = sqrt(delta_pos_center_axis_y*delta_pos_center_axis_y + delta_pos_center_axis_z*delta_pos_center_axis_z);
+
+        // skip if outside cylinder
         if (
-            pos_x_i >= box_min_x && pos_x_i <= box_max_x &&
-            pos_y_i >= box_min_y && pos_y_i <= box_max_y &&
-            pos_z_i >= box_min_z && pos_z_i <= box_max_z
+            dist_center_axis - radius_i >= cylinder_radius ||
+            pos_x_i + radius_i <= cylinder_min_x ||
+            pos_x_i - radius_i >= cylinder_max_x
         )
         {
             continue;
         }
 
-        // delete particle if outside of bounding box
+        // delete particle if outside of cylinder
         sphere_pvs.id_vec.erase(sphere_pvs.id_vec.begin() + iter_i);
         sphere_pvs.type_vec.erase(sphere_pvs.type_vec.begin() + iter_i);
         sphere_pvs.position_x_vec.erase(sphere_pvs.position_x_vec.begin() + iter_i);

@@ -7,7 +7,6 @@
 #include "collisioncheck_spheresphere_sweep_1dx.hpp"
 #include "collisioncheck_spheresphere_sweep_1dy.hpp"
 #include "collisioncheck_spheresphere_sweep_1dz.hpp"
-#include "container_function.hpp"
 #include "container_smat_integrable.hpp"
 #include "container_sphere.hpp"
 #include "container_typedef.hpp"
