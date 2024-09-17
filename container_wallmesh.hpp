@@ -6,6 +6,8 @@ struct WallMeshPositionVelocityStruct
 {
  
     int num_mesh = 0;
+    int num_mesh_historical_max = 0;
+
     std::vector<int> id_vec;
     std::vector<int> type_vec;
     std::vector<double> position_p1_x_vec;
@@ -17,6 +19,7 @@ struct WallMeshPositionVelocityStruct
     std::vector<double> position_p3_x_vec;
     std::vector<double> position_p3_y_vec;
     std::vector<double> position_p3_z_vec;
+
     double velocity_translate_x = 0.;
     double velocity_translate_y = 0.;
     double velocity_translate_z = 0.;

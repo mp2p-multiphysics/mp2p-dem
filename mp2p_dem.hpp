@@ -16,6 +16,7 @@
 #include "delete_sphere_cylinderx_inside.hpp"
 #include "delete_sphere_cylindery_inside.hpp"
 #include "delete_sphere_cylinderz_inside.hpp"
+#include "delete_wallmesh.hpp"
 #include "force_sphere_constant.hpp"
 #include "forcemoment_spheresphere_hertz.hpp"
 #include "forcemoment_spherewallmesh_hertz.hpp"

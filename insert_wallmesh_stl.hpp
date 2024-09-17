@@ -61,6 +61,7 @@ void InsertWallMeshSTL::insert_wallmesh(WallMeshPositionVelocityStruct &wallmesh
         if (line_num % 7 == 3)
         {
             wallmesh_pvs.num_mesh++;  // increment number of triangles
+            wallmesh_pvs.num_mesh_historical_max++;  // increment historical max of number of triangles
             wallmesh_pvs.id_vec.push_back(line_num/7);  // store ID of triangle
             wallmesh_pvs.type_vec.push_back(type_int);  // store type of material
         }
