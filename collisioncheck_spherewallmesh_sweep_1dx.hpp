@@ -117,7 +117,7 @@ VectorPairInt CollisionCheckSphereWallMeshSweep1Dx::broad_search(SpherePositionV
     VectorPairIntDouble bound_id_pos_x_vec;
 
     // reset vector if particle count changed
-    if (sphere_pvs.num_particle != num_particle_old || sphere_pvs.num_particle_historical_max != num_particle_historical_max_old)
+    if (sphere_pvs.num_particle != num_particle_old || sphere_pvs.num_particle_historical_max != num_particle_historical_max_old || sphere_pvs.num_particle_historical_max == 0)
     {
 
         // redo particle IDs

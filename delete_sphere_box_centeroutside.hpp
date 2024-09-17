@@ -8,12 +8,10 @@ class DeleteSphereBoxCenterOutside
 
     public:
 
-    // lower point
+    // geometry
     double box_min_x = 0.;
     double box_min_y = 0.;
     double box_min_z = 0.;
-
-    // upper point
     double box_max_x = 0.;
     double box_max_y = 0.;
     double box_max_z = 0.;
@@ -35,12 +33,10 @@ class DeleteSphereBoxCenterOutside
     )
     {
         
-        // coordinates of lower point
+        // geometry
         box_min_x = box_min_x_in;
         box_min_y = box_min_y_in;
         box_min_z = box_min_z_in;
-
-        // coordinates of upper point
         box_max_x = box_max_x_in;
         box_max_y = box_max_y_in;
         box_max_z = box_max_z_in;        

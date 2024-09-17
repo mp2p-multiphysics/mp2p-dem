@@ -21,6 +21,7 @@
 #include "forcemoment_spherewallmesh_hertz.hpp"
 #include "initialize_sphere_positionvelocity_csv.hpp"
 #include "initialize_wallmesh_position_stl.hpp"
+#include "insert_sphere_box_inside_number.hpp"
 #include "insert_sphere_csv.hpp"
 #include "integrate_sparsematrix_euler.hpp"
 #include "integrate_sphere_modifiedeuler.hpp"
