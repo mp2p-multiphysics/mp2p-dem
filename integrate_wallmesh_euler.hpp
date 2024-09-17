@@ -6,6 +6,22 @@
 
 class IntegrateWallMeshEuler
 {
+    /*
+
+    Calculates the position of a wall based on the velocity.
+    Uses the Euler method.
+
+    Variables
+    =========
+    dt_in : double
+        Length of time step.
+
+    Functions
+    =========
+    integrate_positionvelocity : void
+        Calculates the position of a wall based on the velocity.
+
+    */
 
     public:
 
@@ -32,6 +48,20 @@ class IntegrateWallMeshEuler
 
 void IntegrateWallMeshEuler::integrate_positionvelocity(WallMeshPositionVelocityStruct &wallmesh_pvs)
 {
+    /*
+
+    Calculates the position of a wall based on the velocity.
+
+    Arguments
+    =========
+    wallmesh_pvs : WallMeshPositionVelocityStruct
+        struct with position and velocity of mesh triangles in a wall.
+
+    Returns
+    =======
+    (none)
+
+    */
 
     // get wall velocities
     double vel_translate_x = wallmesh_pvs.velocity_translate_x;

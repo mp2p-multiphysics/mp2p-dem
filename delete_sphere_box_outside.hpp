@@ -5,6 +5,38 @@
 
 class DeleteSphereBoxOutside
 {
+    /*
+
+    Deletes spheres outside a box-shaped region.
+
+    Variables
+    =========
+    radius_vec_in : VectorDouble
+        vector with the radius of each type of sphere.
+    box_min_x_in : double
+        Lower x-coordinate of the box.
+    box_min_y_in : double
+        Lower y-coordinate of the box.
+    box_min_z_in : double
+        Lower z-coordinate of the box.
+    box_max_x_in : double
+        Upper x-coordinate of the box.
+    box_max_y_in : double
+        Upper y-coordinate of the box.
+    box_max_z_in : double
+        Upper z-coordinate of the box.
+
+    Functions
+    =========
+    delete_sphere : void
+        Deletes spheres from the simulation.
+
+    Notes
+    =====
+    This class deletes spheres that are partially or fully outside the box.
+    Deletion occurs even if the center of the sphere is not outside the box.
+
+    */
 
     public:
 
@@ -54,6 +86,20 @@ class DeleteSphereBoxOutside
 
 void DeleteSphereBoxOutside::delete_sphere(SpherePositionVelocityStruct &sphere_pvs)
 {
+    /*
+
+    Deletes spheres from the simulation.
+
+    Arguments
+    =========
+    sphere_pvs : SpherePositionVelocityStruct
+        struct with position and velocity of each sphere.
+
+    Returns
+    =======
+    (none)
+
+    */
 
     // delete particles outside of simulation box
     for (int iter_i = 0; iter_i < sphere_pvs.num_particle; iter_i++)

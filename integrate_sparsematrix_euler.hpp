@@ -6,6 +6,22 @@
 
 class IntegrateSparseMatrixEuler
 {
+    /*
+
+    Integrates the values in a sparse matrix.
+    Uses the Euler method.
+
+    Variables
+    =========
+    dt_in : double
+        Length of time step.
+
+    Functions
+    =========
+    integrate_u : void
+        Integrates the values in a sparse matrix.
+
+    */
 
     public:
 
@@ -37,6 +53,21 @@ void IntegrateSparseMatrixEuler::integrate_u
     SparseMatrixIntegrable &smat  
 )
 {
+    /*
+
+    Integrates the values in a sparse matrix.
+    Uses the Euler method.
+
+    Arguments
+    =========
+    smat : SparseMatrixIntegrable
+        Sparse matrix to be integrated.
+
+    Returns
+    =======
+    (none)
+
+    */
 
     // update sparse matrix
     for (auto &overlap_pair : smat.dudt)

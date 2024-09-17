@@ -7,6 +7,25 @@
 
 class OutputSphereForceMomentCSV
 {
+    /*
+
+    Outputs the net force and moment acting on each sphere to a CSV.
+
+    Variables
+    =========
+    file_out_base_str_in : string
+        Base file name of the output files.
+
+    Functions
+    =========
+    output_forcemoment : void
+        Outputs the net force and moment acting on each sphere to a CSV.
+
+    Notes
+    =====
+    The base file name should contain an asterisk '*', which will be replaced with the time step.
+
+    */
 
     public:
 
@@ -45,6 +64,24 @@ class OutputSphereForceMomentCSV
 
 void OutputSphereForceMomentCSV::output_forcemoment(SpherePositionVelocityStruct &sphere_pvs, SphereForceMomentStruct &sphere_fms, int ts)
 {
+    /*
+
+    Outputs the net force and moment acting on each sphere to a CSV file.
+
+    Arguments
+    =========
+    sphere_pvs : SpherePositionVelocityStruct
+        struct with position and velocity of each sphere.
+    sphere_fms : SpherePositionVelocityStruct
+        struct with forces and moments on each sphere.
+    ts : int
+        nth timestep in the simulation.
+
+    Returns
+    =======
+    (none)
+
+    */
 
     // create output filename
     // replace '*' with timestep

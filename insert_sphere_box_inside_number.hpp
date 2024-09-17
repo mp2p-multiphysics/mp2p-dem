@@ -8,6 +8,47 @@
 
 class InsertSphereBoxInsideNumber
 {
+    /*
+
+    Inserts spheres inside a box-shaped region.
+
+    Variables
+    =========
+    radius_vec_in : VectorDouble
+        vector with the radius of each type of sphere.
+    number_fraction_vec_in : VectorDouble
+        vector with the fraction (by number) of each type of sphere to be generated.
+    box_min_x_in : double
+        Lower x-coordinate of the box.
+    box_min_y_in : double
+        Lower y-coordinate of the box.
+    box_min_z_in : double
+        Lower z-coordinate of the box.
+    box_max_x_in : double
+        Upper x-coordinate of the box.
+    box_max_y_in : double
+        Upper y-coordinate of the box.
+    box_max_z_in : double
+        Upper z-coordinate of the box.
+    num_insert_sphere_in : int
+        Total number of spheres to be inserted.
+    num_insert_instance_in : int
+        Number of times that spheres will be inserted.
+    num_max_insert_attempt_in : int
+        Maximum number of attempts that will be done to insert particles in the box.
+    seed_in : int
+        Seed for random number generation.
+
+    Functions
+    =========
+    insert_sphere : void
+        Inserts spheres into the simulation.
+
+    Notes
+    =====
+    This class inserts spheres that are fully inside the box.
+
+    */
 
     public:
 
@@ -87,6 +128,20 @@ class InsertSphereBoxInsideNumber
 
 void InsertSphereBoxInsideNumber::insert_sphere(SpherePositionVelocityStruct &sphere_pvs)
 {
+    /*
+
+    Inserts spheres into the simulation.
+
+    Arguments
+    =========
+    sphere_pvs : SpherePositionVelocityStruct
+        struct with position and velocity of each sphere.
+
+    Returns
+    =======
+    (none)
+
+    */
 
     // seed random number generator if first instance
     if (is_first_insertion)

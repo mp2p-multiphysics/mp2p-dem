@@ -14,6 +14,34 @@
 template <class CollisionCheckSphereSphere>
 class ForceMomentSphereSphereHertz
 {
+    /*
+
+    Calculates collision forces and moments between spheres.
+    Uses the Hertzian (spring-dashpot) model to calculate collision forces.
+
+    Variables
+    =========
+    radius_vec_in : VectorDouble
+        vector with the radius of each type of sphere.
+    springconstant_normal_mat_in : MatrixDouble
+        Matrix (nested vector) with the normal spring constant of each type of sphere-sphere interaction.
+    springconstant_tangent_mat_in : MatrixDouble
+        Matrix with the tangential spring constant of each type of sphere-sphere interaction.
+    dampingcoefficient_normal_mat_in : MatrixDouble
+        Matrix with the normal damping coefficient of each type of sphere-sphere interaction.
+    dampingcoefficient_tangent_mat_in : MatrixDouble
+        Matrix with the tangential damping coefficient of each type of sphere-sphere interaction.
+    frictioncoefficient_sliding_mat_in : MatrixDouble
+        Matrix with the sliding friction coefficient of each type of sphere-sphere interaction.
+    frictioncoefficient_rolling_mat_in : MatrixDouble
+        Matrix with the rolling friction coefficient of each type of sphere-sphere interaction.
+
+    Functions
+    =========
+    add_forcemoment : void
+        Adds forces and moments to spheres in the simulation.
+
+    */
 
     public:
 
@@ -87,6 +115,24 @@ void ForceMomentSphereSphereHertz<CollisionCheckSphereSphere>::add_forcemoment(
     SpherePositionVelocityStruct &sphere_pvs
 )
 {
+    /*
+
+    Adds forces and moments to spheres in the simulation.
+
+    Arguments
+    =========
+    sphere_fms : SphereForceMomentStruct
+        struct with forces and moments on each sphere.
+    overlap_tangent_mat : SparseMatrixIntegrable
+        Sparse matrix with tangential overlaps between colliding spheres.
+    sphere_pvs : SphereParticleVelocityStruct
+        struct with position and velocity of each sphere.      
+
+    Returns
+    =======
+    (none)
+
+    */
 
     // generate preliminary list of collision pairs
     VectorPairInt collision_vec = collision_check.broad_search(sphere_pvs);
@@ -114,6 +160,11 @@ void ForceMomentSphereSphereHertz<CollisionCheckSphereSphere>::calculate_forcemo
     int indx_i, int indx_j
 )
 {
+    /*
+
+    Calculates forces and moments of colliding spheres.
+
+    */
 
     // get particle id
     int id_i = sphere_pvs.id_vec[indx_i];

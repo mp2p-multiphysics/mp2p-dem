@@ -7,6 +7,25 @@
 
 class OutputWallMeshPositionSTL
 {
+    /*
+
+    Outputs the position of the wall to a STL file.
+
+    Variables
+    =========
+    file_out_base_str_in : string
+        Base file name of the output files.
+
+    Functions
+    =========
+    output_positionvelocity : void
+        Outputs the position of the wall to a STL file.
+
+    Notes
+    =====
+    The base file name should contain an asterisk '*', which will be replaced with the time step.
+
+    */
 
     public:
 
@@ -45,6 +64,22 @@ class OutputWallMeshPositionSTL
 
 void OutputWallMeshPositionSTL::output_position(WallMeshPositionVelocityStruct &wallmesh_pvs, int ts)
 {
+    /*
+
+    Outputs the position of the wall to a STL file.
+
+    Arguments
+    =========
+    wallmesh_pvs : WallMeshPositionVelocityStruct
+        struct with position and velocity of mesh triangles in a wall.
+    ts : int
+        nth timestep in the simulation.
+
+    Returns
+    =======
+    (none)
+
+    */
 
     // create output filename
     // replace '*' with timestep

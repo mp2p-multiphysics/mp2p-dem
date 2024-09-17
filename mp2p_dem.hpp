@@ -1,3 +1,16 @@
+/*
+####################################################
+####################################################
+###   __  __ ____ ____  ____                     ###
+###  |  \/  |  _ \___ \|  _ \     Multi-purpose  ###
+###  | |\/| | |_) |__) | |_) |    Multiphysics   ###
+###  | |  | |  __// __/|  __/     Program        ###
+###  |_|  |_|_|  |_____|_|        (DEM Headers)  ###
+###                                              ###
+####################################################
+####################################################
+*/
+
 #include "collisioncheck_spheresphere_naive.hpp"
 #include "collisioncheck_spheresphere_sweep_1dx.hpp"
 #include "collisioncheck_spheresphere_sweep_1dy.hpp"
@@ -24,7 +37,7 @@
 #include "insert_sphere_csv.hpp"
 #include "insert_wallmesh_stl.hpp"
 #include "integrate_sparsematrix_euler.hpp"
-#include "integrate_sphere_modifiedeuler.hpp"
+#include "integrate_sphere_semiimpliciteuler.hpp"
 #include "integrate_wallmesh_euler.hpp"
 #include "output_sphere_forcemoment_csv.hpp"
 #include "output_sphere_positionvelocity_csv.hpp"

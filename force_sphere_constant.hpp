@@ -5,6 +5,25 @@
 
 class ForceSphereConstant
 {
+    /*
+
+    Applies a constant force on each sphere.
+
+    Variables
+    =========
+    force_x_in : double
+        x-component of the force.
+    force_y_in : double
+        y-component of the force.
+    force_z_in : double
+        z-component of the force.
+
+    Functions
+    =========
+    add_force : void
+        Adds forces to spheres in the simulation.
+
+    */
 
     public:
 
@@ -34,6 +53,20 @@ class ForceSphereConstant
 
 void ForceSphereConstant::add_force(SphereForceMomentStruct &sphere_fms)
 {
+    /*
+
+    Adds forces to spheres in the simulation.
+
+    Arguments
+    =========
+    sphere_fms : SphereForceMomentStruct
+        struct with forces and moments on each sphere.
+
+    Returns
+    =======
+    (none)
+
+    */
 
     // add forces
     for (int indx_i = 0; indx_i < sphere_fms.num_particle; indx_i++)

@@ -7,6 +7,41 @@
 
 class InsertSphereCSV
 {
+    /*
+
+    Inserts spheres following positions and velocities indicated by a CSV file.
+
+    Variables
+    =========
+    file_in_str_in : string
+        File name of the CSV file.
+    scale_length_in : double
+        Factor by which the length dimension is scaled.
+
+    Functions
+    =========
+    insert_sphere : void
+        Inserts spheres into the simulation.
+
+    Notes
+    =====
+    The columns in the CSV file must be arranged in the following order:
+        ID
+        type
+        x-component of position
+        y-component of position
+        z-component of position
+        x-component of velocity
+        y-component of velocity
+        z-component of velocity
+        x-component of angularposition
+        y-component of angularposition
+        z-component of angularposition
+        x-component of angularvelocity
+        y-component of angularvelocity
+        z-component of angularvelocity
+
+    */
 
     public:
 
@@ -34,6 +69,20 @@ class InsertSphereCSV
 
 void InsertSphereCSV::insert_sphere(SpherePositionVelocityStruct &sphere_pvs)
 {
+    /*
+
+    Inserts spheres into the simulation.
+
+    Arguments
+    =========
+    sphere_pvs : SpherePositionVelocityStruct
+        struct with position and velocity of each sphere.
+
+    Returns
+    =======
+    (none)
+
+    */
 
     // read file with particle positions and velocities
     std::ifstream file_in_stream(file_in_str);

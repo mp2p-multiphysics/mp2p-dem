@@ -5,6 +5,20 @@
 
 class DeleteWallMesh
 {
+    /*
+
+    Deletes a wall from the simulation.
+
+    Variables
+    =========
+    (none)
+
+    Functions
+    =========
+    delete_wallmesh : void
+        Deletes a wall from the simulation.
+
+    */
 
     public:
 
@@ -21,7 +35,21 @@ class DeleteWallMesh
 
 void DeleteWallMesh::delete_wallmesh(WallMeshPositionVelocityStruct &wallmesh_pvs)
 {
+    /*
 
+    Deletes a wall from the simulation.
+
+    Arguments
+    =========
+    wallmesh_pvs : WallMeshPositionVelocityStruct
+        struct with position and velocity of mesh triangles in a wall.
+
+    Returns
+    =======
+    (none)
+
+    */
+    
     // clear all wallmesh vectors
     wallmesh_pvs.id_vec.clear();
     wallmesh_pvs.type_vec.clear();

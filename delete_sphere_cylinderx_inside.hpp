@@ -5,6 +5,36 @@
 
 class DeleteSphereCylinderxInside
 {
+    /*
+
+    Deletes spheres inside a cylinder with the x-axis as the axis of symmetry.
+
+    Variables
+    =========
+    radius_vec_in : VectorDouble
+        vector with the radius of each type of sphere.
+    cylinder_center_y_in : double
+        y-coordinate of the axis of symmetry.
+    cylinder_center_z_in : double
+        z-coordinate of the axis of symmetry.
+    cylinder_min_x_in : double
+        Lower x-coordinate of the cylinder.
+    cylinder_max_x_in : double
+        Upper x-coordinate of the cylinder.
+    cylinder_radius_in : double
+        Radius of the cylinder.
+
+    Functions
+    =========
+    delete_sphere : void
+        Deletes spheres from the simulation.
+
+    Notes
+    =====
+    This class deletes spheres that are partially or fully inside the cylinder.
+    Deletion occurs even if the center of the sphere is not inside the cylinder.
+
+    */
 
     public:
 
@@ -53,6 +83,20 @@ class DeleteSphereCylinderxInside
 
 void DeleteSphereCylinderxInside::delete_sphere(SpherePositionVelocityStruct &sphere_pvs)
 {
+    /*
+
+    Deletes spheres from the simulation.
+
+    Arguments
+    =========
+    sphere_pvs : SpherePositionVelocityStruct
+        struct with position and velocity of each sphere.
+
+    Returns
+    =======
+    (none)
+
+    */
 
     // delete particles outside of simulation box
     for (int iter_i = 0; iter_i < sphere_pvs.num_particle; iter_i++)

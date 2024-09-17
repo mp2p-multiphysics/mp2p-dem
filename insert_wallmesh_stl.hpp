@@ -7,6 +7,25 @@
 
 class InsertWallMeshSTL
 {
+    /*
+
+    Inserts a wall following positions indicated by an STL file.
+
+    Variables
+    =========
+    file_in_str_in : string
+        File name of the CSV file.
+    type_int_in : int
+        Type of wall.
+    scale_length_in : double
+        Factor by which the length dimension is scaled.
+
+    Functions
+    =========
+    insert_wallmesh : void
+        Inserts a wall into the simulation.
+
+    */
 
     public:
 
@@ -36,6 +55,20 @@ class InsertWallMeshSTL
 
 void InsertWallMeshSTL::insert_wallmesh(WallMeshPositionVelocityStruct &wallmesh_pvs)
 {
+    /*
+
+    Inserts a wall into the simulation.
+
+    Arguments
+    =========
+    wallmesh_pvs : WallMeshPositionVelocityStruct
+        struct with position and velocity of mesh triangles in a wall.
+
+    Returns
+    =======
+    (none)
+
+    */
 
     // read file with particle positions and velocities
     std::ifstream file_in_stream(file_in_str);

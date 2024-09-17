@@ -14,6 +14,34 @@
 template <class CollisionCheckSphereWallMesh>
 class ForceMomentSphereWallMeshHertz
 {
+    /*
+
+    Calculates collision forces and moments between spheres and mesh triangles.
+    Uses the Hertzian (spring-dashpot) model to calculate collision forces.
+
+    Variables
+    =========
+    radius_vec_in : VectorDouble
+        vector with the radius of each type of sphere.
+    springconstant_normal_mat_in : MatrixDouble
+        Matrix (nested vector) with the normal spring constant of each type of sphere-wallmesh interaction.
+    springconstant_tangent_mat_in : MatrixDouble
+        Matrix with the tangential spring constant of each type of sphere-wallmesh interaction.
+    dampingcoefficient_normal_mat_in : MatrixDouble
+        Matrix with the normal damping coefficient of each type of sphere-wallmesh interaction.
+    dampingcoefficient_tangent_mat_in : MatrixDouble
+        Matrix with the tangential damping coefficient of each type of sphere-wallmesh interaction.
+    frictioncoefficient_sliding_mat_in : MatrixDouble
+        Matrix with the sliding friction coefficient of each type of sphere-wallmesh interaction.
+    frictioncoefficient_rolling_mat_in : MatrixDouble
+        Matrix with the rolling friction coefficient of each type of sphere-wallmesh interaction.
+
+    Functions
+    =========
+    add_forcemoment : void
+        Adds forces and moments to spheres in the simulation.
+
+    */
 
     public:
 
@@ -116,7 +144,27 @@ void ForceMomentSphereWallMeshHertz<CollisionCheckSphereWallMesh>::add_forcemome
     WallMeshPositionVelocityStruct &wallmesh_pvs
 )
 {
-    
+    /*
+
+    Adds forces and moments to spheres in the simulation.
+
+    Arguments
+    =========
+    sphere_fms : SphereForceMomentStruct
+        struct with forces and moments on each sphere.
+    overlap_tangent_mat : SparseMatrixIntegrable
+        Sparse matrix with tangential overlaps between colliding spheres.
+    sphere_pvs : SphereParticleVelocityStruct
+        struct with position and velocity of each sphere.      
+    wallmesh_pvs : SphereParticleVelocityStruct
+        struct with position and velocity of the wall.
+
+    Returns
+    =======
+    (none)
+
+    */
+
     // generate preliminary list of collision pairs
     VectorPairInt collision_vec = collision_check.broad_search(sphere_pvs, wallmesh_pvs);
 
@@ -144,6 +192,11 @@ void ForceMomentSphereWallMeshHertz<CollisionCheckSphereWallMesh>::calculate_for
     int indx_i, int indx_k
 )
 {
+    /*
+
+    Calculates forces and moments acting on spheres in sphere-wallmesh collisions.
+
+    */
 
     // get particle and wall id
     int id_i = sphere_pvs.id_vec[indx_i];
@@ -398,6 +451,11 @@ bool ForceMomentSphereWallMeshHertz<CollisionCheckSphereWallMesh>::check_possibl
     int indx_i, int indx_k
 )
 {
+    /*
+
+    Checks if center of sphere is too far from mesh triangle.
+
+    */
 
     // get particle and wall type
     int type_i = sphere_pvs.type_vec[indx_i];
@@ -479,6 +537,12 @@ void ForceMomentSphereWallMeshHertz<CollisionCheckSphereWallMesh>::check_face_co
     int indx_i, int indx_k
 )
 {
+    /*
+
+    Checks if sphere collides with face of mesh triangle.
+    If so, calculates the contact point.
+
+    */
 
     // get particle and wall type
     int type_i = sphere_pvs.type_vec[indx_i];
@@ -586,6 +650,12 @@ void ForceMomentSphereWallMeshHertz<CollisionCheckSphereWallMesh>::check_edge_co
     int indx_i, int indx_k
 )
 {
+    /*
+
+    Checks if sphere collides with edge of mesh triangle.
+    If so, calculates the contact point.
+
+    */
 
     // get particle and wall type
     int type_i = sphere_pvs.type_vec[indx_i];
@@ -677,6 +747,12 @@ void ForceMomentSphereWallMeshHertz<CollisionCheckSphereWallMesh>::check_vertex_
     int indx_i, int indx_k
 )
 {
+    /*
+
+    Checks if sphere collides with vertex of mesh triangle.
+    If so, calculates the contact point.
+
+    */
 
     // get particle and wall type
     int type_i = sphere_pvs.type_vec[indx_i];
@@ -754,6 +830,11 @@ void ForceMomentSphereWallMeshHertz<CollisionCheckSphereWallMesh>::calculate_vel
     double pos_contact_x, double pos_contact_y, double pos_contact_z
 )
 {
+    /*
+
+    Calculates the velocity of a mesh triangle at a given contact point.
+
+    */
 
     // get wall velocities
     double vel_translate_x = wallmesh_pvs.velocity_translate_x;

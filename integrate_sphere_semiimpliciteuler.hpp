@@ -1,11 +1,31 @@
-#ifndef INTEGRATE_SPHERE_MODIFIEDEULER
-#define INTEGRATE_SPHERE_MODIFIEDEULER
+#ifndef INTEGRATE_SPHERE_SEMIIMPLICITEULER
+#define INTEGRATE_SPHERE_SEMIIMPLICITEULER
 #include <vector>
 #include "container_sphere.hpp"
 #include "container_typedef.hpp"
 
-class IntegrateSphereModifiedEuler
+class IntegrateSphereSemiImplicitEuler
 {
+    /*
+
+    Calculates the positions and velocities of spheres based on the forces and moments.
+    Uses the semi-implicit Euler method.
+
+    Variables
+    =========
+    radius_vec_in : VectorDouble
+        vector with the radius of each type of sphere.
+    density_vec_in : VectorDouble
+        vector with the density of each type of sphere.
+    dt_in : double
+        Length of time step.
+
+    Functions
+    =========
+    integrate_positionvelocity : void
+        Calculates the positions and velocities of spheres based on the forces and moments.
+
+    */
 
     public:
 
@@ -18,17 +38,17 @@ class IntegrateSphereModifiedEuler
     void integrate_positionvelocity
     (
         SpherePositionVelocityStruct &sphere_pvs,  
-        SphereForceMomentStruct sphere_fms
+        SphereForceMomentStruct &sphere_fms
     );
 
     // default constructor
-    IntegrateSphereModifiedEuler()
+    IntegrateSphereSemiImplicitEuler()
     {
 
     }
 
     // constructor
-    IntegrateSphereModifiedEuler(VectorDouble radius_vec_in, VectorDouble density_vec_in, double dt_in)
+    IntegrateSphereSemiImplicitEuler(VectorDouble radius_vec_in, VectorDouble density_vec_in, double dt_in)
     {
         radius_vec = radius_vec_in;
         density_vec = density_vec_in;
@@ -37,12 +57,28 @@ class IntegrateSphereModifiedEuler
 
 };
 
-void IntegrateSphereModifiedEuler::integrate_positionvelocity
+void IntegrateSphereSemiImplicitEuler::integrate_positionvelocity
 (
     SpherePositionVelocityStruct &sphere_pvs,   
-    SphereForceMomentStruct sphere_fms
+    SphereForceMomentStruct &sphere_fms
 )
 {
+    /*
+
+    Calculates the positions and velocities of spheres based on the forces and moments.
+
+    Arguments
+    =========
+    sphere_pvs : SpherePositionVelocityStruct
+        struct with position and velocity of each sphere.
+    sphere_fms : SpherePositionVelocityStruct
+        struct with forces and moments on each sphere.
+
+    Returns
+    =======
+    (none)
+
+    */
 
     // update positions and velocities
     for (int indx_i = 0; indx_i < sphere_pvs.num_particle; indx_i++)

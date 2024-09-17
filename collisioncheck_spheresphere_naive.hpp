@@ -7,6 +7,29 @@
 
 class CollisionCheckSphereSphereNaive
 {
+    /*
+
+    Collision checker for sphere-sphere collisions.
+    Uses naive pairwise search.
+
+    Variables
+    =========
+    (none)
+
+    Functions
+    =========
+    set_input : void
+        Sets input variables to collision checker.
+    broad_search : VectorPairInt
+        Generates vector of sphere pairs that may collide.
+
+    Notes
+    ====
+    This collision checker tests every possible pair for collision.
+    This is inefficient and is provided only for debugging more efficient collision checkers.
+
+    */
+
 
     public:
 
@@ -24,11 +47,42 @@ class CollisionCheckSphereSphereNaive
 
 void CollisionCheckSphereSphereNaive::set_input(VectorDouble &radius_vec_in)
 {
+    /*
+
+    Sets input variables to collision checker.
+
+    Arguments
+    =========
+    radius_vec_in : VectorDouble
+        vector with the radius of each type of sphere.
+
+    Returns
+    =======
+    (none)
+
+    */    
+    
     // not needed for naive search
+
 }
 
 VectorPairInt CollisionCheckSphereSphereNaive::broad_search(SpherePositionVelocityStruct &sphere_pvs)
 {
+    /*
+
+    Generates vector of sphere pairs that may collide.
+
+    Arguments
+    =========
+    sphere_pvs : SpherePositionVelocityStruct
+        struct with position and velocity of each sphere.
+
+    Returns
+    =======
+    collision_vec : VectorPairInt
+        vector of sphere pairs that may collide.
+
+    */
 
     // initialize vector with index pairs
     VectorPairInt collision_vec;

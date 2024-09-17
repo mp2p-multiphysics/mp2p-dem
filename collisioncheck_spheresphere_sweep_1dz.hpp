@@ -1,6 +1,5 @@
 #ifndef COLLISIONCHECK_SPHERESPHERE_SWEEP_1DZ
 #define COLLISIONCHECK_SPHERESPHERE_SWEEP_1DZ
-#include <set>
 #include <utility>
 #include <vector>
 #include "container_sphere.hpp"
@@ -8,6 +7,30 @@
 
 class CollisionCheckSphereSphereSweep1Dz
 {
+    /*
+
+    Collision checker for sphere-sphere collisions.
+    Uses the sweep and prune algorithm along the z-axis.
+
+    Variables
+    =========
+    radius_vec_in : VectorDouble
+        vector with the radius of each type of sphere.
+    enlarge_factor_in : double (default = 0.05)
+        Enlarges sphere radius by a factor of enlarge_factor_in during collision checking.
+
+    Functions
+    =========
+    set_input : void
+        Sets input variables to collision checker.
+    broad_search : VectorPairInt
+        Generates vector of sphere pairs that may collide.
+
+    Notes
+    ====
+    Use enlarge_factor_in > 0 so that the end of collision is recorded when tangential overlap is calculated.
+
+    */
 
     public:
 
@@ -57,6 +80,21 @@ void CollisionCheckSphereSphereSweep1Dz::set_input(VectorDouble &radius_vec_in)
 
 VectorPairInt CollisionCheckSphereSphereSweep1Dz::broad_search(SpherePositionVelocityStruct &sphere_pvs)
 {
+    /*
+
+    Generates vector of sphere pairs that may collide.
+
+    Arguments
+    =========
+    sphere_pvs : SpherePositionVelocityStruct
+        struct with position and velocity of each sphere.
+
+    Returns
+    =======
+    collision_vec : VectorPairInt
+        vector of sphere pairs that may collide.
+
+    */
 
     // sweep along z axis
 
@@ -291,6 +329,11 @@ VectorPairInt CollisionCheckSphereSphereSweep1Dz::broad_search(SpherePositionVel
 
 void CollisionCheckSphereSphereSweep1Dz::sort_pair_insertion(VectorPairIntDouble &pair_vec)
 {
+    /*
+
+    Implementation of insertion sort that sorts a vector of <int, double> pairs based on the value of the double.
+
+    */
 
     // iterate through each element
     for (int i = 1; i < pair_vec.size(); i++)
