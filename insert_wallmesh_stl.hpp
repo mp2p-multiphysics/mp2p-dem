@@ -1,18 +1,44 @@
-#ifndef INITIALIZE_WALLMESH_POSITION_STL
-#define INITIALIZE_WALLMESH_POSITION_STL
+#ifndef INSERT_WALLMESH_STL
+#define INSERT_WALLMESH_STL
 #include <fstream>
 #include <sstream>
 #include <vector>
 #include "container_wallmesh.hpp"
 
-WallMeshPositionVelocityStruct initialize_wallmesh_position_stl(std::string file_in_str, int type_int, double scale_length = 1.)
+class InsertWallMeshSTL
+{
+
+    public:
+
+    // variables
+    std::string file_in_str;
+    int type_int;
+    double scale_length;
+
+    // functions
+    void insert_wallmesh(WallMeshPositionVelocityStruct &wallmesh_pvs);
+
+    // default constructor
+    InsertWallMeshSTL()
+    {
+
+    }
+
+    // constructor
+    InsertWallMeshSTL(std::string file_in_str_in, int type_int_in, double scale_length_in = 1.)
+    {
+        file_in_str = file_in_str_in;
+        type_int = type_int_in;
+        scale_length = scale_length_in;
+    }
+
+};
+
+void InsertWallMeshSTL::insert_wallmesh(WallMeshPositionVelocityStruct &wallmesh_pvs)
 {
 
     // read file with particle positions and velocities
     std::ifstream file_in_stream(file_in_str);
-
-    // initialize struct with coordinates of mesh triangles
-    WallMeshPositionVelocityStruct wpvs;
 
     // iterate for each line
     int line_num = 0;  // counts line numbers
@@ -34,9 +60,9 @@ WallMeshPositionVelocityStruct initialize_wallmesh_position_stl(std::string file
         // every 3rd line starts the triangle data
         if (line_num % 7 == 3)
         {
-            wpvs.num_mesh++;  // increment number of triangles
-            wpvs.id_vec.push_back(line_num/7);  // store ID of triangle
-            wpvs.type_vec.push_back(type_int);  // store type of material
+            wallmesh_pvs.num_mesh++;  // increment number of triangles
+            wallmesh_pvs.id_vec.push_back(line_num/7);  // store ID of triangle
+            wallmesh_pvs.type_vec.push_back(type_int);  // store type of material
         }
 
         // convert line string into stringstream
@@ -63,27 +89,27 @@ WallMeshPositionVelocityStruct initialize_wallmesh_position_stl(std::string file
                 case 3:  // point 1
                 switch(value_num)  // each value contains data for each x, y, or z coordinate
                 {
-                    case 1: wpvs.position_p1_x_vec.push_back(scale_length * std::stod(value_str)); break; // x
-                    case 2: wpvs.position_p1_y_vec.push_back(scale_length * std::stod(value_str)); break; // y
-                    case 3: wpvs.position_p1_z_vec.push_back(scale_length * std::stod(value_str)); break; // z
+                    case 1: wallmesh_pvs.position_p1_x_vec.push_back(scale_length * std::stod(value_str)); break; // x
+                    case 2: wallmesh_pvs.position_p1_y_vec.push_back(scale_length * std::stod(value_str)); break; // y
+                    case 3: wallmesh_pvs.position_p1_z_vec.push_back(scale_length * std::stod(value_str)); break; // z
                 }
                 break;
 
                 case 4:  // point 2
                 switch(value_num)  // each value contains data for each x, y, or z coordinate
                 {
-                    case 1: wpvs.position_p2_x_vec.push_back(scale_length * std::stod(value_str)); break; // x
-                    case 2: wpvs.position_p2_y_vec.push_back(scale_length * std::stod(value_str)); break; // y
-                    case 3: wpvs.position_p2_z_vec.push_back(scale_length * std::stod(value_str)); break; // z
+                    case 1: wallmesh_pvs.position_p2_x_vec.push_back(scale_length * std::stod(value_str)); break; // x
+                    case 2: wallmesh_pvs.position_p2_y_vec.push_back(scale_length * std::stod(value_str)); break; // y
+                    case 3: wallmesh_pvs.position_p2_z_vec.push_back(scale_length * std::stod(value_str)); break; // z
                 }
                 break;
 
                 case 5:  // point 3
                 switch(value_num)  // each value contains data for each x, y, or z coordinate
                 {
-                    case 1: wpvs.position_p3_x_vec.push_back(scale_length * std::stod(value_str)); break; // x
-                    case 2: wpvs.position_p3_y_vec.push_back(scale_length * std::stod(value_str)); break; // y
-                    case 3: wpvs.position_p3_z_vec.push_back(scale_length * std::stod(value_str)); break; // z
+                    case 1: wallmesh_pvs.position_p3_x_vec.push_back(scale_length * std::stod(value_str)); break; // x
+                    case 2: wallmesh_pvs.position_p3_y_vec.push_back(scale_length * std::stod(value_str)); break; // y
+                    case 3: wallmesh_pvs.position_p3_z_vec.push_back(scale_length * std::stod(value_str)); break; // z
                 }
                 break;
 
@@ -101,8 +127,6 @@ WallMeshPositionVelocityStruct initialize_wallmesh_position_stl(std::string file
 
     // close file
     file_in_stream.close();
-
-    return wpvs;
 
 }
 
