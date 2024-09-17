@@ -39,9 +39,9 @@ class CollisionCheckSphereWallMeshSweep1Dy
     VectorInt bound_rank_id_b_vec;
 
     // number of particles in previous usage
-    int num_particle_old = 0;
-    int num_particle_historical_max_old = 0;
-
+    int num_particle_old = -1;
+    int num_particle_historical_max_old = -1;
+    
     // functions
     void sort_pair_insertion(VectorPairIntDouble &pair_vec);
 
@@ -117,7 +117,7 @@ VectorPairInt CollisionCheckSphereWallMeshSweep1Dy::broad_search(SpherePositionV
     VectorPairIntDouble bound_id_pos_y_vec;
 
     // reset vector if particle count changed
-    if (sphere_pvs.num_particle != num_particle_old || sphere_pvs.num_particle_historical_max != num_particle_historical_max_old || sphere_pvs.num_particle_historical_max == 0)
+    if (sphere_pvs.num_particle != num_particle_old || sphere_pvs.num_particle_historical_max != num_particle_historical_max_old)
     {
 
         // redo particle IDs

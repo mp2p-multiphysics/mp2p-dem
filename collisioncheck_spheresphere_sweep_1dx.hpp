@@ -39,8 +39,8 @@ class CollisionCheckSphereSphereSweep1Dx
     VectorInt bound_rank_id_a_vec;
 
     // number of particles in previous usage
-    int num_particle_old = 0;
-    int num_particle_historical_max_old = 0;
+    int num_particle_old = -1;
+    int num_particle_historical_max_old = -1;
 
     // functions
     void sort_pair_insertion(VectorPairIntDouble &pair_vec);
