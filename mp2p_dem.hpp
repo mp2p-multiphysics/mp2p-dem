@@ -33,6 +33,7 @@
 #include "force_sphere_constant.hpp"
 #include "forcemoment_spheresphere_hertz.hpp"
 #include "forcemoment_spherewallmesh_hertz.hpp"
+#include "initialize_sphere_forcemoment_zero.hpp"
 #include "insert_sphere_box_inside_number.hpp"
 #include "insert_sphere_csv.hpp"
 #include "insert_wallmesh_stl.hpp"

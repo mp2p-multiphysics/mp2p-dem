@@ -13,6 +13,7 @@
 #include "container_sphere.hpp"
 #include "container_typedef.hpp"
 #include "container_wallmesh.hpp"
+#include "initialize_sphere_forcemoment_zero.hpp"
 
 template <class CollisionCheckSphereWallMesh>
 class OutputSphereWallMeshForceMomentHertz
@@ -223,7 +224,7 @@ void OutputSphereWallMeshForceMomentHertz<CollisionCheckSphereWallMesh>::add_for
     */
 
     // initialize forces and moments on wallmesh
-    SphereForceMomentStruct wallmesh_fms = sphere_fms_fill(sphere_fms.num_particle);
+    SphereForceMomentStruct wallmesh_fms = initialize_sphere_forcemoment_zero(sphere_fms.num_particle);
 
     // generate preliminary list of collision pairs
     VectorPairInt collision_vec = collision_check.broad_search(sphere_pvs, wallmesh_pvs);
