@@ -50,6 +50,7 @@ class OutputSphereSphereForceMomentHertz
     Notes
     =====
     Use this class instead of ForceMomentSphereSphereHertz if additional statistics about the collisions are to be outputted.
+    Set the file name to an empty string "" if no file is to be generated.
 
     */
 

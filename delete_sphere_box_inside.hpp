@@ -6,9 +6,6 @@
 class DeleteSphereBoxInside
 {
     /*
-    ***********************************
-    *** MP2P DEM Simulation Package ***
-    ***********************************
 
     Deletes spheres inside a box-shaped region.
 
