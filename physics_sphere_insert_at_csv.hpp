@@ -21,7 +21,7 @@ class PhysicsSphereInsertAtCSV : public PhysicsBase
     // insertion times
     int ts_insert = 0;
 
-    // data aobut particles to be inserted
+    // data to insert
     int num_element = 0;
     VectorInt material_vec;
     std::vector<EigenVector3D> position_vec;

@@ -56,7 +56,7 @@ void ColliderSphereMeshNaive::compute_collide_pair(CollisionSphereMeshVector &co
 
         // iterate through each combination
         for (int indx_i = 0; indx_i < sphere_ptr_i->num_element; indx_i++){
-        for (int indx_j = 0; indx_j < mesh_ptr_j->num_element; indx_j++){
+        for (int indx_j = 0; indx_j < mesh_ptr_j->num_face; indx_j++){
 
             // get permanent IDs
             int pid_i = sphere_ptr_i->tid_to_pid_vec[indx_i];

@@ -1,6 +1,6 @@
 #ifndef CONTAINER_SPHERESPHERE
 #define CONTAINER_SPHERESPHERE
-#include <unordered_map>
+#include <map>
 #include <utility>
 #include <vector>
 #include "container_spheresphere.hpp"
@@ -21,7 +21,7 @@ class CollisionSphereSphereMatrix
     public:
 
     // map of collision pair to value
-    std::unordered_map<CollisionSphereSpherePair, double> value_map;
+    std::map<CollisionSphereSpherePair, double> value_map;
 
     // functions
     double get_value(CollisionSphereSpherePair collision_pair);

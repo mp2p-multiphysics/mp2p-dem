@@ -25,5 +25,6 @@
 #include "physics_mesh_insert_at_stl.hpp"
 #include "physics_sphere_force.hpp"
 #include "physics_sphere_insert_at_csv.hpp"
+#include "physics_spheremesh_collision_hertz.hpp"
 #include "physics_spheresphere_collision_hertz.hpp"
 #include "wall_mesh.hpp"
