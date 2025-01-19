@@ -2,8 +2,9 @@
 #define COLLIDER_SPHERESPHERE_NAIVE
 #include <utility>
 #include "collider_spheresphere_base.hpp"
-#include "particle_sphere.hpp"
 #include "container_typedef.hpp"
+#include "sphere.hpp"
+#include "sphere_group.hpp"
 
 namespace DEM
 {
@@ -12,85 +13,69 @@ class ColliderSphereSphereNaive : public ColliderSphereSphereBase
 {
 
     public:
-    
-    // vector of sphere objects
-    std::vector<ParticleSphere*> sphere_ptr_vec;
-    std::vector<std::pair<ParticleSphere*, ParticleSphere*>> spheresphere_ptr_pair_vec;
 
-    // functions used in timestepping
-    void compute_collide_pair(CollisionSphereSphereVector &collision_vec, int ts);
+    // vector of sphere groups
+    std::vector<SphereGroup*> spheregroup_ptr_vec;
+
+    // vector of collision pairs
+    std::vector<std::pair<Sphere, Sphere>> collision_vec;
+
+    // functions
+    std::vector<std::pair<Sphere, Sphere>> get_collision_vec();
+    void update_collision_vec();
 
     // default constructor
     ColliderSphereSphereNaive() {}
 
     // constructor
-    ColliderSphereSphereNaive(std::vector<ParticleSphere*> sphere_ptr_vec_in)
+    ColliderSphereSphereNaive(std::vector<SphereGroup*> spheregroup_ptr_vec_in)
     {
 
-        // store vector of spheres
-        sphere_ptr_vec = sphere_ptr_vec_in;
-
-        // generate pairs of sphere objects
-        generate_spheresphere_ptr_pair();
+        // store inputs
+        spheregroup_ptr_vec = spheregroup_ptr_vec_in;
 
     }
 
     private:
 
-    void generate_spheresphere_ptr_pair();
-
 };
 
-void ColliderSphereSphereNaive::compute_collide_pair(CollisionSphereSphereVector &collision_vec, int ts)
+std::vector<std::pair<Sphere, Sphere>> ColliderSphereSphereNaive::get_collision_vec()
 {
-
-    // iterate through each pair
-    for (auto spheresphere_ptr_pair : spheresphere_ptr_pair_vec)
-    {
-
-        // subset spheres
-        ParticleSphere* sphere_ptr_i = spheresphere_ptr_pair.first;
-        ParticleSphere* sphere_ptr_j = spheresphere_ptr_pair.second;
-
-        // verify if i and j are the same
-        bool is_i_j_same = (sphere_ptr_i == sphere_ptr_j);
-
-        // iterate through each combination
-        // i and j are different - iterate through every pid_i and pid_j permutation
-        // i and j are the same - iterate through every pid_i and pid_j combination
-        for (int indx_i = 0; indx_i < sphere_ptr_i->num_element; indx_i++){
-        for (int indx_j = indx_i * int(is_i_j_same); indx_j < sphere_ptr_j->num_element; indx_j++){
-
-            // get permanent IDs
-            int pid_i = sphere_ptr_i->tid_to_pid_vec[indx_i];
-            int pid_j = sphere_ptr_j->tid_to_pid_vec[indx_j];
-            
-            // create pair of colliding objects
-            std::pair<ParticleSphere*, int> sphere_pid_i = {sphere_ptr_i, pid_i};
-            std::pair<ParticleSphere*, int> sphere_pid_j = {sphere_ptr_j, pid_j};
-
-            // append to vector
-            collision_vec.push_back({sphere_pid_i, sphere_pid_j});
-
-        }}
-
-    }
-
+    return collision_vec;
 }
 
-void ColliderSphereSphereNaive::generate_spheresphere_ptr_pair()
+void ColliderSphereSphereNaive::update_collision_vec()
 {
 
-    // get number of sphere objects
-    int num_sphere = sphere_ptr_vec.size();
+    // clear vector
+    collision_vec.clear();
 
-    // iterate through all combinations (including self-combination)
-    for (int indx_i = 0; indx_i < num_sphere; indx_i++){
-    for (int indx_j = indx_i; indx_j < num_sphere; indx_j++){
+    // iterate through each sphere group combination
+    for (auto spheregroup_ptr_i : spheregroup_ptr_vec){
+    for (auto spheregroup_ptr_j : spheregroup_ptr_vec){
 
-        // insert pair of sphere objects to vector
-        std::pair<ParticleSphere*, ParticleSphere*> spheresphere_pair = {sphere_ptr_vec[indx_i], sphere_ptr_vec[indx_j]};
-        spheresphere_ptr_pair_vec.push_back(spheresphere_pair);
+        // get number of spheres
+        int num_sphere_i = spheregroup_ptr_i->sphere_vec.size();
+        int num_sphere_j = spheregroup_ptr_j->sphere_vec.size();
+
+        // check if sphere group i and j are different
+        int is_spheregroup_different = int(spheregroup_ptr_i != spheregroup_ptr_j);
+
+        // iterate through each sphere combination
+        // j starts from i if sphere groups are the same
+        // j starts from 0 if sphere groups are different
+        for (int indx_i = 0; indx_i < num_sphere_i; indx_i++){
+        for (int indx_j = indx_i * is_spheregroup_different; indx_j < num_sphere_j; indx_j++){
+
+            // subset spheres
+            Sphere sphere_i = spheregroup_ptr_i->sphere_vec[indx_i];
+            Sphere sphere_j = spheregroup_ptr_j->sphere_vec[indx_j];
+
+            // append to collision vector
+            collision_vec.push_back({sphere_i, sphere_j});
+
+        }}
 
     }}
 
