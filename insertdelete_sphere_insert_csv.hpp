@@ -3,7 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include "insertdelete_base.hpp"
-#include "sphere_group.hpp"
+#include "group_sphere.hpp"
 
 namespace DEM
 {
@@ -14,7 +14,7 @@ class InsertDeleteSphereInsertCSV : public InsertDeleteBase
     public:
 
     // sphere group
-    SphereGroup* spheregroup_ptr;
+    GroupSphere* spheregroup_ptr;
 
     // insertion parameters
     int ts_insert = 0;
@@ -23,13 +23,14 @@ class InsertDeleteSphereInsertCSV : public InsertDeleteBase
     double enlarge_ratio = 0.;
 
     // functions
+    std::vector<GroupBase*> get_group_ptr_vec() {return {spheregroup_ptr};};
     void update(int ts, double dt);
 
     // default constructor
     InsertDeleteSphereInsertCSV() {}
 
     // constructor
-    InsertDeleteSphereInsertCSV(SphereGroup &spheregroup_in, int ts_insert_in, std::string file_in_str_in, double scale_factor_in = 1., double enlarge_ratio_in = 1.05)
+    InsertDeleteSphereInsertCSV(GroupSphere &spheregroup_in, int ts_insert_in, std::string file_in_str_in, double scale_factor_in = 1., double enlarge_ratio_in = 1.05)
     {
 
         // store inputs

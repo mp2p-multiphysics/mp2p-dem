@@ -1,6 +1,7 @@
 #ifndef SOLVER
 #define SOLVER
 #include <iostream>
+#include <unordered_set>
 #include "container_typedef.hpp"
 #include "forcemoment_base.hpp"
 #include "insertdelete_base.hpp"
@@ -18,14 +19,16 @@ class Solver
     std::vector<InsertDeleteBase*> insertdelete_ptr_vec;
     std::vector<ForceMomentBase*> forcemoment_ptr_vec;
     std::vector<PositionVelocityBase*> positionvelocity_ptr_vec;
+    std::vector<GroupBase*> group_ptr_vec;
 
     // timestepping
     int num_ts = 0;
+    int num_ts_output = 0;
     double dt = 0.;
 
     // functions
-    void set_timestep(int num_ts_in, double dt_in);
-    void solve(int num_ts_output, bool verbose);
+    void set_timestep(int num_ts_in, int num_ts_output_in, double dt_in);
+    void solve(bool verbose);
 
     // default constructor
     Solver() {}    
@@ -39,27 +42,46 @@ class Solver
         forcemoment_ptr_vec = forcemoment_ptr_vec_in;
         positionvelocity_ptr_vec = positionvelocity_ptr_vec_in;
 
+        // get groups
+        extract_group_vec();
+
     }
 
     private:
 
+    // functions
+    void extract_group_vec();
+
 };
 
-void Solver::set_timestep(int num_ts_in, double dt_in)
+void Solver::set_timestep(int num_ts_in, int num_ts_output_in, double dt_in)
 {
 
     // set timestepping parameters
     num_ts = num_ts_in;
+    num_ts_output = num_ts_output_in;
     dt = dt_in;
 
 }
 
-void Solver::solve(int num_ts_output = 100, bool verbose = true)
+void Solver::solve(bool verbose = true)
 {
 
     // iterate through each timestep
     for (int ts = 0; ts < num_ts; ts++)
     {
+
+        // write output files
+        if (ts % num_ts_output == 0){
+        for (auto group_ptr : group_ptr_vec){
+            group_ptr->write_output(ts);
+        }}
+
+        // clear forces and moments
+        for (auto group_ptr : group_ptr_vec)
+        {
+            group_ptr->clear_forcemoment();
+        }
 
         // insertdelete -> forcemoment -> positionvelocity
         for (auto insertdelete_ptr : insertdelete_ptr_vec)
@@ -82,6 +104,34 @@ void Solver::solve(int num_ts_output = 100, bool verbose = true)
         }
 
     }
+
+}
+
+void Solver::extract_group_vec()
+{
+
+    // initialize set of groups
+    std::unordered_set<GroupBase*> group_ptr_set;
+
+    // iterate through objects
+    for (auto insertdelete_ptr : insertdelete_ptr_vec)
+    {
+        std::vector<GroupBase*> group_vec = insertdelete_ptr->get_group_ptr_vec();
+        group_ptr_set.insert(group_vec.begin(), group_vec.end());
+    }
+    for (auto forcemoment_ptr : forcemoment_ptr_vec)
+    {
+        std::vector<GroupBase*> group_vec = forcemoment_ptr->get_group_ptr_vec();
+        group_ptr_set.insert(group_vec.begin(), group_vec.end());
+    }
+    for (auto positionvelocity_ptr : positionvelocity_ptr_vec)
+    {
+        std::vector<GroupBase*> group_vec = positionvelocity_ptr->get_group_ptr_vec();
+        group_ptr_set.insert(group_vec.begin(), group_vec.end());
+    }
+
+    // convert to vector
+    group_ptr_vec = std::vector<GroupBase*>(group_ptr_set.begin(), group_ptr_set.end());
 
 }
 

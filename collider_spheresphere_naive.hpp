@@ -15,7 +15,7 @@ class ColliderSphereSphereNaive : public ColliderSphereSphereBase
     public:
 
     // vector of sphere groups
-    std::vector<SphereGroup*> spheregroup_ptr_vec;
+    std::vector<GroupSphere*> spheregroup_ptr_vec;
 
     // vector of collision pairs
     std::vector<std::pair<Sphere, Sphere>> collision_vec;
@@ -28,7 +28,7 @@ class ColliderSphereSphereNaive : public ColliderSphereSphereBase
     ColliderSphereSphereNaive() {}
 
     // constructor
-    ColliderSphereSphereNaive(std::vector<SphereGroup*> spheregroup_ptr_vec_in)
+    ColliderSphereSphereNaive(std::vector<GroupSphere*> spheregroup_ptr_vec_in)
     {
 
         // store inputs
