@@ -35,7 +35,7 @@ struct Sphere
 
 };
 
-class GroupSphere : public GroupBase
+class SphereGroup : public BaseGroup
 {
 
     public:
@@ -55,7 +55,7 @@ class GroupSphere : public GroupBase
     void set_output_positionvelocity(std::string file_out_str);
 
     // default constructor
-    GroupSphere() {}
+    SphereGroup() {}
 
     private:
 
@@ -64,7 +64,7 @@ class GroupSphere : public GroupBase
 
 };
 
-void GroupSphere::clear_forcemoment()
+void SphereGroup::clear_forcemoment()
 {
 
     // iterate through each sphere
@@ -76,7 +76,7 @@ void GroupSphere::clear_forcemoment()
 
 }
 
-void GroupSphere::write_output(int ts)
+void SphereGroup::write_output(int ts)
 {
 
     // generate output files
@@ -84,12 +84,12 @@ void GroupSphere::write_output(int ts)
 
 }
 
-void GroupSphere::set_output_positionvelocity(std::string file_out_str)
+void SphereGroup::set_output_positionvelocity(std::string file_out_str)
 {
     file_out_positionvelocity_str = file_out_str;
 }
 
-void GroupSphere::output_positionvelocity_csv(int ts)
+void SphereGroup::output_positionvelocity_csv(int ts)
 {
 
     // do not make file if filename not set

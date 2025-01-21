@@ -11,11 +11,12 @@
 ###################################################
 */
 
-// #include "collider_spheresphere_base.hpp"
-// #include "collider_spheresphere_naive.hpp"
+#include "collider_spheresphere_base.hpp"
+#include "collider_spheresphere_naive.hpp"
 #include "container_typedef.hpp"
 #include "forcemoment_base.hpp"
 #include "forcemoment_sphere_force.hpp"
+#include "forcemoment_spheresphere_hertz.hpp"
 #include "group_base.hpp"
 #include "group_mesh.hpp"
 #include "group_sphere.hpp"

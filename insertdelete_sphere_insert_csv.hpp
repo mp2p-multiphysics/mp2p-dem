@@ -14,7 +14,7 @@ class InsertDeleteSphereInsertCSV : public InsertDeleteBase
     public:
 
     // sphere group
-    GroupSphere* spheregroup_ptr;
+    SphereGroup* spheregroup_ptr;
 
     // insertion parameters
     int ts_insert = 0;
@@ -23,14 +23,14 @@ class InsertDeleteSphereInsertCSV : public InsertDeleteBase
     double enlarge_ratio = 0.;
 
     // functions
-    std::vector<GroupBase*> get_group_ptr_vec() {return {spheregroup_ptr};};
+    std::vector<BaseGroup*> get_group_ptr_vec() {return {spheregroup_ptr};};
     void update(int ts, double dt);
 
     // default constructor
     InsertDeleteSphereInsertCSV() {}
 
     // constructor
-    InsertDeleteSphereInsertCSV(GroupSphere &spheregroup_in, int ts_insert_in, std::string file_in_str_in, double scale_factor_in = 1., double enlarge_ratio_in = 1.05)
+    InsertDeleteSphereInsertCSV(SphereGroup &spheregroup_in, int ts_insert_in, std::string file_in_str_in, double scale_factor_in = 1., double enlarge_ratio_in = 1.05)
     {
 
         // store inputs

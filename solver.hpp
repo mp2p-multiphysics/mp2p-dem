@@ -19,7 +19,7 @@ class Solver
     std::vector<InsertDeleteBase*> insertdelete_ptr_vec;
     std::vector<ForceMomentBase*> forcemoment_ptr_vec;
     std::vector<PositionVelocityBase*> positionvelocity_ptr_vec;
-    std::vector<GroupBase*> group_ptr_vec;
+    std::vector<BaseGroup*> group_ptr_vec;
 
     // timestepping
     int num_ts = 0;
@@ -71,12 +71,6 @@ void Solver::solve(bool verbose = true)
     for (int ts = 0; ts < num_ts; ts++)
     {
 
-        // write output files
-        if (ts % num_ts_output == 0){
-        for (auto group_ptr : group_ptr_vec){
-            group_ptr->write_output(ts);
-        }}
-
         // clear forces and moments
         for (auto group_ptr : group_ptr_vec)
         {
@@ -88,6 +82,13 @@ void Solver::solve(bool verbose = true)
         {
             insertdelete_ptr->update(ts, dt);
         }
+
+        // write output files
+        if (ts % num_ts_output == 0){
+        for (auto group_ptr : group_ptr_vec){
+            group_ptr->write_output(ts);
+        }}
+
         for (auto forcemoment_ptr : forcemoment_ptr_vec)
         {
             forcemoment_ptr->update(ts, dt);
@@ -111,27 +112,27 @@ void Solver::extract_group_vec()
 {
 
     // initialize set of groups
-    std::unordered_set<GroupBase*> group_ptr_set;
+    std::unordered_set<BaseGroup*> group_ptr_set;
 
     // iterate through objects
     for (auto insertdelete_ptr : insertdelete_ptr_vec)
     {
-        std::vector<GroupBase*> group_vec = insertdelete_ptr->get_group_ptr_vec();
+        std::vector<BaseGroup*> group_vec = insertdelete_ptr->get_group_ptr_vec();
         group_ptr_set.insert(group_vec.begin(), group_vec.end());
     }
     for (auto forcemoment_ptr : forcemoment_ptr_vec)
     {
-        std::vector<GroupBase*> group_vec = forcemoment_ptr->get_group_ptr_vec();
+        std::vector<BaseGroup*> group_vec = forcemoment_ptr->get_group_ptr_vec();
         group_ptr_set.insert(group_vec.begin(), group_vec.end());
     }
     for (auto positionvelocity_ptr : positionvelocity_ptr_vec)
     {
-        std::vector<GroupBase*> group_vec = positionvelocity_ptr->get_group_ptr_vec();
+        std::vector<BaseGroup*> group_vec = positionvelocity_ptr->get_group_ptr_vec();
         group_ptr_set.insert(group_vec.begin(), group_vec.end());
     }
 
     // convert to vector
-    group_ptr_vec = std::vector<GroupBase*>(group_ptr_set.begin(), group_ptr_set.end());
+    group_ptr_vec = std::vector<BaseGroup*>(group_ptr_set.begin(), group_ptr_set.end());
 
 }
 

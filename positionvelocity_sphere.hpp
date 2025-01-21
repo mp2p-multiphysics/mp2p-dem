@@ -16,20 +16,20 @@ class PositionVelocitySphere : public PositionVelocityBase
     public:
 
     // sphere group
-    GroupSphere* spheregroup_ptr;
+    SphereGroup* spheregroup_ptr;
 
     // parameters
     ParameterUnary* density_ptr;
 
     // functions
-    std::vector<GroupBase*> get_group_ptr_vec() {return {spheregroup_ptr};};
+    std::vector<BaseGroup*> get_group_ptr_vec() {return {spheregroup_ptr};};
     void update(int ts, double dt);
 
     // default constructor
     PositionVelocitySphere() {}
 
     // constructor
-    PositionVelocitySphere(GroupSphere &spheregroup_in, ParameterUnary &density_in)
+    PositionVelocitySphere(SphereGroup &spheregroup_in, ParameterUnary &density_in)
     {
 
         // store variables

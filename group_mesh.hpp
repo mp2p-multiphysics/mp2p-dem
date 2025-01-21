@@ -29,7 +29,7 @@ struct Mesh
 
 };
 
-class GroupMesh : public GroupBase
+class MeshGroup : public BaseGroup
 {
 
     public:
@@ -45,7 +45,7 @@ class GroupMesh : public GroupBase
     void clear_forcemoment() {};
 
     // default constructor
-    GroupMesh() {}
+    MeshGroup() {}
 
     private:
 

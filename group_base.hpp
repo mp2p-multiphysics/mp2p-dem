@@ -4,7 +4,7 @@
 namespace DEM
 {
 
-class GroupBase
+class BaseGroup
 {
 
     public:
@@ -14,7 +14,7 @@ class GroupBase
     virtual void clear_forcemoment() {};
 
     // default constructor
-    GroupBase() {}
+    BaseGroup() {}
 
     private:
 

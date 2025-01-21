@@ -13,20 +13,20 @@ class ForceMomentSphereForce : public ForceMomentBase
     public:
 
     // sphere group
-    GroupSphere* spheregroup_ptr;
+    SphereGroup* spheregroup_ptr;
 
     // constant force
     EigenVector3D force;
 
     // functions
-    std::vector<GroupBase*> get_group_ptr_vec() {return {spheregroup_ptr};};
+    std::vector<BaseGroup*> get_group_ptr_vec() {return {spheregroup_ptr};};
     void update(int ts, double dt);
 
     // default constructor
     ForceMomentSphereForce() {}
 
     // constructor
-    ForceMomentSphereForce(GroupSphere &spheregroup_in, EigenVector3D force_in)
+    ForceMomentSphereForce(SphereGroup &spheregroup_in, EigenVector3D force_in)
     {
 
         // store variables
