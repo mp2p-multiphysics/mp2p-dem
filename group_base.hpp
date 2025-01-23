@@ -10,8 +10,7 @@ class BaseGroup
     public:
 
     // functions
-    virtual void write_output(int ts) {};
-    virtual void clear_forcemoment() {};
+    virtual void output_file(int ts) {};
 
     // default constructor
     BaseGroup() {}

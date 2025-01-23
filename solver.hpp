@@ -71,28 +71,26 @@ void Solver::solve(bool verbose = true)
     for (int ts = 0; ts < num_ts; ts++)
     {
 
-        // clear forces and moments
-        for (auto group_ptr : group_ptr_vec)
-        {
-            group_ptr->clear_forcemoment();
-        }
-
-        // insertdelete -> forcemoment -> positionvelocity
+        // insert or delete particles
         for (auto insertdelete_ptr : insertdelete_ptr_vec)
         {
             insertdelete_ptr->update(ts, dt);
         }
 
-        // write output files
-        if (ts % num_ts_output == 0){
-        for (auto group_ptr : group_ptr_vec){
-            group_ptr->write_output(ts);
-        }}
-
+        // calculate forces and moments
         for (auto forcemoment_ptr : forcemoment_ptr_vec)
         {
             forcemoment_ptr->update(ts, dt);
         }
+
+        // write output files
+        if (ts % num_ts_output == 0){
+        for (auto group_ptr : group_ptr_vec){
+            group_ptr->output_file(ts);
+        }}
+
+        // calculate position and velocity
+        // also resets forces and moments
         for (auto positionvelocity_ptr : positionvelocity_ptr_vec)
         {
             positionvelocity_ptr->update(ts, dt);

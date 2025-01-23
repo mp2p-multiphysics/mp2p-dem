@@ -1,20 +1,20 @@
-#ifndef COLLIDER_SPHERESPHERE_NAIVE
-#define COLLIDER_SPHERESPHERE_NAIVE
-#include <utility>
-#include "collider_spheresphere_base.hpp"
+#ifndef COLLIDER_SPHEREMESH_NAIVE
+#define COLLIDER_SPHEREMESH_NAIVE
 #include "container_typedef.hpp"
+#include "group_mesh.hpp"
 #include "group_sphere.hpp"
 
 namespace DEM
 {
 
-class ColliderSphereSphereNaive : public ColliderSphereSphereBase
+class ColliderSphereMeshNaive
 {
 
     public:
 
-    // sphere group
+    // sphere and mesh group
     SphereGroup* spheregroup_ptr;
+    MeshGroup* meshgroup_ptr;
 
     // vector of collision pairs
     std::vector<std::pair<int, int>> collision_vec;
@@ -24,14 +24,15 @@ class ColliderSphereSphereNaive : public ColliderSphereSphereBase
     void update_collision_vec();
 
     // default constructor
-    ColliderSphereSphereNaive() {}
+    ColliderSphereMeshNaive() {}
 
     // constructor
-    ColliderSphereSphereNaive(SphereGroup &spheregroup_in)
+    ColliderSphereMeshNaive(SphereGroup &spheregroup_in, MeshGroup &meshgroup_in)
     {
 
         // store inputs
         spheregroup_ptr = &spheregroup_in;
+        meshgroup_ptr = &meshgroup_in;
 
     }
 
@@ -39,12 +40,13 @@ class ColliderSphereSphereNaive : public ColliderSphereSphereBase
 
 };
 
-std::vector<std::pair<int, int>> ColliderSphereSphereNaive::get_collision_vec()
+std::vector<std::pair<int, int>> ColliderSphereMeshNaive::get_collision_vec()
 {
     return collision_vec;
 }
 
-void ColliderSphereSphereNaive::update_collision_vec()
+
+void ColliderSphereMeshNaive::update_collision_vec()
 {
 
     // clear vector
@@ -52,7 +54,7 @@ void ColliderSphereSphereNaive::update_collision_vec()
 
     // iterate through each sphere combination
     for (int indx_i = 0; indx_i < spheregroup_ptr->num_sphere; indx_i++){
-    for (int indx_j = indx_i + 1; indx_j < spheregroup_ptr->num_sphere; indx_j++){
+    for (int indx_j = 0; indx_j < meshgroup_ptr->num_mesh; indx_j++){
 
         // append to collision vector
         collision_vec.push_back({indx_i, indx_j});

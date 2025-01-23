@@ -44,8 +44,6 @@ class InsertDeleteSphereInsertCSV : public InsertDeleteBase
 
     private:
 
-    void read_csv();
-
 };
 
 void InsertDeleteSphereInsertCSV::update(int ts, double dt)
@@ -56,17 +54,6 @@ void InsertDeleteSphereInsertCSV::update(int ts, double dt)
     {
         return;
     }
-
-    // read csv file
-    read_csv();
-
-    // update collision pairs
-
-
-}
-
-void InsertDeleteSphereInsertCSV::read_csv()
-{
 
     // read file with particle positions and velocities
     std::ifstream file_in_stream(file_in_str);
@@ -93,15 +80,16 @@ void InsertDeleteSphereInsertCSV::read_csv()
         int value_num = 0;  // counts position of value
         std::string value_str;  // stores values in lines
         Sphere sphere_sub;  // shpere object
+        Sphere sphere_previous_ts_sub;  // shpere object at previous timestep
 
         // iterate through each value
         while (std::getline(line_stream, value_str, ','))
         {
 
-            // store values in appropriate vector
+            // store values for sphere
             switch (value_num)
             {
-                case 0: sphere_sub.gid = spheregroup_ptr->gid_max; break;
+                case 0: sphere_sub.gid = spheregroup_ptr->num_sphere_max; break;
                 case 1: sphere_sub.mid = std::stoi(value_str); break;
                 case 2: sphere_sub.position.coeffRef(0) = scale_factor * std::stod(value_str); break;
                 case 3: sphere_sub.position.coeffRef(1) = scale_factor * std::stod(value_str); break;
@@ -121,6 +109,12 @@ void InsertDeleteSphereInsertCSV::read_csv()
                 break;
             }
 
+            // store values for sphere in previous timestep
+            // mostly same as sphere_sub except positions
+            sphere_previous_ts_sub = sphere_sub;
+            sphere_previous_ts_sub.position -= sphere_sub.velocity*dt;
+            sphere_previous_ts_sub.angularposition -= sphere_sub.angularvelocity*dt;
+
             // increment value count
             value_num++;
 
@@ -128,7 +122,9 @@ void InsertDeleteSphereInsertCSV::read_csv()
     
         // insert spheres
         spheregroup_ptr->sphere_vec.push_back(sphere_sub);
-        spheregroup_ptr->gid_max += 1;
+        spheregroup_ptr->sphere_previous_ts_vec.push_back(sphere_previous_ts_sub);
+        spheregroup_ptr->num_sphere += 1;
+        spheregroup_ptr->num_sphere_max += 1;
 
     }
 

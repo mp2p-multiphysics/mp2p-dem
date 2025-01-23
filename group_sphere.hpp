@@ -40,20 +40,22 @@ class SphereGroup : public BaseGroup
 
     public:
 
-    // largest inserted ID so far
-    int gid_max = 0;
+    // number of spheres
+    int num_sphere = 0;  // current number
+    int num_sphere_max = 0;  // historical max
 
     // vector of spheres
+    // note: order of spheres in sphere_vec must match sphere_previous_ts_vec
     std::vector<Sphere> sphere_vec;
+    std::vector<Sphere> sphere_previous_ts_vec;
 
     // output file
     std::string file_out_positionvelocity_str;
 
     // functions
-    void write_output(int ts);
-    void clear_forcemoment();
+    void output_file(int ts);
     void set_output_positionvelocity(std::string file_out_str);
-
+    
     // default constructor
     SphereGroup() {}
 
@@ -64,24 +66,9 @@ class SphereGroup : public BaseGroup
 
 };
 
-void SphereGroup::clear_forcemoment()
+void SphereGroup::output_file(int ts)
 {
-
-    // iterate through each sphere
-    for (auto &sphere : sphere_vec)
-    {
-        sphere.force = {0., 0., 0.,};
-        sphere.moment = {0., 0., 0.,};
-    }
-
-}
-
-void SphereGroup::write_output(int ts)
-{
-
-    // generate output files
     output_positionvelocity_csv(ts);
-
 }
 
 void SphereGroup::set_output_positionvelocity(std::string file_out_str)

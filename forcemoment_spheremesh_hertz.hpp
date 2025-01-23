@@ -64,7 +64,6 @@ class ForceMomentSphereSphereHertz : public ForceMomentBase
 
     // functions
     void compute_force_pair(int indx_i, int indx_j, double dt);
-    double get_overlap_tangent_value(std::pair<int, int> collision_pair);
 
 };
 
@@ -79,24 +78,6 @@ void ForceMomentSphereSphereHertz::update(int ts, double dt)
     {
         compute_force_pair(indx_pair.first, indx_pair.second, dt);
     }
-
-}
-
-double ForceMomentSphereSphereHertz::get_overlap_tangent_value(std::pair<int, int> collision_pair)
-{
-
-    // find key in map
-    auto iter = overlap_tangent_map.find(collision_pair);
-
-    // return value if found
-    if (iter != overlap_tangent_map.end()) {
-        return iter->second;
-    }
-
-    // return zero otherwise
-    // also append zero to map
-    overlap_tangent_map[collision_pair] = 0.;
-    return 0.;
 
 }
 
@@ -115,9 +96,6 @@ void ForceMomentSphereSphereHertz::compute_force_pair(int indx_i, int indx_j, do
     double radius_i = sphere_i.radius;
     double radius_j = sphere_j.radius;
 
-    // get particle group ID pair
-    std::pair<int, int> collision_pair = {sphere_i.gid, sphere_j.gid};
-
     // calculate displacement from center of i to j
     EigenVector3D delta_pos_ij = -pos_i + pos_j;
     double delta_pos_ij_mag = delta_pos_ij.norm();
@@ -129,7 +107,8 @@ void ForceMomentSphereSphereHertz::compute_force_pair(int indx_i, int indx_j, do
     // negative or zero normal overlap
     if (overlap_normal_ij_val <= 0)
     {
-        overlap_tangent_map.erase(collision_pair);  // reset tangential overlap
+//        overlap_tangent_mat.prune(collision_pair);  // reset tangential overlap
+//        ddt_overlap_tangent_mat.prune(collision_pair);
         return;
     }
 
@@ -151,9 +130,9 @@ void ForceMomentSphereSphereHertz::compute_force_pair(int indx_i, int indx_j, do
     double friction_sliding = friction_sliding_ptr->get_value(mid_i, mid_j);
     double friction_rolling = friction_rolling_ptr->get_value(mid_i, mid_j);
 
-    // get tangential overlap
-    // assigns a value of zero to tangential overlap if none yet
-    double overlap_tangent_ij_val = get_overlap_tangent_value(collision_pair);
+//    // get tangential overlap
+//    double overlap_tangent_ij_val = overlap_tangent_mat.get_value(collision_pair);
+    double overlap_tangent_ij_val = 0.;
 
     // calculate normal vector
     EigenVector3D normal_ij = delta_pos_ij/delta_pos_ij_mag;
@@ -211,8 +190,8 @@ void ForceMomentSphereSphereHertz::compute_force_pair(int indx_i, int indx_j, do
     // calculate collision force
     EigenVector3D force_collision_ij = force_collision_normal_ij + force_collision_tangent_ij;
 
-    // update collision matrix
-    overlap_tangent_map[collision_pair] += relvel_tangent_ij_val*dt;
+//    // update collision matrix
+//    ddt_overlap_tangent_mat.set_value(collision_pair, relvel_tangent_ij_val);
     
     // add forces on sphere i
     // apply Newton's third law to get forces on j
