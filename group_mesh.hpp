@@ -16,6 +16,11 @@ struct Mesh
     EigenVector3D position_p1;
     EigenVector3D position_p2;
 
+    // point IDs of positions
+    int pid_p0;
+    int pid_p1;
+    int pid_p2;
+
     // enlarged geometry for collision detection
     EigenVector3D position_min_enlarged;
     EigenVector3D position_max_enlarged;
@@ -32,6 +37,7 @@ class MeshGroup : public BaseGroup
 
     // vector of meshes
     std::vector<Mesh> mesh_vec;
+    std::vector<EigenVector3D> point_vec;
 
     // output file
     std::string file_out_position_str;

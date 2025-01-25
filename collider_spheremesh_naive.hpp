@@ -1,5 +1,6 @@
 #ifndef COLLIDER_SPHEREMESH_NAIVE
 #define COLLIDER_SPHEREMESH_NAIVE
+#include "collider_spheremesh_base.hpp"
 #include "container_typedef.hpp"
 #include "group_mesh.hpp"
 #include "group_sphere.hpp"
@@ -7,7 +8,7 @@
 namespace DEM
 {
 
-class ColliderSphereMeshNaive
+class ColliderSphereMeshNaive : public ColliderSphereMeshBase
 {
 
     public:
