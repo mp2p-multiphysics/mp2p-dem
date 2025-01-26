@@ -1,16 +1,16 @@
-#ifndef POSITIONVELOCITY_SPHERE
-#define POSITIONVELOCITY_SPHERE
+#ifndef INTEGRAL_SPHERE
+#define INTEGRAL_SPHERE
 #include <fstream>
 #include <sstream>
 #include "container_typedef.hpp"
 #include "group_sphere.hpp"
+#include "integral_base.hpp"
 #include "parameter_unary.hpp"
-#include "positionvelocity_base.hpp"
 
 namespace DEM
 {
 
-class PositionVelocitySphere : public PositionVelocityBase
+class IntegralSphere : public IntegralBase
 {
 
     public:
@@ -26,10 +26,10 @@ class PositionVelocitySphere : public PositionVelocityBase
     void update(int ts, double dt);
 
     // default constructor
-    PositionVelocitySphere() {}
+    IntegralSphere() {}
 
     // constructor
-    PositionVelocitySphere(SphereGroup &spheregroup_in, ParameterUnary &density_in)
+    IntegralSphere(SphereGroup &spheregroup_in, ParameterUnary &density_in)
     {
 
         // store variables
@@ -42,7 +42,7 @@ class PositionVelocitySphere : public PositionVelocityBase
 
 };
 
-void PositionVelocitySphere::update(int ts, double dt)
+void IntegralSphere::update(int ts, double dt)
 {
 
     // iterate through each sphere

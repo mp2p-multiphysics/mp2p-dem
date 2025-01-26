@@ -1,5 +1,5 @@
-#ifndef INSERTDELETE_MESH_INSERT_STL
-#define INSERTDELETE_MESH_INSERT_STL
+#ifndef INSERT_MESH_INSERT_STL
+#define INSERT_MESH_INSERT_STL
 #include <fstream>
 #include <sstream>
 #include "insertdelete_base.hpp"
@@ -8,7 +8,7 @@
 namespace DEM
 {
 
-class InsertDeleteMeshInsertSTL : public InsertDeleteBase
+class InsertMeshSTL : public InsertDeleteBase
 {
 
     public:
@@ -27,10 +27,10 @@ class InsertDeleteMeshInsertSTL : public InsertDeleteBase
     void update(int ts, double dt);
 
     // default constructor
-    InsertDeleteMeshInsertSTL() {}
+    InsertMeshSTL() {}
 
     // constructor
-    InsertDeleteMeshInsertSTL(MeshGroup &meshgroup_in, int ts_insert_in, std::string file_in_str_in, double scale_factor_in = 1., double enlarge_ratio_in = 1.05)
+    InsertMeshSTL(MeshGroup &meshgroup_in, int ts_insert_in, std::string file_in_str_in, double scale_factor_in = 1., double enlarge_ratio_in = 1.05)
     {
 
         // store inputs
@@ -46,7 +46,7 @@ class InsertDeleteMeshInsertSTL : public InsertDeleteBase
 
 };
 
-void InsertDeleteMeshInsertSTL::update(int ts, double dt)
+void InsertMeshSTL::update(int ts, double dt)
 {
 
     // skip if not insertion timestep

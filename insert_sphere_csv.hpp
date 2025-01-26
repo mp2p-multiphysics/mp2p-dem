@@ -1,5 +1,5 @@
-#ifndef INSERTDELETE_SPHERE_INSERT_CSV
-#define INSERTDELETE_SPHERE_INSERT_CSV
+#ifndef INSERT_SPHERE_CSV
+#define INSERT_SPHERE_CSV
 #include <fstream>
 #include <sstream>
 #include "insertdelete_base.hpp"
@@ -8,7 +8,7 @@
 namespace DEM
 {
 
-class InsertDeleteSphereInsertCSV : public InsertDeleteBase
+class InsertSphereCSV : public InsertDeleteBase
 {
 
     public:
@@ -27,10 +27,10 @@ class InsertDeleteSphereInsertCSV : public InsertDeleteBase
     void update(int ts, double dt);
 
     // default constructor
-    InsertDeleteSphereInsertCSV() {}
+    InsertSphereCSV() {}
 
     // constructor
-    InsertDeleteSphereInsertCSV(SphereGroup &spheregroup_in, int ts_insert_in, std::string file_in_str_in, double scale_factor_in = 1., double enlarge_ratio_in = 1.05)
+    InsertSphereCSV(SphereGroup &spheregroup_in, int ts_insert_in, std::string file_in_str_in, double scale_factor_in = 1., double enlarge_ratio_in = 1.05)
     {
 
         // store inputs
@@ -46,7 +46,7 @@ class InsertDeleteSphereInsertCSV : public InsertDeleteBase
 
 };
 
-void InsertDeleteSphereInsertCSV::update(int ts, double dt)
+void InsertSphereCSV::update(int ts, double dt)
 {
 
     // skip if not insertion timestep

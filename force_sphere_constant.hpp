@@ -1,5 +1,5 @@
-#ifndef FORCEMOMENT_SPHERE_FORCE
-#define FORCEMOMENT_SPHERE_FORCE
+#ifndef FORCE_SPHERE_CONSTANT
+#define FORCE_SPHERE_CONSTANT
 #include "container_typedef.hpp"
 #include "forcemoment_base.hpp"
 #include "group_sphere.hpp"
@@ -7,7 +7,7 @@
 namespace DEM
 {
 
-class ForceMomentSphereForce : public ForceMomentBase
+class ForceSphereConstant : public ForceMomentBase
 {
 
     public:
@@ -23,10 +23,10 @@ class ForceMomentSphereForce : public ForceMomentBase
     void update(int ts, double dt);
 
     // default constructor
-    ForceMomentSphereForce() {}
+    ForceSphereConstant() {}
 
     // constructor
-    ForceMomentSphereForce(SphereGroup &spheregroup_in, EigenVector3D force_in)
+    ForceSphereConstant(SphereGroup &spheregroup_in, EigenVector3D force_in)
     {
 
         // store variables
@@ -39,7 +39,7 @@ class ForceMomentSphereForce : public ForceMomentBase
 
 };
 
-void ForceMomentSphereForce::update(int ts, double dt)
+void ForceSphereConstant::update(int ts, double dt)
 {
 
     // add force to particles

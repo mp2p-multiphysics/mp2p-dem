@@ -1,12 +1,12 @@
-#ifndef POSITIONVELOCITY_BASE
-#define POSITIONVELOCITY_BASE
+#ifndef MODIFY_BASE
+#define MODIFY_BASE
 #include <vector>
 #include "group_base.hpp"
 
 namespace DEM
 {
 
-class PositionVelocityBase
+class ModifyBase
 {
 
     public:
@@ -16,7 +16,7 @@ class PositionVelocityBase
     virtual void update(int ts, double dt) {};
 
     // default constructor
-    PositionVelocityBase() {}
+    ModifyBase() {}
 
     private:
 
