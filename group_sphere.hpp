@@ -11,26 +11,28 @@ namespace DEM
 struct Sphere
 {
 
-    // group ID
-    int gid;
-
-    // material ID
-    int mid;
-
-    // positions and velocities
-    EigenVector3D position;
-    EigenVector3D velocity;
-    EigenVector3D angularposition;
-    EigenVector3D angularvelocity;
+    // IDs
+    int gid; // group ID
+    int mid; // material ID
 
     // forces and moments
     EigenVector3D force;
     EigenVector3D moment;
 
+    // positions and velocities (current step)
+    EigenVector3D position;
+    EigenVector3D velocity;
+    EigenVector3D angularposition;
+    EigenVector3D angularvelocity;
+
+    // positions (previous step)
+    EigenVector3D previous_position;
+    EigenVector3D previous_angularposition;
+
     // geometry
     double radius;
 
-    // enlarged geometry for collision detection
+    // enlarged geometry (collision detection)
     double radius_enlarged;
 
 };
@@ -45,9 +47,7 @@ class SphereGroup : public BaseGroup
     int num_sphere_max = 0;  // historical max
 
     // vector of spheres
-    // note: order of spheres in sphere_vec must match sphere_previous_ts_vec
     std::vector<Sphere> sphere_vec;
-    std::vector<Sphere> sphere_previous_ts_vec;
 
     // output file
     std::string file_out_positionvelocity_str;

@@ -80,7 +80,6 @@ void InsertSphereCSV::update(int ts, double dt)
         int value_num = 0;  // counts position of value
         std::string value_str;  // stores values in lines
         Sphere sphere_sub;  // shpere object
-        Sphere sphere_previous_ts_sub;  // shpere object at previous timestep
 
         // iterate through each value
         while (std::getline(line_stream, value_str, ','))
@@ -103,17 +102,16 @@ void InsertSphereCSV::update(int ts, double dt)
                 case 11: sphere_sub.angularvelocity.coeffRef(0) = std::stod(value_str); break;
                 case 12: sphere_sub.angularvelocity.coeffRef(1) = std::stod(value_str); break;
                 case 13: sphere_sub.angularvelocity.coeffRef(2) = std::stod(value_str); break;
-                case 14:
-                    sphere_sub.radius = scale_factor * std::stod(value_str);
-                    sphere_sub.radius_enlarged = scale_factor * enlarge_ratio * std::stod(value_str);
-                break;
+                case 14: sphere_sub.radius = scale_factor * std::stod(value_str); break;
             }
 
-            // store values for sphere in previous timestep
-            // mostly same as sphere_sub except positions
-            sphere_previous_ts_sub = sphere_sub;
-            sphere_previous_ts_sub.position -= sphere_sub.velocity*dt;
-            sphere_previous_ts_sub.angularposition -= sphere_sub.angularvelocity*dt;
+            // compute hypothetical previous position
+            // assume zero acceleration
+            sphere_sub.previous_position = sphere_sub.position - sphere_sub.velocity*dt;
+            sphere_sub.previous_angularposition = sphere_sub.angularposition - sphere_sub.angularvelocity*dt;
+
+            // compute enlarged radius
+            sphere_sub.radius_enlarged = enlarge_ratio * sphere_sub.radius;
 
             // increment value count
             value_num++;
@@ -122,7 +120,6 @@ void InsertSphereCSV::update(int ts, double dt)
     
         // insert spheres
         spheregroup_ptr->sphere_vec.push_back(sphere_sub);
-        spheregroup_ptr->sphere_previous_ts_vec.push_back(sphere_previous_ts_sub);
         spheregroup_ptr->num_sphere += 1;
         spheregroup_ptr->num_sphere_max += 1;
 

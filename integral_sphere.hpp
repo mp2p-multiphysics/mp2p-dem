@@ -46,13 +46,8 @@ void IntegralSphere::update(int ts, double dt)
 {
 
     // iterate through each sphere
-    for (int indx_i = 0; indx_i < spheregroup_ptr->num_sphere; indx_i++)
+    for (auto &sphere : spheregroup_ptr->sphere_vec)
     {
-
-        // get spheres
-        Sphere sphere_prev = spheregroup_ptr->sphere_previous_ts_vec[indx_i];
-        Sphere sphere = spheregroup_ptr->sphere_vec[indx_i];
-        Sphere sphere_next = sphere; // copy to modify
 
         // get properties
         int mid = sphere.mid;
@@ -63,21 +58,25 @@ void IntegralSphere::update(int ts, double dt)
         double mass = (4./3.)*M_PI*density*radius*radius*radius;
         double moi = 0.4*mass*radius*radius;
 
+        // store current position
+        EigenVector3D pos = sphere.position;
+        EigenVector3D angpos = sphere.angularposition;
+
         // get new position
-        sphere_next.position = 2*sphere.position - sphere_prev.position + sphere.force*dt*dt/mass;
-        sphere_next.angularposition = 2*sphere.angularposition - sphere_prev.angularposition + sphere.moment*dt*dt/moi;
+        sphere.position = 2*pos - sphere.previous_position + sphere.force*dt*dt/mass;
+        sphere.angularposition = 2*angpos - sphere.previous_angularposition + sphere.moment*dt*dt/moi;
 
         // get new velocity
-        sphere_next.velocity = 0.5*(sphere_next.position - sphere_prev.position)/dt;
-        sphere_next.angularvelocity = 0.5*(sphere_next.angularposition - sphere_prev.angularposition)/dt;
+        sphere.velocity = 0.5*(sphere.position - sphere.previous_position)/dt;
+        sphere.angularvelocity = 0.5*(sphere.angularposition - sphere.previous_angularposition)/dt;
+
+        // current position -> previous position
+        sphere.previous_position = pos;
+        sphere.previous_angularposition = angpos;
 
         // reset forces and moments
-        sphere_next.force = {0., 0., 0.,};
-        sphere_next.moment = {0., 0., 0.,};
-
-        // store spheres
-        spheregroup_ptr->sphere_previous_ts_vec[indx_i] = sphere;
-        spheregroup_ptr->sphere_vec[indx_i] = sphere_next;
+        sphere.force = {0., 0., 0.,};
+        sphere.moment = {0., 0., 0.,};
 
     }
 
