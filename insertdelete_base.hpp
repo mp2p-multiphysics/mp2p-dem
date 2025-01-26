@@ -8,6 +8,18 @@ namespace DEM
 
 class InsertDeleteBase
 {
+    /*
+
+    Base class for insertion or deletion of group objects.
+
+    Functions
+    =========
+    get_group_ptr_vec : vector<BaseGroup*>
+        Returns pointers to group objects affected by this object.
+    update : void
+        Updates this object.
+
+    */
 
     public:
 

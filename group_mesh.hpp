@@ -29,6 +29,18 @@ struct Mesh
 
 class MeshGroup : public BaseGroup
 {
+    /*
+
+    Walls represented as triangular elements.
+
+    Functions
+    =========
+    output_file : void
+        Writes output files.
+    set_output_position : void
+        Set the output STL file name with position values.
+
+    */
 
     public:
 
@@ -67,6 +79,20 @@ class MeshGroup : public BaseGroup
 
 void MeshGroup::output_file(int ts)
 {
+    /*
+
+    Writes output files.
+
+    Arguments
+    =========
+    ts : int
+        Timestep number.
+
+    Returns
+    =======
+    (none)
+
+    */
 
     // generate output files
     output_position_stl(ts);
@@ -75,7 +101,28 @@ void MeshGroup::output_file(int ts)
 
 void MeshGroup::set_output_position(std::string file_out_str)
 {
+    /*
+
+    Set the output STL file name with position values.
+
+    Arguments
+    =========
+    file_out_str : string
+        Path to STL file.
+
+    Returns
+    =======
+    (none)
+
+    Notes
+    =====
+    file_out_str must have an asterisk '*'.
+    This will be replaced with the timestep number.
+
+    */
+    
     file_out_position_str = file_out_str;
+
 }
 
 void MeshGroup::output_position_stl(int ts)

@@ -10,6 +10,53 @@ namespace DEM
 
 class InsertSphereCSV : public InsertDeleteBase
 {
+    /*
+
+    Inserts spheres once at a specified time.
+
+    Variables
+    =========
+    spheregroup_in : SphereGroup
+        Sphere group to be inserted to.
+    ts_insert_in : int
+        Timestep at which insertion is performed.
+    file_in_str_in : string
+        Path to STL file with mesh to insert.
+    scale_factor_in : double
+        Scale factor multiplied to the coordinates.
+        Default value is 1.
+    enlarge_factor_in : double
+        Factor used to enlarge the spheres for collision checking.
+        Default value is 0.05.
+
+    Functions
+    =========
+    get_group_ptr_vec : vector<BaseGroup*>
+        Returns pointers to group objects affected by this object.
+    update : void
+        Updates this object.
+
+    Notes
+    =====
+    The CSV file with point data must have the following columns:
+        sphere ID
+        material ID
+        x-coordinate of position
+        y-coordinate of position
+        z-coordinate of position
+        x-coordinate of velocity
+        y-coordinate of velocity
+        z-coordinate of velocity
+        x-coordinate of angular position
+        y-coordinate of angular position
+        z-coordinate of angular position
+        x-coordinate of angular velocity
+        y-coordinate of angular velocity
+        z-coordinate of angular velocity
+        radius
+    Scale factor is multiplied to the linear positions, velocities, and radii.
+
+    */
 
     public:
 
@@ -48,6 +95,22 @@ class InsertSphereCSV : public InsertDeleteBase
 
 void InsertSphereCSV::update(int ts, double dt)
 {
+    /*
+
+    Updates this object.
+
+    Arguments
+    =========
+    ts : int
+        Timestep number.
+    dt : double
+        Duration of timestep.
+
+    Returns
+    =======
+    (none)
+
+    */
 
     // skip if not insertion timestep
     if (ts != ts_insert)

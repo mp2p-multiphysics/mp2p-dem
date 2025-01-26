@@ -10,6 +10,25 @@ namespace DEM
 
 class ColliderSphereMeshNaive : public ColliderSphereMeshBase
 {
+    /*
+
+    Sphere-mesh broad phase collision checking via naive pairwise search.
+
+    Variables
+    =========
+    spheregroup_in : SphereGroup
+        Spheres where collision checks are applied.
+    meshgroup_in : MeshGroup
+        Meshes where collision checks are applied.
+
+    Functions
+    =========
+    get_collision_vec : vector<pair<int, int>>
+        Returns (sphere group ID, mesh index) pairs that may collide.
+    update_collision_vec : void
+        Updates the collision vector.
+
+    */
 
     public:
 
@@ -43,12 +62,41 @@ class ColliderSphereMeshNaive : public ColliderSphereMeshBase
 
 std::vector<std::pair<int, int>> ColliderSphereMeshNaive::get_collision_vec()
 {
+    /*
+
+    Returns (sphere group ID, mesh index) pairs that may collide.
+
+    Arguments
+    =========
+    (none)
+
+    Returns
+    =======
+    collision_vec : vector<pair<int, int>>
+        Vector of (sphere group ID, mesh index) pairs that may collide.
+
+    */
+
     return collision_vec;
+
 }
 
 
 void ColliderSphereMeshNaive::update_collision_vec()
 {
+    /*
+
+    Updates the collision vector.
+
+    Arguments
+    =========
+    (none)
+
+    Returns
+    =======
+    (none)
+
+    */
 
     // clear vector
     collision_vec.clear();

@@ -10,6 +10,52 @@ namespace DEM
 
 class InsertMeshSTL : public InsertDeleteBase
 {
+    /*
+
+    Inserts a mesh once at a specified time.
+
+    Variables
+    =========
+    meshgroup_in : MeshGroup
+        Mesh group to be inserted to.
+    ts_insert_in : int
+        Timestep at which insertion is performed.
+    mid_in : int
+        Material ID.
+    file_in_str_in : string
+        Path to STL file with mesh to insert.
+    velocity_translate_in : Eigen::Vector3d
+        Translational velocity of the mesh.
+        Default value is {0, 0, 0}.
+    angularvelocity_rotate_in
+        Rotational velocity of the mesh around an axis.
+        Default value is 0.
+    position_rotateaxis_begin_in : Eigen::Vector3d
+        Start point of the axis of rotation.
+        Default value is {0, 0, 0}.
+    position_rotateaxis_end_in : Eigen::Vector3d
+        End point of the axis of rotation.
+        Default value is {0, 0, 1}.
+    scale_factor_in : double
+        Scale factor multiplied to the coordinates.
+        Default value is 1.
+    enlarge_factor_in : double
+        Factor used to enlarge the meshes for collision checking.
+        Default value is 0.05.
+
+    Functions
+    =========
+    get_group_ptr_vec : vector<BaseGroup*>
+        Returns pointers to group objects affected by this object.
+    update : void
+        Updates this object.
+
+    Notes
+    =====
+    Direction of rotation follows the right-hand rule.
+    Scale factor is multiplied to the positions of each point in the mesh.
+
+    */
 
     public:
 
@@ -72,6 +118,22 @@ class InsertMeshSTL : public InsertDeleteBase
 
 void InsertMeshSTL::update(int ts, double dt)
 {
+    /*
+
+    Updates this object.
+
+    Arguments
+    =========
+    ts : int
+        Timestep number.
+    dt : double
+        Duration of timestep.
+
+    Returns
+    =======
+    (none)
+
+    */
 
     // skip if not insertion timestep
     if (ts != ts_insert)

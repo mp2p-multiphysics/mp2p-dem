@@ -8,6 +8,18 @@ namespace DEM
 
 class ModifyBase
 {
+    /*
+
+    Base class for modifying the variables of an object.
+
+    Functions
+    =========
+    get_group_ptr_vec : vector<BaseGroup*>
+        Returns pointers to group objects affected by this object.
+    update : void
+        Updates this object.
+
+    */
 
     public:
 

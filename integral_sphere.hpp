@@ -12,6 +12,23 @@ namespace DEM
 
 class IntegralSphere : public IntegralBase
 {
+    /*
+
+    Updates the position and velocities of spheres via velocity Verlet integration.
+
+    Variables
+    =========
+    spheregroup_in : SphereGroup
+        Spheres whose positions and velocities are updated.
+
+    Functions
+    =========
+    get_group_ptr_vec : vector<BaseGroup*>
+        Returns pointers to group objects affected by this object.
+    update : void
+        Updates this object.
+
+    */
 
     public:
 
@@ -44,6 +61,22 @@ class IntegralSphere : public IntegralBase
 
 void IntegralSphere::update(int ts, double dt)
 {
+    /*
+
+    Updates this object.
+
+    Arguments
+    =========
+    ts : int
+        Timestep number.
+    dt : double
+        Duration of timestep.
+
+    Returns
+    =======
+    (none)
+
+    */
 
     // iterate through each sphere
     for (auto &sphere : spheregroup_ptr->sphere_vec)

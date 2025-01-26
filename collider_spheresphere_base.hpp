@@ -8,6 +8,18 @@ namespace DEM
 
 class ColliderSphereSphereBase
 {
+    /*
+
+    Base class for sphere-sphere broad phase collision checkers.
+
+    Functions
+    =========
+    get_collision_vec : vector<pair<int, int>>
+        Returns (sphere group ID, sphere group ID) pairs that may collide.
+    update_collision_vec : void
+        Updates the collision vector.
+
+    */
 
     public:
 

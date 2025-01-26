@@ -8,6 +8,18 @@ namespace DEM
 
 class ForceMomentBase
 {
+    /*
+
+    Base class for force and/or moment calculations.
+
+    Functions
+    =========
+    get_group_ptr_vec : vector<BaseGroup*>
+        Returns pointers to group objects affected by this object.
+    update : void
+        Updates this object.
+
+    */
 
     public:
 

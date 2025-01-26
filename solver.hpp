@@ -14,6 +14,26 @@ namespace DEM
 
 class Solver
 {
+    /*
+
+    Runs the DEM simulation.
+
+    Functions
+    =========
+    set_insertdelete : void
+        Set insertion or deletion objects in the simulation.
+    set_modify : void
+        Set modifying objects in the simulation.
+    set_forcemoment : void
+        Set force or moment objects in the simulation.
+    set_integral : void
+        Set integral objects in the simulation.
+    set_timestep : void
+        Set parameters needed for timestepping when running the simulation.
+    solve : void
+        Runs the simulation.
+
+    */
 
     public:
 
@@ -27,8 +47,8 @@ class Solver
     std::unordered_set<BaseGroup*> group_ptr_set;
 
     // timestepping
-    int num_ts = 0;
-    int num_ts_output = 0;
+    int num_timestep = 0;
+    int num_timestep_output = 0;
     double dt = 0.;
 
     // functions
@@ -36,7 +56,7 @@ class Solver
     void set_modify(std::vector<ModifyBase*> modify_ptr_vec_in);
     void set_forcemoment(std::vector<ForceMomentBase*> forcemoment_ptr_vec_in);
     void set_integral(std::vector<IntegralBase*> integral_ptr_vec_in);
-    void set_timestep(int num_ts_in, int num_ts_output_in, double dt_in);
+    void set_timestep(int num_timestep_in, int num_timestep_output_in, double dt_in);
     void solve(bool verbose);
 
     // default constructor
@@ -44,14 +64,25 @@ class Solver
 
     private:
 
-    // functions
-    void extract_group_vec();
-
 };
 
 void Solver::set_insertdelete(std::vector<InsertDeleteBase*> insertdelete_ptr_vec_in)
 {
-    
+    /*
+
+    Set insertion or deletion objects in the simulation.
+
+    Arguments
+    =========
+    insertdelete_ptr_vec_in : vector<InsertDeleteBase*>
+        Vector of pointers to insertion or deletion objects.
+
+    Returns
+    =======
+    (none)
+
+    */
+
     // store objects
     insertdelete_ptr_vec = insertdelete_ptr_vec_in;
     
@@ -66,6 +97,20 @@ void Solver::set_insertdelete(std::vector<InsertDeleteBase*> insertdelete_ptr_ve
 
 void Solver::set_modify(std::vector<ModifyBase*> modify_ptr_vec_in)
 {
+    /*
+
+    Set modifying objects in the simulation.
+
+    Arguments
+    =========
+    modify_ptr_vec_in : vector<ModifyBase*>
+        Vector of pointers to modifying objects.
+
+    Returns
+    =======
+    (none)
+
+    */
 
     // store objects
     modify_ptr_vec = modify_ptr_vec_in;
@@ -81,6 +126,20 @@ void Solver::set_modify(std::vector<ModifyBase*> modify_ptr_vec_in)
 
 void Solver::set_forcemoment(std::vector<ForceMomentBase*> forcemoment_ptr_vec_in)
 {
+    /*
+
+    Set force or moment objects in the simulation.
+
+    Arguments
+    =========
+    forcemoment_ptr_vec_in : vector<ForceMomentBase*>
+        Vector of pointers to force or moment objects.
+
+    Returns
+    =======
+    (none)
+
+    */
 
     // store objects
     forcemoment_ptr_vec = forcemoment_ptr_vec_in;
@@ -96,6 +155,20 @@ void Solver::set_forcemoment(std::vector<ForceMomentBase*> forcemoment_ptr_vec_i
 
 void Solver::set_integral(std::vector<IntegralBase*> integral_ptr_vec_in)
 {
+    /*
+
+    Set integral objects in the simulation.
+
+    Arguments
+    =========
+    integral_ptr_vec_in : vector<IntegralBase*>
+        Vector of pointers to integral objects.
+
+    Returns
+    =======
+    (none)
+
+    */
 
     // store objects
     integral_ptr_vec = integral_ptr_vec_in;
@@ -109,12 +182,30 @@ void Solver::set_integral(std::vector<IntegralBase*> integral_ptr_vec_in)
 
 }
 
-void Solver::set_timestep(int num_ts_in, int num_ts_output_in, double dt_in)
+void Solver::set_timestep(int num_timestep_in, int num_timestep_output_in, double dt_in)
 {
+    /*
+
+    Set parameters needed for timestepping when running the simulation.
+
+    Arguments
+    =========
+    num_timestep_in : int
+        Number of timesteps to simulate.
+    num_timestep_output_in : int
+        Frequency of output file generation.
+    dt_in : double
+        Time interval of timestep.
+
+    Returns
+    =======
+    (none)
+
+    */
 
     // set timestepping parameters
-    num_ts = num_ts_in;
-    num_ts_output = num_ts_output_in;
+    num_timestep = num_timestep_in;
+    num_timestep_output = num_timestep_output_in;
     dt = dt_in;
 
 }
@@ -136,7 +227,7 @@ void Solver::solve(bool verbose = true)
     double integral_time = 0;
 
     // iterate through each timestep
-    for (int ts = 0; ts < num_ts; ts++)
+    for (int ts = 0; ts < num_timestep; ts++)
     {
 
         // insert or delete objects
@@ -162,7 +253,7 @@ void Solver::solve(bool verbose = true)
 
         // write output files
         auto t3 = std::chrono::steady_clock::now();
-        if (ts % num_ts_output == 0){
+        if (ts % num_timestep_output == 0){
         for (auto group_ptr : group_ptr_vec){
             group_ptr->output_file(ts);
         }}
@@ -177,7 +268,7 @@ void Solver::solve(bool verbose = true)
 
         // output progress
         auto t5 = std::chrono::steady_clock::now();
-        if (verbose && ts % num_ts_output == 0)
+        if (verbose && ts % num_timestep_output == 0)
         {
             std::cout << "Timestep: " << ts << "\n";
         }

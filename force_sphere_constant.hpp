@@ -9,6 +9,25 @@ namespace DEM
 
 class ForceSphereConstant : public ForceMomentBase
 {
+    /*
+
+    Applies a constant force on sphere objects.
+
+    Variables
+    =========
+    spheregroup_in : SphereGroup
+        Spheres where force is applied.
+    force_in : Eigen::Vector3d
+        Constant force to be applied.
+
+    Functions
+    =========
+    get_group_ptr_vec : vector<BaseGroup*>
+        Returns pointers to group objects affected by this object.
+    update : void
+        Updates this object.
+
+    */
 
     public:
 
@@ -41,6 +60,22 @@ class ForceSphereConstant : public ForceMomentBase
 
 void ForceSphereConstant::update(int ts, double dt)
 {
+    /*
+
+    Updates this object.
+
+    Arguments
+    =========
+    ts : int
+        Timestep number.
+    dt : double
+        Duration of timestep.
+
+    Returns
+    =======
+    (none)
+
+    */
 
     // add force to particles
     for (auto &sphere : spheregroup_ptr->sphere_vec)

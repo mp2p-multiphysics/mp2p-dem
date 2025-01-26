@@ -39,6 +39,18 @@ struct Sphere
 
 class SphereGroup : public BaseGroup
 {
+    /*
+
+    Particles represented as spheres.
+
+    Functions
+    =========
+    output_file : void
+        Writes output files.
+    set_output_position : void
+        Set the output CSV file name with position and velocity values.
+
+    */
 
     public:
 
@@ -68,12 +80,50 @@ class SphereGroup : public BaseGroup
 
 void SphereGroup::output_file(int ts)
 {
+    /*
+
+    Writes output files.
+
+    Arguments
+    =========
+    ts : int
+        Timestep number.
+
+    Returns
+    =======
+    (none)
+
+    */
+    
+    // generate output files
     output_positionvelocity_csv(ts);
+
 }
 
 void SphereGroup::set_output_positionvelocity(std::string file_out_str)
 {
+    /*
+
+    Set the output CSV file name with position and velocity values.
+
+    Arguments
+    =========
+    file_out_str : string
+        Path to CSV file.
+
+    Returns
+    =======
+    (none)
+
+    Notes
+    =====
+    file_out_str must have an asterisk '*'.
+    This will be replaced with the timestep number.
+
+    */
+
     file_out_positionvelocity_str = file_out_str;
+
 }
 
 void SphereGroup::output_positionvelocity_csv(int ts)

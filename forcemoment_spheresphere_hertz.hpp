@@ -11,6 +11,37 @@ namespace DEM
 
 class ForceMomentSphereSphereHertz : public ForceMomentBase
 {
+    /*
+
+    Computes collision forces and moments between spheres via the Hertz model.
+
+    Variables
+    =========
+    spheregroup_in : SphereGroup
+        Spheres where forces and moments are applied.
+    collider_in : ColliderSphereSphereBase
+        Broad phase collision checker.
+    spring_normal_in : ParameterBinary
+        Spring constant in the normal direction.
+    spring_tangent_in : ParameterBinary
+        Spring constant in the tangential direction.
+    damping_normal_in : ParameterBinary
+        Damping coefficient in the normal direction.
+    damping_tangent_in : ParameterBinary
+        Damping coefficient in the tangential direction.
+    friction_sliding_in : ParameterBinary
+        Sliding friction coefficient.
+    friction_rolling_in : ParameterBinary
+        Rolling friction coefficient.
+
+    Functions
+    =========
+    get_group_ptr_vec : vector<BaseGroup*>
+        Returns pointers to group objects affected by this object.
+    update : void
+        Updates this object.
+
+    */
 
     public:
 
@@ -70,6 +101,22 @@ class ForceMomentSphereSphereHertz : public ForceMomentBase
 
 void ForceMomentSphereSphereHertz::update(int ts, double dt)
 {
+    /*
+
+    Updates this object.
+
+    Arguments
+    =========
+    ts : int
+        Timestep number.
+    dt : double
+        Duration of timestep.
+
+    Returns
+    =======
+    (none)
+
+    */
 
     // update vector of collision pairs
     collider_ptr->update_collision_vec();

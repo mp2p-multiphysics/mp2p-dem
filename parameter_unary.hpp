@@ -7,6 +7,23 @@ namespace DEM
 
 class ParameterUnary
 {
+    /*
+
+    Material properties.
+
+    Variables
+    =========
+    num_value_in : int
+        Number of materials
+    value_vec_in : VectorDouble
+        Vector of material properties.
+
+    Functions
+    =========
+    get_value : double
+        Returns properties of a material.
+
+    */
 
     public:
 
@@ -34,9 +51,26 @@ class ParameterUnary
 
 };
 
-double ParameterUnary::get_value(int indx_i)
+double ParameterUnary::get_value(int mid_i)
 {
-    return value_vec[indx_i];
+    /*
+
+    Returns properties of a material.
+
+    Arguments
+    =========
+    mid_i : int
+        Material ID of i.
+
+    Returns
+    =======
+    value : double
+        Property of the material.
+
+    */
+    
+    return value_vec[mid_i];
+
 }
 
 }

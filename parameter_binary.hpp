@@ -7,6 +7,28 @@ namespace DEM
 
 class ParameterBinary
 {
+    /*
+
+    Pairwise material properties.
+
+    Variables
+    =========
+    num_value_in : int
+        Number of materials
+    value_vec_in : VectorDouble
+        Vector of pairwise material properties.
+
+    Functions
+    =========
+    get_value : double
+        Returns properties for a pair of materials.
+
+    Notes
+    =====
+    Properties of materials 0, 1, 2, ..., N in value_vec_in must be arranged as follows:
+    (0, 0) (0, 1) (0, 2) (0, N) (1, 1) (1, 2) (1, N) (2, 2) (2, N) ...
+
+    */
 
     public:
 
@@ -49,9 +71,28 @@ class ParameterBinary
 
 };
 
-double ParameterBinary::get_value(int indx_i, int indx_j)
+double ParameterBinary::get_value(int mid_i, int mid_j)
 {
-    return value_reshape_vec[indx_i][indx_j];
+    /*
+
+    Returns properties for a pair of materials.
+
+    Arguments
+    =========
+    mid_i : int
+        Material ID of i.
+    mid_j : int
+        Material ID of j.
+
+    Returns
+    =======
+    value : double
+        Property for the pair of materials.
+
+    */
+    
+    return value_reshape_vec[mid_i][mid_j];
+
 }
 
 void ParameterBinary::reshape_triangle()

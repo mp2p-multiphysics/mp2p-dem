@@ -11,6 +11,23 @@ namespace DEM
 
 class IntegralMesh : public IntegralBase
 {
+    /*
+
+    Updates the position of a moving mesh.
+
+    Variables
+    =========
+    meshgroup_in : MeshGroup
+        Meshes whose positions are updated.
+
+    Functions
+    =========
+    get_group_ptr_vec : vector<BaseGroup*>
+        Returns pointers to group objects affected by this object.
+    update : void
+        Updates this object.
+
+    */
 
     public:
 
@@ -39,6 +56,22 @@ class IntegralMesh : public IntegralBase
 
 void IntegralMesh::update(int ts, double dt)
 {
+    /*
+
+    Updates this object.
+
+    Arguments
+    =========
+    ts : int
+        Timestep number.
+    dt : double
+        Duration of timestep.
+
+    Returns
+    =======
+    (none)
+
+    */
 
     // get mesh velocity
     EigenVector3D vel_trn = meshgroup_ptr->velocity_translate;
