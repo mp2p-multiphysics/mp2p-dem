@@ -20,7 +20,7 @@ class InsertSphereCSV : public InsertDeleteBase
     int ts_insert = 0;
     std::string file_in_str;
     double scale_factor = 0.;
-    double enlarge_ratio = 0.;
+    double enlarge_factor = 0.;
 
     // functions
     std::vector<BaseGroup*> get_group_ptr_vec() {return {spheregroup_ptr};};
@@ -30,7 +30,7 @@ class InsertSphereCSV : public InsertDeleteBase
     InsertSphereCSV() {}
 
     // constructor
-    InsertSphereCSV(SphereGroup &spheregroup_in, int ts_insert_in, std::string file_in_str_in, double scale_factor_in = 1., double enlarge_ratio_in = 1.05)
+    InsertSphereCSV(SphereGroup &spheregroup_in, int ts_insert_in, std::string file_in_str_in, double scale_factor_in = 1., double enlarge_factor_in = 0.05)
     {
 
         // store inputs
@@ -38,7 +38,7 @@ class InsertSphereCSV : public InsertDeleteBase
         ts_insert = ts_insert_in;
         file_in_str = file_in_str_in;
         scale_factor = scale_factor_in;
-        enlarge_ratio = enlarge_ratio_in;
+        enlarge_factor = enlarge_factor_in;
 
     }
 
@@ -111,7 +111,7 @@ void InsertSphereCSV::update(int ts, double dt)
             sphere_sub.previous_angularposition = sphere_sub.angularposition - sphere_sub.angularvelocity*dt;
 
             // compute enlarged radius
-            sphere_sub.radius_enlarged = enlarge_ratio * sphere_sub.radius;
+            sphere_sub.radius_enlarged = (1. + enlarge_factor) * sphere_sub.radius;
 
             // increment value count
             value_num++;

@@ -46,9 +46,16 @@ void IntegralMesh::update(int ts, double dt)
     EigenVector3D rotaxis_p0 = meshgroup_ptr->position_rotateaxis_begin;
     EigenVector3D rotaxis_p1 = meshgroup_ptr->position_rotateaxis_end;
 
-    // check if rotation occurs
+    // check if translation or rotation occurs
     // skip expensive calculations if it does not
+    bool is_trn = vel_trn == EigenVector3D::Zero();
     bool is_rot = angvel_rot != 0. || rotaxis_p0 == rotaxis_p1;
+
+    // skip if no motion
+    if (is_trn && is_rot)
+    {
+        return;
+    }
 
     // compute rotation matrix if rotation occurs
     Eigen::Matrix3d rot_mat = Eigen::Matrix3d::Identity();
@@ -97,6 +104,17 @@ void IntegralMesh::update(int ts, double dt)
             mesh.position_p2 += rotaxis_p0;
 
         }
+
+        // get bounding box
+        EigenVector3D pos_min = (mesh.position_p0).cwiseMin(mesh.position_p1).cwiseMin(mesh.position_p2);
+        EigenVector3D pos_max = (mesh.position_p0).cwiseMax(mesh.position_p1).cwiseMax(mesh.position_p2);
+
+        // get diagonal
+        double delta_pos_diag = (pos_max-pos_min).norm();
+
+        // store enlarged bounding box
+        mesh.position_min_enlarged = pos_min.array() - delta_pos_diag;
+        mesh.position_max_enlarged = pos_max.array() - delta_pos_diag;
 
     }
 
