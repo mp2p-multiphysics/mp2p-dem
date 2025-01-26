@@ -11,17 +11,17 @@ namespace DEM
 struct Mesh
 {
 
-    // positions
-    EigenVector3D position_p0;
-    EigenVector3D position_p1;
-    EigenVector3D position_p2;
-
-    // point IDs of positions
+    // point IDs
     int pid_p0;
     int pid_p1;
     int pid_p2;
 
-    // enlarged geometry for collision detection
+    // positions (current step)
+    EigenVector3D position_p0;
+    EigenVector3D position_p1;
+    EigenVector3D position_p2;
+
+    // enlarged geometry (collision detection)
     EigenVector3D position_min_enlarged;
     EigenVector3D position_max_enlarged;
 
@@ -42,9 +42,12 @@ class MeshGroup : public BaseGroup
     // output file
     std::string file_out_position_str;
 
+    // material ID
+    int mid = 0;
+
     // velocity
     EigenVector3D velocity_translate;
-    double angularvelocity_rotate;
+    double angularvelocity_rotate = 0;
     EigenVector3D position_rotateaxis_begin;
     EigenVector3D position_rotateaxis_end;
 

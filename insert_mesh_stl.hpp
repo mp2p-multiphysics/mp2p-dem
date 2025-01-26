@@ -22,6 +22,15 @@ class InsertMeshSTL : public InsertDeleteBase
     double scale_factor = 0.;
     double enlarge_ratio = 0.;
 
+    // material ID
+    int mid = 0;
+
+    // velocity
+    EigenVector3D velocity_translate;
+    double angularvelocity_rotate = 0;
+    EigenVector3D position_rotateaxis_begin;
+    EigenVector3D position_rotateaxis_end;
+
     // functions
     std::vector<BaseGroup*> get_group_ptr_vec() {return {meshgroup_ptr};};
     void update(int ts, double dt);
@@ -30,13 +39,28 @@ class InsertMeshSTL : public InsertDeleteBase
     InsertMeshSTL() {}
 
     // constructor
-    InsertMeshSTL(MeshGroup &meshgroup_in, int ts_insert_in, std::string file_in_str_in, double scale_factor_in = 1., double enlarge_ratio_in = 1.05)
+    InsertMeshSTL
+    (
+        MeshGroup &meshgroup_in, int ts_insert_in, int mid_in, std::string file_in_str_in,
+        EigenVector3D velocity_translate_in = {0., 0., 0.}, double angularvelocity_rotate_in = 0.,
+        EigenVector3D position_rotateaxis_begin_in = {0., 0., 0.}, EigenVector3D position_rotateaxis_end_in = {0., 0., 1.},
+        double scale_factor_in = 1., double enlarge_ratio_in = 1.05
+    )
     {
 
         // store inputs
         meshgroup_ptr = &meshgroup_in;
         ts_insert = ts_insert_in;
+        mid = mid_in;
         file_in_str = file_in_str_in;
+
+        // store velocity
+        velocity_translate = velocity_translate_in;
+        angularvelocity_rotate = angularvelocity_rotate_in;
+        position_rotateaxis_begin = position_rotateaxis_begin_in;
+        position_rotateaxis_end = position_rotateaxis_end_in;
+
+        // store other optional inputs
         scale_factor = scale_factor_in;
         enlarge_ratio = enlarge_ratio_in;
 
@@ -54,6 +78,13 @@ void InsertMeshSTL::update(int ts, double dt)
     {
         return;
     }
+
+    // store group parameters
+    meshgroup_ptr->mid = mid;
+    meshgroup_ptr->velocity_translate = velocity_translate;
+    meshgroup_ptr->angularvelocity_rotate = angularvelocity_rotate;
+    meshgroup_ptr->position_rotateaxis_begin = position_rotateaxis_begin;
+    meshgroup_ptr->position_rotateaxis_end = position_rotateaxis_end;
 
     // read file with particle positions and velocities
     std::ifstream file_in_stream(file_in_str);
