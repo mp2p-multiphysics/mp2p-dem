@@ -11,6 +11,9 @@ namespace DEM
 struct Mesh
 {
 
+    // IDs
+    int gid; // group ID
+
     // point IDs
     int pid_p0;
     int pid_p1;
@@ -21,9 +24,11 @@ struct Mesh
     EigenVector3D position_p1;
     EigenVector3D position_p2;
 
-    // enlarged geometry (collision detection)
-    EigenVector3D position_min_enlarged;
-    EigenVector3D position_max_enlarged;
+    // distance tracking (collision check)
+    double distance_verlet;
+    double distance_traveled_p0;
+    double distance_traveled_p1;
+    double distance_traveled_p2;
 
 };
 

@@ -25,9 +25,9 @@ class InsertSphereCSV : public InsertDeleteBase
     scale_factor_in : double
         Scale factor multiplied to the coordinates.
         Default value is 1.
-    enlarge_factor_in : double
-        Factor used to enlarge the spheres for collision checking.
-        Default value is 0.05.
+    distance_verlet_rel_in : double
+        Verlet distance relative to the particle radius.
+        Default value is 0.50.
 
     Functions
     =========
@@ -67,7 +67,7 @@ class InsertSphereCSV : public InsertDeleteBase
     int ts_insert = 0;
     std::string file_in_str;
     double scale_factor = 0.;
-    double enlarge_factor = 0.;
+    double distance_verlet_rel = 0.;
 
     // functions
     std::vector<BaseGroup*> get_group_ptr_vec() {return {spheregroup_ptr};};
@@ -77,7 +77,7 @@ class InsertSphereCSV : public InsertDeleteBase
     InsertSphereCSV() {}
 
     // constructor
-    InsertSphereCSV(SphereGroup &spheregroup_in, int ts_insert_in, std::string file_in_str_in, double scale_factor_in = 1., double enlarge_factor_in = 0.05)
+    InsertSphereCSV(SphereGroup &spheregroup_in, int ts_insert_in, std::string file_in_str_in, double scale_factor_in = 1., double distance_verlet_rel_in = 0.5)
     {
 
         // store inputs
@@ -85,7 +85,7 @@ class InsertSphereCSV : public InsertDeleteBase
         ts_insert = ts_insert_in;
         file_in_str = file_in_str_in;
         scale_factor = scale_factor_in;
-        enlarge_factor = enlarge_factor_in;
+        distance_verlet_rel = distance_verlet_rel_in;
 
     }
 
@@ -173,19 +173,24 @@ void InsertSphereCSV::update(int ts, double dt)
             sphere_sub.previous_position = sphere_sub.position - sphere_sub.velocity*dt;
             sphere_sub.previous_angularposition = sphere_sub.angularposition - sphere_sub.angularvelocity*dt;
 
-            // compute enlarged radius
-            sphere_sub.radius_enlarged = (1. + enlarge_factor) * sphere_sub.radius;
+            // initialize collision check data
+            sphere_sub.distance_traveled = 0.;
+            sphere_sub.distance_verlet = distance_verlet_rel * sphere_sub.radius;
 
             // increment value count
             value_num++;
 
         }
     
+        // update mapping
+        spheregroup_ptr->tid_to_gid_vec.push_back(spheregroup_ptr->num_sphere_max);
+        spheregroup_ptr->gid_to_tid_map[spheregroup_ptr->num_sphere_max] = spheregroup_ptr->num_sphere;
+
         // insert spheres
         spheregroup_ptr->sphere_vec.push_back(sphere_sub);
         spheregroup_ptr->num_sphere += 1;
         spheregroup_ptr->num_sphere_max += 1;
-
+        
     }
 
     // close file

@@ -112,6 +112,11 @@ void IntegralMesh::update(int ts, double dt)
     for (auto &mesh : meshgroup_ptr->mesh_vec)
     {
 
+        // store initial position
+        EigenVector3D pos_p0 = mesh.position_p0;
+        EigenVector3D pos_p1 = mesh.position_p1;
+        EigenVector3D pos_p2 = mesh.position_p2;
+
         // apply translation
         mesh.position_p0 += vel_trn*dt;
         mesh.position_p1 += vel_trn*dt;
@@ -138,16 +143,10 @@ void IntegralMesh::update(int ts, double dt)
 
         }
 
-        // get bounding box
-        EigenVector3D pos_min = (mesh.position_p0).cwiseMin(mesh.position_p1).cwiseMin(mesh.position_p2);
-        EigenVector3D pos_max = (mesh.position_p0).cwiseMax(mesh.position_p1).cwiseMax(mesh.position_p2);
-
-        // get diagonal
-        double delta_pos_diag = (pos_max-pos_min).norm();
-
-        // store enlarged bounding box
-        mesh.position_min_enlarged = pos_min.array() - delta_pos_diag;
-        mesh.position_max_enlarged = pos_max.array() - delta_pos_diag;
+        // add to distance traveled
+        mesh.distance_traveled_p0 += (mesh.position_p0 - pos_p0).norm();
+        mesh.distance_traveled_p1 += (mesh.position_p1 - pos_p1).norm();
+        mesh.distance_traveled_p2 += (mesh.position_p2 - pos_p2).norm();
 
     }
 

@@ -39,8 +39,8 @@ class InsertMeshSTL : public InsertDeleteBase
     scale_factor_in : double
         Scale factor multiplied to the coordinates.
         Default value is 1.
-    enlarge_factor_in : double
-        Factor used to enlarge the meshes for collision checking.
+    distance_verlet_rel_in : double
+        Verlet distance relative to the diagonal of the AABB.
         Default value is 0.05.
 
     Functions
@@ -66,7 +66,7 @@ class InsertMeshSTL : public InsertDeleteBase
     int ts_insert = 0;
     std::string file_in_str;
     double scale_factor = 0.;
-    double enlarge_factor = 0.;
+    double distance_verlet_rel = 0.;
 
     // material ID
     int mid = 0;
@@ -90,7 +90,7 @@ class InsertMeshSTL : public InsertDeleteBase
         MeshGroup &meshgroup_in, int ts_insert_in, int mid_in, std::string file_in_str_in,
         EigenVector3D velocity_translate_in = {0., 0., 0.}, double angularvelocity_rotate_in = 0.,
         EigenVector3D position_rotateaxis_begin_in = {0., 0., 0.}, EigenVector3D position_rotateaxis_end_in = {0., 0., 1.},
-        double scale_factor_in = 1., double enlarge_factor_in = 0.05
+        double scale_factor_in = 1., double distance_verlet_rel_in = 0.05
     )
     {
 
@@ -108,7 +108,7 @@ class InsertMeshSTL : public InsertDeleteBase
 
         // store other optional inputs
         scale_factor = scale_factor_in;
-        enlarge_factor = enlarge_factor_in;
+        distance_verlet_rel = distance_verlet_rel_in;
 
     }
 
@@ -273,18 +273,19 @@ void InsertMeshSTL::update(int ts, double dt)
         if (line_num % 7 == 5)
         {
             
-            // get bounding box
+            // mesh ID
+            mesh_sub.gid = meshgroup_ptr->num_mesh;
+
+            // verlet distance
             EigenVector3D pos_min = (mesh_sub.position_p0).cwiseMin(mesh_sub.position_p1).cwiseMin(mesh_sub.position_p2);
             EigenVector3D pos_max = (mesh_sub.position_p0).cwiseMax(mesh_sub.position_p1).cwiseMax(mesh_sub.position_p2);
-
-            // get diagonal
             double delta_pos_diag = (pos_max-pos_min).norm();
+            mesh_sub.distance_verlet = distance_verlet_rel*delta_pos_diag;
+            mesh_sub.distance_traveled_p0 = 0.;
+            mesh_sub.distance_traveled_p1 = 0.;
+            mesh_sub.distance_traveled_p2 = 0.;
 
-            // store enlarged bounding box
-            mesh_sub.position_min_enlarged = pos_min.array() - delta_pos_diag;
-            mesh_sub.position_max_enlarged = pos_max.array() - delta_pos_diag;
-
-            // insert mesh to meshgroup
+            // insert mesh into group
             meshgroup_ptr->mesh_vec.push_back(mesh_sub);
             meshgroup_ptr->num_mesh++;
 

@@ -13,8 +13,10 @@
 
 #include "collider_spheremesh_base.hpp"
 #include "collider_spheremesh_naive.hpp"
+#include "collider_spheremesh_sap1d.hpp"
 #include "collider_spheresphere_base.hpp"
 #include "collider_spheresphere_naive.hpp"
+#include "collider_spheresphere_sap1d.hpp"
 #include "container_typedef.hpp"
 #include "force_sphere_constant.hpp"
 #include "forcemoment_base.hpp"

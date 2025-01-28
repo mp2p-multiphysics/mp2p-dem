@@ -119,7 +119,7 @@ void ForceMomentSphereSphereHertz::update(int ts, double dt)
     */
 
     // update vector of collision pairs
-    collider_ptr->update_collision_vec();
+    collider_ptr->update_collision_vec(ts);
     
     // iterate through each pair
     for (auto indx_pair : collider_ptr->get_collision_vec())

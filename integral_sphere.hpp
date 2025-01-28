@@ -103,6 +103,9 @@ void IntegralSphere::update(int ts, double dt)
         sphere.velocity = 0.5*(sphere.position - sphere.previous_position)/dt;
         sphere.angularvelocity = 0.5*(sphere.angularposition - sphere.previous_angularposition)/dt;
 
+        // add to distance traveled
+        sphere.distance_traveled += (sphere.position - pos).norm();
+
         // current position -> previous position
         sphere.previous_position = pos;
         sphere.previous_angularposition = angpos;

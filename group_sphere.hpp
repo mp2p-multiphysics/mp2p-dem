@@ -32,8 +32,9 @@ struct Sphere
     // geometry
     double radius;
 
-    // enlarged geometry (collision detection)
-    double radius_enlarged;
+    // distance tracking (collision check)
+    double distance_verlet;
+    double distance_traveled;
 
 };
 
@@ -60,6 +61,8 @@ class SphereGroup : public BaseGroup
 
     // vector of spheres
     std::vector<Sphere> sphere_vec;
+    VectorInt tid_to_gid_vec;  // maps temporary ID (index in sphere_vec) to group ID
+    MapIntInt gid_to_tid_map;  // maps group ID to temporary ID (index in sphere_vec)
 
     // output file
     std::string file_out_positionvelocity_str;

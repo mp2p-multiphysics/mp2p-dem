@@ -129,7 +129,7 @@ void ForceMomentSphereMeshHertz::update(int ts, double dt)
     */
 
     // update vector of collision pairs
-    collider_ptr->update_collision_vec();
+    collider_ptr->update_collision_vec(ts);
     
     // reset vectors of unique edge pairs and vertices
     edge_pair_vec.clear();

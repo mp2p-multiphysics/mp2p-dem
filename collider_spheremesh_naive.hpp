@@ -41,7 +41,7 @@ class ColliderSphereMeshNaive : public ColliderSphereMeshBase
 
     // functions
     std::vector<std::pair<int, int>> get_collision_vec();
-    void update_collision_vec();
+    void update_collision_vec(int ts);
 
     // default constructor
     ColliderSphereMeshNaive() {}
@@ -82,7 +82,7 @@ std::vector<std::pair<int, int>> ColliderSphereMeshNaive::get_collision_vec()
 }
 
 
-void ColliderSphereMeshNaive::update_collision_vec()
+void ColliderSphereMeshNaive::update_collision_vec(int ts)
 {
     /*
 
@@ -90,7 +90,8 @@ void ColliderSphereMeshNaive::update_collision_vec()
 
     Arguments
     =========
-    (none)
+    ts : int
+        Timestep number.
 
     Returns
     =======
@@ -98,7 +99,7 @@ void ColliderSphereMeshNaive::update_collision_vec()
 
     */
 
-    // clear vector
+    // clear collision vector
     collision_vec.clear();
 
     // iterate through each sphere combination
@@ -106,7 +107,7 @@ void ColliderSphereMeshNaive::update_collision_vec()
     for (int indx_j = 0; indx_j < meshgroup_ptr->num_mesh; indx_j++){
 
         // append to collision vector
-        collision_vec.push_back({indx_i, indx_j});
+        collision_vec.push_back({spheregroup_ptr->tid_to_gid_vec[indx_i], indx_j});
 
     }}
 

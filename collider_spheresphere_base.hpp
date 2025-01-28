@@ -6,6 +6,24 @@
 namespace DEM
 {
 
+struct SphereSphereAABB
+{
+
+    // global ID
+    int gid;
+
+    // minimum point
+    double x_min;
+    double y_min;
+    double z_min;
+
+    // maximum point
+    double x_max;
+    double y_max;
+    double z_max;
+
+};
+
 class ColliderSphereSphereBase
 {
     /*
@@ -25,7 +43,7 @@ class ColliderSphereSphereBase
 
     // functions
     virtual std::vector<std::pair<int, int>> get_collision_vec() {return {};};
-    virtual void update_collision_vec() {};
+    virtual void update_collision_vec(int ts) {};
 
     // default constructor
     ColliderSphereSphereBase() {}
