@@ -44,7 +44,7 @@ class Solver
     std::vector<IntegralBase*> integral_ptr_vec;
 
     // set of groups
-    std::unordered_set<BaseGroup*> group_ptr_set;
+    std::vector<BaseGroup*> group_ptr_vec;
 
     // timestepping
     int num_timestep = 0;
@@ -60,7 +60,20 @@ class Solver
     void solve(bool verbose);
 
     // default constructor
-    Solver() {}    
+    Solver() {}
+
+    // constructor
+    Solver(SphereGroup &spheregroup_in, std::vector<MeshGroup*> meshgroup_ptr_vec_in)
+    {
+        
+        // store groups
+        group_ptr_vec.push_back(&spheregroup_in);
+        for (auto meshgroup_ptr : meshgroup_ptr_vec_in)
+        {
+            group_ptr_vec.push_back(meshgroup_ptr);
+        }
+
+    }
 
     private:
 
@@ -85,13 +98,6 @@ void Solver::set_insertdelete(std::vector<InsertDeleteBase*> insertdelete_ptr_ve
 
     // store objects
     insertdelete_ptr_vec = insertdelete_ptr_vec_in;
-    
-    // get groups
-    for (auto insertdelete_ptr : insertdelete_ptr_vec)
-    {
-        std::vector<BaseGroup*> group_vec = insertdelete_ptr->get_group_ptr_vec();
-        group_ptr_set.insert(group_vec.begin(), group_vec.end());
-    }
 
 }
 
@@ -114,13 +120,6 @@ void Solver::set_modify(std::vector<ModifyBase*> modify_ptr_vec_in)
 
     // store objects
     modify_ptr_vec = modify_ptr_vec_in;
-    
-    // get groups
-    for (auto modify_ptr : modify_ptr_vec)
-    {
-        std::vector<BaseGroup*> group_vec = modify_ptr->get_group_ptr_vec();
-        group_ptr_set.insert(group_vec.begin(), group_vec.end());
-    }
 
 }
 
@@ -143,13 +142,6 @@ void Solver::set_forcemoment(std::vector<ForceMomentBase*> forcemoment_ptr_vec_i
 
     // store objects
     forcemoment_ptr_vec = forcemoment_ptr_vec_in;
-    
-    // get groups
-    for (auto forcemoment_ptr : forcemoment_ptr_vec)
-    {
-        std::vector<BaseGroup*> group_vec = forcemoment_ptr->get_group_ptr_vec();
-        group_ptr_set.insert(group_vec.begin(), group_vec.end());
-    }
 
 }
 
@@ -172,13 +164,6 @@ void Solver::set_integral(std::vector<IntegralBase*> integral_ptr_vec_in)
 
     // store objects
     integral_ptr_vec = integral_ptr_vec_in;
-    
-    // get groups
-    for (auto integral_ptr : integral_ptr_vec)
-    {
-        std::vector<BaseGroup*> group_vec = integral_ptr->get_group_ptr_vec();
-        group_ptr_set.insert(group_vec.begin(), group_vec.end());
-    }
 
 }
 
@@ -212,12 +197,20 @@ void Solver::set_timestep(int num_timestep_in, int num_timestep_output_in, doubl
 
 void Solver::solve(bool verbose = true)
 {
+    /*
+    
+    Runs the simulation.
+
+    Arguments
+    =========
+    verbose : bool
+        If true, print output to console.
+        Default value is true.
+
+    */
 
     // start calculation timer
     auto t_begin = std::chrono::steady_clock::now();
-
-    // convert group set to vector
-    std::vector<BaseGroup*> group_ptr_vec(group_ptr_set.begin(), group_ptr_set.end());
 
     // calculation time
     double insertdelete_time = 0;
@@ -226,47 +219,66 @@ void Solver::solve(bool verbose = true)
     double inputoutput_time = 0;
     double integral_time = 0;
 
+    // initialize groups
+    // insert/delete -> modify -> force/moment -> output -> integral
+    auto t00 = std::chrono::steady_clock::now();
+    for (auto insertdelete_ptr : insertdelete_ptr_vec)
+    {
+        insertdelete_ptr->initialize(dt);
+    }
+    auto t01 = std::chrono::steady_clock::now();
+    for (auto modify_ptr : modify_ptr_vec)
+    {
+        modify_ptr->initialize(dt);
+    }
+    auto t02 = std::chrono::steady_clock::now();
+    for (auto forcemoment_ptr : forcemoment_ptr_vec)
+    {
+        forcemoment_ptr->initialize(dt);
+    }
+    auto t03 = std::chrono::steady_clock::now();
+    for (auto integral_ptr : integral_ptr_vec)
+    {
+        integral_ptr->initialize(dt);
+    }
+    auto t04 = std::chrono::steady_clock::now();
+
+    // compute times
+    insertdelete_time += std::chrono::duration<double>(t01 - t00).count();
+    modify_time += std::chrono::duration<double>(t02 - t01).count();
+    forcemoment_time += std::chrono::duration<double>(t03 - t02).count();
+    integral_time += std::chrono::duration<double>(t04 - t03).count();
+
     // iterate through each timestep
     for (int ts = 0; ts < num_timestep; ts++)
     {
-
-        // insert or delete objects
+        
+        // insert/delete -> modify -> force/moment -> output -> integral
         auto t0 = std::chrono::steady_clock::now();
         for (auto insertdelete_ptr : insertdelete_ptr_vec)
         {
-            insertdelete_ptr->update(ts, dt);
+            insertdelete_ptr->update(ts);
         }
-
-        // modify objects
         auto t1 = std::chrono::steady_clock::now();
         for (auto modify_ptr : modify_ptr_vec)
         {
-            modify_ptr->update(ts, dt);
+            modify_ptr->update(ts);
         }
-
-        // calculate forces and moments
         auto t2 = std::chrono::steady_clock::now();
         for (auto forcemoment_ptr : forcemoment_ptr_vec)
         {
-            forcemoment_ptr->update(ts, dt);
+            forcemoment_ptr->update(ts);
         }
-
-        // write output files
         auto t3 = std::chrono::steady_clock::now();
         if (ts % num_timestep_output == 0){
         for (auto group_ptr : group_ptr_vec){
             group_ptr->output_file(ts);
         }}
-
-        // calculate position and velocity
-        // also resets forces and moments
         auto t4 = std::chrono::steady_clock::now();
         for (auto integral_ptr : integral_ptr_vec)
         {
-            integral_ptr->update(ts, dt);
+            integral_ptr->update(ts);
         }
-
-        // output progress
         auto t5 = std::chrono::steady_clock::now();
         if (verbose && ts % num_timestep_output == 0)
         {
@@ -286,12 +298,15 @@ void Solver::solve(bool verbose = true)
     auto t_end = std::chrono::steady_clock::now();
 
     // output calculation time
-    std::cout << "Calculation completed in " << std::chrono::duration<double>(t_end-t_begin).count() << " s.\n";
-    std::cout << "Insert/Delete : " << insertdelete_time << " s\n";
-    std::cout << "Modify        : " << modify_time << " s\n";
-    std::cout << "Force/Moment  : " << forcemoment_time << " s\n";
-    std::cout << "Input/Output  : " << inputoutput_time << " s\n";
-    std::cout << "Integral      : " << integral_time << " s\n";
+    if (verbose)
+    {
+        std::cout << "Calculation completed in " << std::chrono::duration<double>(t_end-t_begin).count() << " s.\n";
+        std::cout << "Insert/Delete : " << insertdelete_time << " s\n";
+        std::cout << "Modify        : " << modify_time << " s\n";
+        std::cout << "Force/Moment  : " << forcemoment_time << " s\n";
+        std::cout << "Input/Output  : " << inputoutput_time << " s\n";
+        std::cout << "Integral      : " << integral_time << " s\n";
+    }
     
 }
 

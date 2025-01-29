@@ -19,13 +19,6 @@ class ColliderSphereSphereNaive : public ColliderSphereSphereBase
     spheregroup_in : SphereGroup
         Spheres where collision checks are applied.
 
-    Functions
-    =========
-    get_collision_vec : vector<pair<int, int>>
-        Returns (sphere group ID, sphere group ID) pairs that may collide.
-    update_collision_vec : void
-        Updates the collision vector.
-
     */
 
     public:
@@ -38,7 +31,9 @@ class ColliderSphereSphereNaive : public ColliderSphereSphereBase
 
     // functions
     std::vector<std::pair<int, int>> get_collision_vec();
-    void update_collision_vec(int ts);
+    SphereGroup* get_spheregroup_ptr() {return spheregroup_ptr;};
+    void initialize(double dt_in) {};
+    void update(int ts);
 
     // default constructor
     ColliderSphereSphereNaive() {}
@@ -82,7 +77,7 @@ std::vector<std::pair<int, int>> ColliderSphereSphereNaive::get_collision_vec()
 
 }
 
-void ColliderSphereSphereNaive::update_collision_vec(int ts)
+void ColliderSphereSphereNaive::update(int ts)
 {
     /*
 

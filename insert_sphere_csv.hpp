@@ -25,16 +25,6 @@ class InsertSphereCSV : public InsertDeleteBase
     scale_factor_in : double
         Scale factor multiplied to the coordinates.
         Default value is 1.
-    distance_verlet_rel_in : double
-        Verlet distance relative to the particle radius.
-        Default value is 0.50.
-
-    Functions
-    =========
-    get_group_ptr_vec : vector<BaseGroup*>
-        Returns pointers to group objects affected by this object.
-    update : void
-        Updates this object.
 
     Notes
     =====
@@ -61,23 +51,23 @@ class InsertSphereCSV : public InsertDeleteBase
     public:
 
     // sphere group
+    double dt = 0.;
     SphereGroup* spheregroup_ptr;
 
     // insertion parameters
     int ts_insert = 0;
     std::string file_in_str;
     double scale_factor = 0.;
-    double distance_verlet_rel = 0.;
 
     // functions
-    std::vector<BaseGroup*> get_group_ptr_vec() {return {spheregroup_ptr};};
-    void update(int ts, double dt);
+    void initialize(double dt_in);
+    void update(int ts) {};
 
     // default constructor
     InsertSphereCSV() {}
 
     // constructor
-    InsertSphereCSV(SphereGroup &spheregroup_in, int ts_insert_in, std::string file_in_str_in, double scale_factor_in = 1., double distance_verlet_rel_in = 0.5)
+    InsertSphereCSV(SphereGroup &spheregroup_in, int ts_insert_in, std::string file_in_str_in, double scale_factor_in = 1.)
     {
 
         // store inputs
@@ -85,7 +75,6 @@ class InsertSphereCSV : public InsertDeleteBase
         ts_insert = ts_insert_in;
         file_in_str = file_in_str_in;
         scale_factor = scale_factor_in;
-        distance_verlet_rel = distance_verlet_rel_in;
 
     }
 
@@ -93,17 +82,15 @@ class InsertSphereCSV : public InsertDeleteBase
 
 };
 
-void InsertSphereCSV::update(int ts, double dt)
+void InsertSphereCSV::initialize(double dt_in)
 {
     /*
 
-    Updates this object.
+    Initialize this object.
 
     Arguments
     =========
-    ts : int
-        Timestep number.
-    dt : double
+    dt_in : double
         Duration of timestep.
 
     Returns
@@ -112,11 +99,8 @@ void InsertSphereCSV::update(int ts, double dt)
 
     */
 
-    // skip if not insertion timestep
-    if (ts != ts_insert)
-    {
-        return;
-    }
+    // store timestep
+    dt = dt_in;
 
     // read file with particle positions and velocities
     std::ifstream file_in_stream(file_in_str);
@@ -172,10 +156,6 @@ void InsertSphereCSV::update(int ts, double dt)
             // assume zero acceleration
             sphere_sub.previous_position = sphere_sub.position - sphere_sub.velocity*dt;
             sphere_sub.previous_angularposition = sphere_sub.angularposition - sphere_sub.angularvelocity*dt;
-
-            // initialize collision check data
-            sphere_sub.distance_traveled = 0.;
-            sphere_sub.distance_verlet = distance_verlet_rel * sphere_sub.radius;
 
             // increment value count
             value_num++;

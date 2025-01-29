@@ -20,13 +20,6 @@ class ForceSphereConstant : public ForceMomentBase
     force_in : Eigen::Vector3d
         Constant force to be applied.
 
-    Functions
-    =========
-    get_group_ptr_vec : vector<BaseGroup*>
-        Returns pointers to group objects affected by this object.
-    update : void
-        Updates this object.
-
     */
 
     public:
@@ -38,8 +31,8 @@ class ForceSphereConstant : public ForceMomentBase
     EigenVector3D force;
 
     // functions
-    std::vector<BaseGroup*> get_group_ptr_vec() {return {spheregroup_ptr};};
-    void update(int ts, double dt);
+    void initialize(double dt_in) {};
+    void update(int ts);
 
     // default constructor
     ForceSphereConstant() {}
@@ -58,7 +51,7 @@ class ForceSphereConstant : public ForceMomentBase
 
 };
 
-void ForceSphereConstant::update(int ts, double dt)
+void ForceSphereConstant::update(int ts)
 {
     /*
 
@@ -68,8 +61,6 @@ void ForceSphereConstant::update(int ts, double dt)
     =========
     ts : int
         Timestep number.
-    dt : double
-        Duration of timestep.
 
     Returns
     =======

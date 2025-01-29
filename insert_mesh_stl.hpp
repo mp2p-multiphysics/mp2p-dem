@@ -39,16 +39,6 @@ class InsertMeshSTL : public InsertDeleteBase
     scale_factor_in : double
         Scale factor multiplied to the coordinates.
         Default value is 1.
-    distance_verlet_rel_in : double
-        Verlet distance relative to the diagonal of the AABB.
-        Default value is 0.05.
-
-    Functions
-    =========
-    get_group_ptr_vec : vector<BaseGroup*>
-        Returns pointers to group objects affected by this object.
-    update : void
-        Updates this object.
 
     Notes
     =====
@@ -60,13 +50,13 @@ class InsertMeshSTL : public InsertDeleteBase
     public:
 
     // mesh group
+    double dt = 0.;
     MeshGroup* meshgroup_ptr;
 
     // insertion parameters
     int ts_insert = 0;
     std::string file_in_str;
     double scale_factor = 0.;
-    double distance_verlet_rel = 0.;
 
     // material ID
     int mid = 0;
@@ -78,8 +68,8 @@ class InsertMeshSTL : public InsertDeleteBase
     EigenVector3D position_rotateaxis_end;
 
     // functions
-    std::vector<BaseGroup*> get_group_ptr_vec() {return {meshgroup_ptr};};
-    void update(int ts, double dt);
+    void initialize(double dt_in);
+    void update(int ts) {};
 
     // default constructor
     InsertMeshSTL() {}
@@ -90,7 +80,7 @@ class InsertMeshSTL : public InsertDeleteBase
         MeshGroup &meshgroup_in, int ts_insert_in, int mid_in, std::string file_in_str_in,
         EigenVector3D velocity_translate_in = {0., 0., 0.}, double angularvelocity_rotate_in = 0.,
         EigenVector3D position_rotateaxis_begin_in = {0., 0., 0.}, EigenVector3D position_rotateaxis_end_in = {0., 0., 1.},
-        double scale_factor_in = 1., double distance_verlet_rel_in = 0.05
+        double scale_factor_in = 1.
     )
     {
 
@@ -108,7 +98,6 @@ class InsertMeshSTL : public InsertDeleteBase
 
         // store other optional inputs
         scale_factor = scale_factor_in;
-        distance_verlet_rel = distance_verlet_rel_in;
 
     }
 
@@ -116,17 +105,15 @@ class InsertMeshSTL : public InsertDeleteBase
 
 };
 
-void InsertMeshSTL::update(int ts, double dt)
+void InsertMeshSTL::initialize(double dt_in)
 {
     /*
 
-    Updates this object.
+    Initializes this object.
 
     Arguments
     =========
-    ts : int
-        Timestep number.
-    dt : double
+    dt_in : double
         Duration of timestep.
 
     Returns
@@ -135,11 +122,8 @@ void InsertMeshSTL::update(int ts, double dt)
 
     */
 
-    // skip if not insertion timestep
-    if (ts != ts_insert)
-    {
-        return;
-    }
+    // store timestep
+    dt = dt_in;
 
     // store group parameters
     meshgroup_ptr->mid = mid;
@@ -275,15 +259,6 @@ void InsertMeshSTL::update(int ts, double dt)
             
             // mesh ID
             mesh_sub.gid = meshgroup_ptr->num_mesh;
-
-            // verlet distance
-            EigenVector3D pos_min = (mesh_sub.position_p0).cwiseMin(mesh_sub.position_p1).cwiseMin(mesh_sub.position_p2);
-            EigenVector3D pos_max = (mesh_sub.position_p0).cwiseMax(mesh_sub.position_p1).cwiseMax(mesh_sub.position_p2);
-            double delta_pos_diag = (pos_max-pos_min).norm();
-            mesh_sub.distance_verlet = distance_verlet_rel*delta_pos_diag;
-            mesh_sub.distance_traveled_p0 = 0.;
-            mesh_sub.distance_traveled_p1 = 0.;
-            mesh_sub.distance_traveled_p2 = 0.;
 
             // insert mesh into group
             meshgroup_ptr->mesh_vec.push_back(mesh_sub);

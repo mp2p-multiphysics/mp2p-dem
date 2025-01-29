@@ -32,10 +32,6 @@ struct Sphere
     // geometry
     double radius;
 
-    // distance tracking (collision check)
-    double distance_verlet;
-    double distance_traveled;
-
 };
 
 class SphereGroup : public BaseGroup
@@ -46,8 +42,6 @@ class SphereGroup : public BaseGroup
 
     Functions
     =========
-    output_file : void
-        Writes output files.
     set_output_position : void
         Set the output CSV file name with position and velocity values.
 

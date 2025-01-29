@@ -33,9 +33,13 @@ class ColliderSphereSphereBase
     Functions
     =========
     get_collision_vec : vector<pair<int, int>>
-        Returns (sphere group ID, sphere group ID) pairs that may collide.
-    update_collision_vec : void
-        Updates the collision vector.
+        Returns (sphere group ID, mesh index) pairs that may collide.
+    get_spheregroup_ptr : SphereGroup*
+        Returns a pointer to the sphere group.
+    initialize : void
+        Initializes the collider.
+    update : void
+        Updates the collider.
 
     */
 
@@ -43,7 +47,9 @@ class ColliderSphereSphereBase
 
     // functions
     virtual std::vector<std::pair<int, int>> get_collision_vec() {return {};};
-    virtual void update_collision_vec(int ts) {};
+    virtual SphereGroup* get_spheregroup_ptr() {return {};};
+    virtual void initialize(double dt_in) {};
+    virtual void update(int ts) {};
 
     // default constructor
     ColliderSphereSphereBase() {}

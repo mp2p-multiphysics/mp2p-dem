@@ -21,13 +21,6 @@ class ColliderSphereMeshNaive : public ColliderSphereMeshBase
     meshgroup_in : MeshGroup
         Meshes where collision checks are applied.
 
-    Functions
-    =========
-    get_collision_vec : vector<pair<int, int>>
-        Returns (sphere group ID, mesh index) pairs that may collide.
-    update_collision_vec : void
-        Updates the collision vector.
-
     */
 
     public:
@@ -41,7 +34,10 @@ class ColliderSphereMeshNaive : public ColliderSphereMeshBase
 
     // functions
     std::vector<std::pair<int, int>> get_collision_vec();
-    void update_collision_vec(int ts);
+    SphereGroup* get_spheregroup_ptr() {return spheregroup_ptr;};
+    MeshGroup* get_meshgroup_ptr() {return meshgroup_ptr;};
+    void initialize(double dt_in) {};
+    void update(int ts);
 
     // default constructor
     ColliderSphereMeshNaive() {}
@@ -64,7 +60,7 @@ std::vector<std::pair<int, int>> ColliderSphereMeshNaive::get_collision_vec()
 {
     /*
 
-    Returns (sphere group ID, mesh index) pairs that may collide.
+    Returns (sphere group ID, mesh group ID) pairs that may collide.
 
     Arguments
     =========
@@ -73,7 +69,7 @@ std::vector<std::pair<int, int>> ColliderSphereMeshNaive::get_collision_vec()
     Returns
     =======
     collision_vec : vector<pair<int, int>>
-        Vector of (sphere group ID, mesh index) pairs that may collide.
+        Vector of (sphere group ID, mesh group ID) pairs that may collide.
 
     */
 
@@ -82,7 +78,7 @@ std::vector<std::pair<int, int>> ColliderSphereMeshNaive::get_collision_vec()
 }
 
 
-void ColliderSphereMeshNaive::update_collision_vec(int ts)
+void ColliderSphereMeshNaive::update(int ts)
 {
     /*
 

@@ -1,6 +1,8 @@
 #ifndef COLLIDER_SPHEREMESH_BASE
 #define COLLIDER_SPHEREMESH_BASE
 #include "container_typedef.hpp"
+#include "group_mesh.hpp"
+#include "group_sphere.hpp"
 
 namespace DEM
 {
@@ -36,8 +38,14 @@ class ColliderSphereMeshBase
     =========
     get_collision_vec : vector<pair<int, int>>
         Returns (sphere group ID, mesh index) pairs that may collide.
-    update_collision_vec : void
-        Updates the collision vector.
+    get_spheregroup_ptr : SphereGroup*
+        Returns a pointer to the sphere group.
+    get_meshgroup_ptr : MeshGroup*
+        Returns a pointer to the mesh group.
+    initialize : void
+        Initializes the collider.
+    update : void
+        Updates the collider.
 
     */
 
@@ -45,7 +53,10 @@ class ColliderSphereMeshBase
 
     // functions
     virtual std::vector<std::pair<int, int>> get_collision_vec() {return {};};
-    virtual void update_collision_vec(int ts) {};
+    virtual SphereGroup* get_spheregroup_ptr() {return {};};
+    virtual MeshGroup* get_meshgroup_ptr() {return {};};
+    virtual void initialize(double dt_in) {};
+    virtual void update(int ts) {};
 
     // default constructor
     ColliderSphereMeshBase() {}

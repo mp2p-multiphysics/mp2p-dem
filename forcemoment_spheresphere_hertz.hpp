@@ -17,8 +17,6 @@ class ForceMomentSphereSphereHertz : public ForceMomentBase
 
     Variables
     =========
-    spheregroup_in : SphereGroup
-        Spheres where forces and moments are applied.
     collider_in : ColliderSphereSphereBase
         Broad phase collision checker.
     spring_normal_in : ParameterBinary
@@ -34,20 +32,14 @@ class ForceMomentSphereSphereHertz : public ForceMomentBase
     friction_rolling_in : ParameterBinary
         Rolling friction coefficient.
 
-    Functions
-    =========
-    get_group_ptr_vec : vector<BaseGroup*>
-        Returns pointers to group objects affected by this object.
-    update : void
-        Updates this object.
-
     */
 
     public:
 
     // sphere group
-    ColliderSphereSphereBase* collider_ptr;
+    double dt = 0.;
     SphereGroup* spheregroup_ptr;
+    ColliderSphereSphereBase* collider_ptr;
 
     // parameters
     ParameterBinary* spring_normal_ptr;
@@ -61,8 +53,8 @@ class ForceMomentSphereSphereHertz : public ForceMomentBase
     std::map<std::pair<int, int>, double> overlap_tangent_map;
 
     // functions
-    std::vector<BaseGroup*> get_group_ptr_vec() {return {spheregroup_ptr};};
-    void update(int ts, double dt);
+    void initialize(double dt_in);
+    void update(int ts);
 
     // default constructor
     ForceMomentSphereSphereHertz() {}
@@ -70,7 +62,7 @@ class ForceMomentSphereSphereHertz : public ForceMomentBase
     // constructor
     ForceMomentSphereSphereHertz
     (
-        SphereGroup &spheregroup_in, ColliderSphereSphereBase &collider_in,
+        ColliderSphereSphereBase &collider_in,
         ParameterBinary &spring_normal_in, ParameterBinary &spring_tangent_in,
         ParameterBinary &damping_normal_in, ParameterBinary &damping_tangent_in,
         ParameterBinary &friction_sliding_in, ParameterBinary &friction_rolling_in
@@ -79,7 +71,7 @@ class ForceMomentSphereSphereHertz : public ForceMomentBase
 
         // store sphere group
         collider_ptr = &collider_in;
-        spheregroup_ptr = &spheregroup_in;
+        spheregroup_ptr = collider_ptr->get_spheregroup_ptr();
 
         // store parameters
         spring_normal_ptr = &spring_normal_in;
@@ -94,12 +86,37 @@ class ForceMomentSphereSphereHertz : public ForceMomentBase
     private:
 
     // functions
-    void compute_force_pair(int indx_i, int indx_j, double dt);
+    void compute_force_pair(int indx_i, int indx_j);
     double get_overlap_tangent_value(std::pair<int, int> collision_pair);
 
 };
 
-void ForceMomentSphereSphereHertz::update(int ts, double dt)
+void ForceMomentSphereSphereHertz::initialize(double dt_in)
+{
+    /*
+
+    Initializes this object.
+
+    Arguments
+    =========
+    dt_in : double
+        Duration of timestep.
+
+    Returns
+    =======
+    (none)
+
+    */
+
+    // store timestep
+    dt = dt_in;
+
+    // initialize collider
+    collider_ptr->initialize(dt);
+
+}
+
+void ForceMomentSphereSphereHertz::update(int ts)
 {
     /*
 
@@ -119,12 +136,12 @@ void ForceMomentSphereSphereHertz::update(int ts, double dt)
     */
 
     // update vector of collision pairs
-    collider_ptr->update_collision_vec(ts);
-    
+    collider_ptr->update(ts);
+
     // iterate through each pair
     for (auto indx_pair : collider_ptr->get_collision_vec())
     {
-        compute_force_pair(indx_pair.first, indx_pair.second, dt);
+        compute_force_pair(indx_pair.first, indx_pair.second);
     }
 
 }
@@ -147,7 +164,7 @@ double ForceMomentSphereSphereHertz::get_overlap_tangent_value(std::pair<int, in
 
 }
 
-void ForceMomentSphereSphereHertz::compute_force_pair(int indx_i, int indx_j, double dt)
+void ForceMomentSphereSphereHertz::compute_force_pair(int indx_i, int indx_j)
 {
 
     // get spheres

@@ -19,16 +19,19 @@ class ColliderSphereSphereSAP1D : public ColliderSphereSphereBase
     =========
     spheregroup_in : SphereGroup
         Spheres where collision checks are applied.
+    meshgroup_in : MeshGroup
+        Meshes where collision checks are applied.
     axis_in : int
         Axis along which sweep and prune is performed.
         Use 0, 1, or 2 for the x, y, or z axes, respectively.
+    distance_verlet_abs_in : double
+        Absolute component of the verlet distance.
+    distance_verlet_rel_in : double
+        Relative component of the verlet distance.
 
-    Functions
-    =========
-    get_collision_vec : vector<pair<int, int>>
-        Returns (sphere group ID, sphere group ID) pairs that may collide.
-    update_collision_vec : void
-        Updates the collision vector.
+    Notes
+    =====
+    The verlet distance is distance_verlet_abs + distance_verlet_rel * radius.
 
     */
 
@@ -37,26 +40,40 @@ class ColliderSphereSphereSAP1D : public ColliderSphereSphereBase
     // sphere group
     SphereGroup* spheregroup_ptr;
 
-    // axis along which to sweep and prune
-    int axis = 0;
-
     // vector of collision pairs
     std::vector<std::pair<int, int>> collision_vec;
 
+    // sweep and prune parameters
+    int axis = 0;  // axis along which sweep and prune is performed
+    double distance_verlet_abs = 0;  // absolute verlet distance
+    double distance_verlet_rel = 0;  // verlet distance relative to sphere radius
+    std::unordered_map<int, double> distance_verlet_map;  // verlet distance for each sphere
+    std::unordered_map<int, EigenVector3D> position_previous_map;  // position at previous collision check
+
+    // previous number of spheres
+    int num_sphere_max_previous = 0;
+    int num_sphere_previous = 0;
+
     // functions
     std::vector<std::pair<int, int>> get_collision_vec();
-    void update_collision_vec(int ts);
+    SphereGroup* get_spheregroup_ptr() {return spheregroup_ptr;};
+    void initialize(double dt_in);
+    void update(int ts);
 
     // default constructor
     ColliderSphereSphereSAP1D() {}
 
     // constructor
-    ColliderSphereSphereSAP1D(SphereGroup &spheregroup_in, int axis_in)
+    ColliderSphereSphereSAP1D(SphereGroup &spheregroup_in, int axis_in, double distance_verlet_abs_in = 0., double distance_verlet_rel_in = 0.5)
     {
 
         // store inputs
         spheregroup_ptr = &spheregroup_in;
         axis = axis_in;
+
+        // optional inputs
+        distance_verlet_abs = distance_verlet_abs_in;
+        distance_verlet_rel = distance_verlet_rel_in;
 
     }
 
@@ -93,7 +110,37 @@ std::vector<std::pair<int, int>> ColliderSphereSphereSAP1D::get_collision_vec()
 
 }
 
-void ColliderSphereSphereSAP1D::update_collision_vec(int ts)
+void ColliderSphereSphereSAP1D::initialize(double dt_in)
+{
+    /*
+
+    Initializes the collider.
+
+    Arguments
+    =========
+    dt_in : double
+        Duration of timestep.
+
+    Returns
+    =======
+    (none)
+
+    */
+
+    // initialize verlet distance and previous position (current position)
+    for (auto &sphere : spheregroup_ptr->sphere_vec)
+    {
+        distance_verlet_map[sphere.gid] = distance_verlet_abs + distance_verlet_rel * sphere.radius;
+        position_previous_map[sphere.gid] = {std::numeric_limits<double>::max(), std::numeric_limits<double>::max(), std::numeric_limits<double>::max()};  // triggers the first collision check
+    }
+
+    // store previous number of spheres
+    int num_sphere_max_previous = spheregroup_ptr->num_sphere_max;
+    int num_sphere_previous = spheregroup_ptr->num_sphere;
+
+}
+
+void ColliderSphereSphereSAP1D::update(int ts)
 {
     /*
 
@@ -110,20 +157,47 @@ void ColliderSphereSphereSAP1D::update_collision_vec(int ts)
 
     */
 
-    // check if update is necessary
-    // skip if verlet distance is not yet traveled
-    bool is_beyond_distance_verlet = false;
-    for (auto &sphere : spheregroup_ptr->sphere_vec)
+    // rerun collider if particles have been inserted or deleted
+    bool is_rerun_collider = false;
+    if (spheregroup_ptr->num_sphere_max != num_sphere_max_previous || spheregroup_ptr->num_sphere != num_sphere_previous)
     {
-        is_beyond_distance_verlet = sphere.distance_traveled > sphere.distance_verlet;
-    }
-    if (!is_beyond_distance_verlet)
+        is_rerun_collider = true;
+        num_sphere_max_previous = spheregroup_ptr->num_sphere_max;
+        num_sphere_previous = spheregroup_ptr->num_sphere;
+    } 
+
+    // rerun collider if any sphere has traveled beyond verlet distance
+    if (!is_rerun_collider){
+    for (auto &sphere : spheregroup_ptr->sphere_vec){
+        
+        // get verlet distance and last position
+        double distance_verlet = distance_verlet_map[sphere.gid];
+        EigenVector3D position_previous = position_previous_map[sphere.gid];
+
+        // check if sphere has traveled beyond verlet distance
+        double distance_traveled = (sphere.position - position_previous).norm();
+        
+        // stop checking if any sphere has traveled beyond verlet distance
+        is_rerun_collider = distance_traveled > distance_verlet;
+        if (is_rerun_collider)
+        {
+            break;
+        }
+
+    }}
+    if (!is_rerun_collider)
     {
         return;
     }
 
     // clear collision vector
     collision_vec.clear();
+
+    // reset previous position
+    for (auto &sphere : spheregroup_ptr->sphere_vec)
+    {
+        position_previous_map[sphere.gid] = sphere.position;
+    }
 
     // initialize vector of AABB
     std::vector<SphereSphereAABB> aabb_vec;
@@ -132,18 +206,15 @@ void ColliderSphereSphereSAP1D::update_collision_vec(int ts)
     for (auto &sphere : spheregroup_ptr->sphere_vec)
     {
         
-        // reset traveled distances
-        sphere.distance_traveled = 0.;
-
         // compute AABB
         SphereSphereAABB aabb_sub;
         aabb_sub.gid = sphere.gid;
-        aabb_sub.x_min = sphere.position(0) - sphere.radius - sphere.distance_verlet;
-        aabb_sub.y_min = sphere.position(1) - sphere.radius - sphere.distance_verlet;
-        aabb_sub.z_min = sphere.position(2) - sphere.radius - sphere.distance_verlet;
-        aabb_sub.x_max = sphere.position(0) + sphere.radius + sphere.distance_verlet;
-        aabb_sub.y_max = sphere.position(1) + sphere.radius + sphere.distance_verlet;
-        aabb_sub.z_max = sphere.position(2) + sphere.radius + sphere.distance_verlet;
+        aabb_sub.x_min = sphere.position(0) - sphere.radius - distance_verlet_map[sphere.gid];
+        aabb_sub.y_min = sphere.position(1) - sphere.radius - distance_verlet_map[sphere.gid];
+        aabb_sub.z_min = sphere.position(2) - sphere.radius - distance_verlet_map[sphere.gid];
+        aabb_sub.x_max = sphere.position(0) + sphere.radius + distance_verlet_map[sphere.gid];
+        aabb_sub.y_max = sphere.position(1) + sphere.radius + distance_verlet_map[sphere.gid];
+        aabb_sub.z_max = sphere.position(2) + sphere.radius + distance_verlet_map[sphere.gid];
 
         // store AABB
         aabb_vec.push_back(aabb_sub);
@@ -176,7 +247,17 @@ void ColliderSphereSphereSAP1D::update_collision_vec(int ts)
         // check for collisions with the remaining active AABBs
         for (const auto& aabb_active : aabb_active_vec){
         if (is_aabb_collision(aabb, aabb_active)){
-            collision_vec.emplace_back(aabb_active.gid, aabb.gid); // Store the colliding pair
+
+            // ensure that the pair is unique (first < second)
+            if (aabb.gid > aabb_active.gid)
+            {
+                collision_vec.emplace_back(aabb_active.gid, aabb.gid);
+            }
+            else
+            {
+                collision_vec.emplace_back(aabb.gid, aabb_active.gid);
+            }
+
         }}
 
         // add the current AABB to the active list

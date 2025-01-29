@@ -20,23 +20,17 @@ class IntegralMesh : public IntegralBase
     meshgroup_in : MeshGroup
         Meshes whose positions are updated.
 
-    Functions
-    =========
-    get_group_ptr_vec : vector<BaseGroup*>
-        Returns pointers to group objects affected by this object.
-    update : void
-        Updates this object.
-
     */
 
     public:
 
     // mesh group
+    double dt = 0.;
     MeshGroup* meshgroup_ptr;
 
     // functions
-    std::vector<BaseGroup*> get_group_ptr_vec() {return {meshgroup_ptr};};
-    void update(int ts, double dt);
+    void initialize(double dt_in) {dt = dt_in;};
+    void update(int ts);
 
     // default constructor
     IntegralMesh() {}
@@ -54,7 +48,7 @@ class IntegralMesh : public IntegralBase
 
 };
 
-void IntegralMesh::update(int ts, double dt)
+void IntegralMesh::update(int ts)
 {
     /*
 
@@ -64,8 +58,6 @@ void IntegralMesh::update(int ts, double dt)
     =========
     ts : int
         Timestep number.
-    dt : double
-        Duration of timestep.
 
     Returns
     =======
@@ -142,11 +134,6 @@ void IntegralMesh::update(int ts, double dt)
             mesh.position_p2 += rotaxis_p0;
 
         }
-
-        // add to distance traveled
-        mesh.distance_traveled_p0 += (mesh.position_p0 - pos_p0).norm();
-        mesh.distance_traveled_p1 += (mesh.position_p1 - pos_p1).norm();
-        mesh.distance_traveled_p2 += (mesh.position_p2 - pos_p2).norm();
 
     }
 

@@ -1,6 +1,5 @@
 #ifndef FORCEMOMENT_SPHEREMESH_HERTZ
 #define FORCEMOMENT_SPHEREMESH_HERTZ
-#include <algorithm>
 #include "collider_spheremesh_base.hpp"
 #include "container_typedef.hpp"
 #include "forcemoment_base.hpp"
@@ -19,10 +18,6 @@ class ForceMomentSphereMeshHertz : public ForceMomentBase
 
     Variables
     =========
-    spheregroup_in : SphereGroup
-        Spheres where forces and moments are applied.
-    meshgroup_in : MeshGroup
-        Meshes where forces and moments are applied.
     collider_in : ColliderSphereMeshBase
         Broad phase collision checker.
     spring_normal_in : ParameterBinary
@@ -38,18 +33,12 @@ class ForceMomentSphereMeshHertz : public ForceMomentBase
     friction_rolling_in : ParameterBinary
         Rolling friction coefficient.
 
-    Functions
-    =========
-    get_group_ptr_vec : vector<BaseGroup*>
-        Returns pointers to group objects affected by this object.
-    update : void
-        Updates this object.
-
     */
 
     public:
 
     // sphere group
+    double dt = 0.;
     ColliderSphereMeshBase* collider_ptr;
     SphereGroup* spheregroup_ptr;
     MeshGroup* meshgroup_ptr;
@@ -70,8 +59,8 @@ class ForceMomentSphereMeshHertz : public ForceMomentBase
     std::vector<int> vertex_vec;
 
     // functions
-    std::vector<BaseGroup*> get_group_ptr_vec() {return {spheregroup_ptr, meshgroup_ptr};};
-    void update(int ts, double dt);
+    void initialize(double dt_in);
+    void update(int ts);
 
     // default constructor
     ForceMomentSphereMeshHertz() {}
@@ -79,7 +68,7 @@ class ForceMomentSphereMeshHertz : public ForceMomentBase
     // constructor
     ForceMomentSphereMeshHertz
     (
-        SphereGroup &spheregroup_in, MeshGroup &meshgroup_in, ColliderSphereMeshBase &collider_in,
+        ColliderSphereMeshBase &collider_in,
         ParameterBinary &spring_normal_in, ParameterBinary &spring_tangent_in,
         ParameterBinary &damping_normal_in, ParameterBinary &damping_tangent_in,
         ParameterBinary &friction_sliding_in, ParameterBinary &friction_rolling_in
@@ -88,8 +77,8 @@ class ForceMomentSphereMeshHertz : public ForceMomentBase
 
         // store sphere group
         collider_ptr = &collider_in;
-        spheregroup_ptr = &spheregroup_in;
-        meshgroup_ptr = &meshgroup_in;
+        spheregroup_ptr = collider_ptr->get_spheregroup_ptr();
+        meshgroup_ptr = collider_ptr->get_meshgroup_ptr();
 
         // store parameters
         spring_normal_ptr = &spring_normal_in;
@@ -104,12 +93,37 @@ class ForceMomentSphereMeshHertz : public ForceMomentBase
     private:
 
     // functions
-    void compute_force_pair(int indx_i, int indx_j, double dt);
+    void compute_force_pair(int indx_i, int indx_j);
     double get_overlap_tangent_value(std::pair<int, int> collision_pair);
 
 };
 
-void ForceMomentSphereMeshHertz::update(int ts, double dt)
+void ForceMomentSphereMeshHertz::initialize(double dt_in)
+{
+    /*
+
+    Initializes this object.
+
+    Arguments
+    =========
+    dt_in : double
+        Duration of timestep.
+
+    Returns
+    =======
+    (none)
+
+    */
+
+    // store timestep
+    dt = dt_in;
+
+    // initialize collider
+    collider_ptr->initialize(dt);
+
+}
+
+void ForceMomentSphereMeshHertz::update(int ts)
 {
     /*
 
@@ -119,8 +133,6 @@ void ForceMomentSphereMeshHertz::update(int ts, double dt)
     =========
     ts : int
         Timestep number.
-    dt : double
-        Duration of timestep.
 
     Returns
     =======
@@ -129,7 +141,7 @@ void ForceMomentSphereMeshHertz::update(int ts, double dt)
     */
 
     // update vector of collision pairs
-    collider_ptr->update_collision_vec(ts);
+    collider_ptr->update(ts);
     
     // reset vectors of unique edge pairs and vertices
     edge_pair_vec.clear();
@@ -138,7 +150,7 @@ void ForceMomentSphereMeshHertz::update(int ts, double dt)
     // iterate through each pair
     for (auto indx_pair : collider_ptr->get_collision_vec())
     {
-        compute_force_pair(indx_pair.first, indx_pair.second, dt);
+        compute_force_pair(indx_pair.first, indx_pair.second);
     }
 
 }
@@ -161,7 +173,7 @@ double ForceMomentSphereMeshHertz::get_overlap_tangent_value(std::pair<int, int>
 
 }
 
-void ForceMomentSphereMeshHertz::compute_force_pair(int indx_i, int indx_j, double dt)
+void ForceMomentSphereMeshHertz::compute_force_pair(int indx_i, int indx_j)
 {
 
     // update collider
@@ -236,7 +248,7 @@ void ForceMomentSphereMeshHertz::compute_force_pair(int indx_i, int indx_j, doub
         double dist_p0p1_ji_mag = (pos_i - projection_p0p1_ji).norm();
 
         // calculate criteria for p0-p1 edge collision
-        bool is_p0p1_collision = ((dist_p0p1_ji_mag + 1e-8) < radius_i);
+        bool is_p0p1_collision = ((dist_p0p1_ji_mag + 1e-8) < radius_i) && relprojection_p0p1_ji_val > 0. && relprojection_p0p1_ji_val < 1.;
 
         // determine contact point if p0-p1 edge collision
         if (is_p0p1_collision)
@@ -266,7 +278,7 @@ void ForceMomentSphereMeshHertz::compute_force_pair(int indx_i, int indx_j, doub
         double dist_p1p2_ji_mag = (pos_i - projection_p1p2_ji).norm();
 
         // calculate criteria for p1-p2 edge collision
-        bool is_p1p2_collision = ((dist_p1p2_ji_mag + 1e-8) < radius_i);
+        bool is_p1p2_collision = ((dist_p1p2_ji_mag + 1e-8) < radius_i) && relprojection_p1p2_ji_val > 0. && relprojection_p1p2_ji_val < 1.;
 
         // determine contact point if p1-p2 edge collision
         if (is_p1p2_collision)
@@ -296,7 +308,7 @@ void ForceMomentSphereMeshHertz::compute_force_pair(int indx_i, int indx_j, doub
         double dist_p2p0_ji_mag = (pos_i - projection_p2p0_ji).norm();
 
         // calculate criteria for p2-p0 edge collision
-        bool is_p2p0_collision = ((dist_p2p0_ji_mag + 1e-8) < radius_i);
+        bool is_p2p0_collision = ((dist_p2p0_ji_mag + 1e-8) < radius_i) && relprojection_p2p0_ji_val > 0. && relprojection_p2p0_ji_val < 1.;
 
         // determine contact point if p2-p0 edge collision
         if (is_p2p0_collision)

@@ -21,26 +21,20 @@ class IntegralSphere : public IntegralBase
     spheregroup_in : SphereGroup
         Spheres whose positions and velocities are updated.
 
-    Functions
-    =========
-    get_group_ptr_vec : vector<BaseGroup*>
-        Returns pointers to group objects affected by this object.
-    update : void
-        Updates this object.
-
     */
 
     public:
 
     // sphere group
+    double dt = 0.;
     SphereGroup* spheregroup_ptr;
 
     // parameters
     ParameterUnary* density_ptr;
 
     // functions
-    std::vector<BaseGroup*> get_group_ptr_vec() {return {spheregroup_ptr};};
-    void update(int ts, double dt);
+    void initialize(double dt_in) {dt = dt_in;};
+    void update(int ts);
 
     // default constructor
     IntegralSphere() {}
@@ -59,7 +53,7 @@ class IntegralSphere : public IntegralBase
 
 };
 
-void IntegralSphere::update(int ts, double dt)
+void IntegralSphere::update(int ts)
 {
     /*
 
@@ -69,8 +63,6 @@ void IntegralSphere::update(int ts, double dt)
     =========
     ts : int
         Timestep number.
-    dt : double
-        Duration of timestep.
 
     Returns
     =======
@@ -102,9 +94,6 @@ void IntegralSphere::update(int ts, double dt)
         // get new velocity
         sphere.velocity = 0.5*(sphere.position - sphere.previous_position)/dt;
         sphere.angularvelocity = 0.5*(sphere.angularposition - sphere.previous_angularposition)/dt;
-
-        // add to distance traveled
-        sphere.distance_traveled += (sphere.position - pos).norm();
 
         // current position -> previous position
         sphere.previous_position = pos;

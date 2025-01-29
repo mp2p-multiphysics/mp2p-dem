@@ -24,12 +24,6 @@ struct Mesh
     EigenVector3D position_p1;
     EigenVector3D position_p2;
 
-    // distance tracking (collision check)
-    double distance_verlet;
-    double distance_traveled_p0;
-    double distance_traveled_p1;
-    double distance_traveled_p2;
-
 };
 
 class MeshGroup : public BaseGroup
@@ -40,8 +34,6 @@ class MeshGroup : public BaseGroup
 
     Functions
     =========
-    output_file : void
-        Writes output files.
     set_output_position : void
         Set the output STL file name with position values.
 
