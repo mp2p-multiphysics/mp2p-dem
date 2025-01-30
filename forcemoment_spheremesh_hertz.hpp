@@ -506,15 +506,16 @@ void ForceMomentSphereMeshHertz::compute_force_pair(int indx_i, int indx_j)
     // add forces on sphere i
     // apply Newton's third law to get forces on j
     spheregroup_ptr->sphere_vec[indx_i].force += force_collision_ij;
-    // meshgroup_ptr->force += -force_collision_ij; // TODO
+    meshgroup_ptr->force += -force_collision_ij; // TODO
 
     // calculate collision moment on i
-    // same direction for i and j since both collision force and normal vector switch signs
     EigenVector3D moment_collision_ij = radius_i*normal_ij.cross(force_collision_tangent_ij);
-    // EigenVector3D moment_collision_ji = radius_j*normal_ij.cross(force_collision_tangent_ij);
+
+    // calculate collision moment on j
+    // use reference point for calculating momemnt arm
+    EigenVector3D moment_collision_ji = (contact_ij - meshgroup_ptr->position_ref).cross(-force_collision_ij);
 
     // calculate relative angular velocities of i and j
-    // EigenVector3D relangvel_ij = angvel_i - angvel_j;
     EigenVector3D relangvel_ij = angvel_i;
     double relangvel_ij_mag = relangvel_ij.norm();
 
@@ -527,21 +528,18 @@ void ForceMomentSphereMeshHertz::compute_force_pair(int indx_i, int indx_j)
     }
 
     // calculate effective radius
-    // double radius_effective = radius_i*radius_j/(radius_i + radius_j);
     double radius_effective = radius_i;
 
     // calculate magnitude of fricion moment
     double moment_friction_ij_val = -force_collision_normal_ij_mag*friction_rolling*radius_effective;
 
     // calculate friction moment on i
-    // axis switches signs for j
     EigenVector3D moment_friction_ij = moment_friction_ij_val*axis_ij;
-    // EigenVector3D moment_friction_ji = -moment_friction_ij;
 
     // add moments on i and j
     spheregroup_ptr->sphere_vec[indx_i].moment += moment_collision_ij + moment_friction_ij;
-    // sphere_j_ptr->moment_vec[tid_j] += moment_collision_ji + moment_friction_ji;
-
+    meshgroup_ptr->moment += moment_collision_ji;
+    
 }
 
 }

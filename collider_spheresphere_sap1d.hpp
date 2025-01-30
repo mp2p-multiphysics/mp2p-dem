@@ -161,9 +161,21 @@ void ColliderSphereSphereSAP1D::update(int ts)
     bool is_rerun_collider = false;
     if (spheregroup_ptr->num_sphere_max != num_sphere_max_previous || spheregroup_ptr->num_sphere != num_sphere_previous)
     {
+        
+        // rerun collider
         is_rerun_collider = true;
+
+        // update previous number of spheres
         num_sphere_max_previous = spheregroup_ptr->num_sphere_max;
         num_sphere_previous = spheregroup_ptr->num_sphere;
+
+        // recalculate verlet distance and previous position
+        for (auto &sphere : spheregroup_ptr->sphere_vec)
+        {
+            distance_verlet_map[sphere.gid] = distance_verlet_abs + distance_verlet_rel * sphere.radius;
+            position_previous_map[sphere.gid] = {std::numeric_limits<double>::max(), std::numeric_limits<double>::max(), std::numeric_limits<double>::max()};  // triggers the first collision check
+        }
+
     } 
 
     // rerun collider if any sphere has traveled beyond verlet distance

@@ -135,6 +135,10 @@ void IntegralMesh::update(int ts)
 
         }
 
+        // reset forces and moments
+        meshgroup_ptr->force = {0., 0., 0.,};
+        meshgroup_ptr->moment = {0., 0., 0.,};
+
     }
 
 }

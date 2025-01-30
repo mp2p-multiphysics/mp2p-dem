@@ -36,6 +36,8 @@ class MeshGroup : public BaseGroup
     =========
     set_output_position : void
         Set the output STL file name with position values.
+    set_output_forcemoment : void
+        Set the output CSV file name with force and moment values.
 
     */
 
@@ -50,6 +52,8 @@ class MeshGroup : public BaseGroup
 
     // output file
     std::string file_out_position_str;
+    std::string file_out_forcemoment_str;
+    std::ofstream log_forcemoment_stream;
 
     // material ID
     int mid = 0;
@@ -60,9 +64,15 @@ class MeshGroup : public BaseGroup
     EigenVector3D position_rotateaxis_begin;
     EigenVector3D position_rotateaxis_end;
 
+    // force and moment
+    EigenVector3D force = EigenVector3D::Zero();
+    EigenVector3D moment = EigenVector3D::Zero();
+    EigenVector3D position_ref = EigenVector3D::Zero();  // reference point for moment calculation
+
     // functions
     void output_file(int ts);
     void set_output_position(std::string file_out_str);
+    void set_output_forcemoment(std::string file_out_str, EigenVector3D position_ref);
 
     // default constructor
     MeshGroup() {}
@@ -71,6 +81,7 @@ class MeshGroup : public BaseGroup
 
     // functions
     void output_position_stl(int ts);
+    void output_forcemoment_csv(int ts);
 
 };
 
@@ -93,6 +104,7 @@ void MeshGroup::output_file(int ts)
 
     // generate output files
     output_position_stl(ts);
+    output_forcemoment_csv(ts);
 
 }
 
@@ -121,6 +133,38 @@ void MeshGroup::set_output_position(std::string file_out_str)
     file_out_position_str = file_out_str;
 
 }
+
+void MeshGroup::set_output_forcemoment(std::string file_out_str, EigenVector3D position_ref_in)
+{
+    /*
+
+    Set the output CSV file name with force and moment values.
+
+    Arguments
+    =========
+    file_out_str : string
+        Path to STL file.
+    position_ref : EigenVector3D
+        Reference point for moment calculation.
+
+    Returns
+    =======
+    (none)
+
+    */
+    
+    // store inputs
+    file_out_forcemoment_str = file_out_str;
+    position_ref = position_ref_in;
+
+    // initialize log file with force and moment
+    log_forcemoment_stream.open(file_out_forcemoment_str);
+    log_forcemoment_stream << "ts,force_x,force_y,force_z,moment_x,moment_y,moment_z\n";
+    log_forcemoment_stream.close();
+    log_forcemoment_stream.open(file_out_forcemoment_str, std::ios_base::app | std::ios_base::out);
+
+}
+
 
 void MeshGroup::output_position_stl(int ts)
 {
@@ -180,6 +224,26 @@ void MeshGroup::output_position_stl(int ts)
 
     // close
     file_out_stream.close();
+
+}
+
+void MeshGroup::output_forcemoment_csv(int ts)
+{
+
+    // do not make file if filename not set
+    if (file_out_position_str.empty())
+    {
+        return;
+    }
+
+    // write to file
+    log_forcemoment_stream << ts << ",";
+    log_forcemoment_stream << force(0) << ",";
+    log_forcemoment_stream << force(1) << ",";
+    log_forcemoment_stream << force(2) << ",";
+    log_forcemoment_stream << moment(0) << ",";
+    log_forcemoment_stream << moment(1) << ",";
+    log_forcemoment_stream << moment(2) << "\n";
 
 }
 

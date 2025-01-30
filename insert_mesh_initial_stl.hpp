@@ -1,5 +1,5 @@
-#ifndef INSERT_MESH_STL
-#define INSERT_MESH_STL
+#ifndef INSERT_MESH_INITIAL_STL
+#define INSERT_MESH_INITIAL_STL
 #include <fstream>
 #include <sstream>
 #include "insertdelete_base.hpp"
@@ -8,11 +8,11 @@
 namespace DEM
 {
 
-class InsertMeshSTL : public InsertDeleteBase
+class InsertMeshInitialSTL : public InsertDeleteBase
 {
     /*
 
-    Inserts a mesh from an STL file at a specified time.
+    Inserts a mesh from an STL file at the start of the simulation.
 
     Variables
     =========
@@ -22,8 +22,6 @@ class InsertMeshSTL : public InsertDeleteBase
         Material ID.
     file_in_str_in : string
         Path to STL file with mesh to insert.
-    ts_insert_in : int
-        Timestep at which the mesh is inserted.
     velocity_translate_in : Eigen::Vector3d
         Translational velocity of the mesh.
         Default value is {0, 0, 0}.
@@ -60,30 +58,23 @@ class InsertMeshSTL : public InsertDeleteBase
     // material ID
     int mid = 0;
 
-    // timesteps
-    int ts_insert = 0;
-
     // velocity
     EigenVector3D velocity_translate;
     double angularvelocity_rotate = 0;
     EigenVector3D position_rotateaxis_begin;
     EigenVector3D position_rotateaxis_end;
 
-    // meshes to insert
-    int num_mesh = 0;
-    std::vector<Mesh> mesh_vec;
-
     // functions
-    void initialize(double dt_in) {dt = dt_in;};
-    void update(int ts);
+    void initialize(double dt_in);
+    void update(int ts) {};
 
     // default constructor
-    InsertMeshSTL() {}
+    InsertMeshInitialSTL() {}
 
     // constructor
-    InsertMeshSTL
+    InsertMeshInitialSTL
     (
-        MeshGroup &meshgroup_in, int mid_in, std::string file_in_str_in, int ts_insert_in,
+        MeshGroup &meshgroup_in, int mid_in, std::string file_in_str_in,
         EigenVector3D velocity_translate_in = {0., 0., 0.}, double angularvelocity_rotate_in = 0.,
         EigenVector3D position_rotateaxis_begin_in = {0., 0., 0.}, EigenVector3D position_rotateaxis_end_in = {0., 0., 1.},
         double scale_factor_in = 1.
@@ -94,9 +85,6 @@ class InsertMeshSTL : public InsertDeleteBase
         meshgroup_ptr = &meshgroup_in;
         mid = mid_in;
         file_in_str = file_in_str_in;
-
-        // store timesteps
-        ts_insert = ts_insert_in;
 
         // store velocity
         velocity_translate = velocity_translate_in;
@@ -113,28 +101,25 @@ class InsertMeshSTL : public InsertDeleteBase
 
 };
 
-void InsertMeshSTL::update(int ts)
+void InsertMeshInitialSTL::initialize(double dt_in)
 {
     /*
 
-    Updates this object.
+    Initializes this object.
 
     Arguments
     =========
-    ts : int
-        Timestep number.
-    
+    dt_in : double
+        Duration of timestep.
+
     Returns
     =======
     (none)
 
     */
 
-    // check if insertion is needed
-    if (ts != ts_insert)
-    {
-        return;  
-    }
+    // store timestep
+    dt = dt_in;
 
     // store group parameters
     meshgroup_ptr->mid = mid;

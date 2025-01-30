@@ -174,9 +174,30 @@ void ColliderSphereMeshSAP1D::update(int ts)
     bool is_rerun_collider = false;
     if (spheregroup_ptr->num_sphere_max != num_sphere_max_previous || spheregroup_ptr->num_sphere != num_sphere_previous)
     {
+        
+        // rerun collider
         is_rerun_collider = true;
+
+        // update previous number of spheres
         num_sphere_max_previous = spheregroup_ptr->num_sphere_max;
         num_sphere_previous = spheregroup_ptr->num_sphere;
+
+        // recalculate verlet distance and previous position
+        double sphere_radius_max = 0;
+        for (auto &sphere : spheregroup_ptr->sphere_vec)
+        {
+            sphere_distance_verlet_map[sphere.gid] = distance_verlet_abs + distance_verlet_rel * sphere.radius;
+            sphere_position_previous_map[sphere.gid] = {std::numeric_limits<double>::max(), std::numeric_limits<double>::max(), std::numeric_limits<double>::max()};  // triggers the first collision check
+            sphere_radius_max = std::max(sphere_radius_max, sphere.radius);
+        }
+        for (auto &mesh : meshgroup_ptr->mesh_vec)
+        {
+            mesh_distance_verlet_map[mesh.gid] = distance_verlet_abs + distance_verlet_rel * sphere_radius_max;
+            mesh_position_p0_previous_map[mesh.gid] = {std::numeric_limits<double>::max(), std::numeric_limits<double>::max(), std::numeric_limits<double>::max()};  // triggers the first collision check
+            mesh_position_p1_previous_map[mesh.gid] = {std::numeric_limits<double>::max(), std::numeric_limits<double>::max(), std::numeric_limits<double>::max()};  // triggers the first collision check
+            mesh_position_p2_previous_map[mesh.gid] = {std::numeric_limits<double>::max(), std::numeric_limits<double>::max(), std::numeric_limits<double>::max()};  // triggers the first collision check
+        }
+
     } 
 
     // rerun collider if any sphere has traveled beyond verlet distance

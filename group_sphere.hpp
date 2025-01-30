@@ -154,10 +154,11 @@ void SphereGroup::output_positionvelocity_csv(int ts)
     std::ofstream file_out_stream(file_out_str);
 
     // write to file
-    file_out_stream << "sphere_id,position_x,position_y,position_z,velocity_x,velocity_y,velocity_z,position_x,angularposition_y,angularposition_z,angularvelocity_x,angularvelocity_y,angularvelocity_z\n";
+    file_out_stream << "id,material,position_x,position_y,position_z,velocity_x,velocity_y,velocity_z,position_x,angularposition_y,angularposition_z,angularvelocity_x,angularvelocity_y,angularvelocity_z,radius\n";
     for (auto &sphere : sphere_vec)
     {
         file_out_stream << sphere.gid << ",";
+        file_out_stream << sphere.mid << ",";
         file_out_stream << sphere.position.coeffRef(0) << ",";
         file_out_stream << sphere.position.coeffRef(1) << ",";
         file_out_stream << sphere.position.coeffRef(2) << ",";
@@ -169,7 +170,8 @@ void SphereGroup::output_positionvelocity_csv(int ts)
         file_out_stream << sphere.angularposition.coeffRef(2) << ",";
         file_out_stream << sphere.angularvelocity.coeffRef(0) << ",";
         file_out_stream << sphere.angularvelocity.coeffRef(1) << ",";
-        file_out_stream << sphere.angularvelocity.coeffRef(2) << "\n";
+        file_out_stream << sphere.angularvelocity.coeffRef(2) << ",";
+        file_out_stream << sphere.radius << "\n";
     }
 
 }

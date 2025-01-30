@@ -1,5 +1,5 @@
-#ifndef INSERT_SPHERE_CSV
-#define INSERT_SPHERE_CSV
+#ifndef INSERT_SPHERE_INITIAL_CSV
+#define INSERT_SPHERE_INITIAL_CSV
 #include <fstream>
 #include <sstream>
 #include "insertdelete_base.hpp"
@@ -8,11 +8,11 @@
 namespace DEM
 {
 
-class InsertSphereCSV : public InsertDeleteBase
+class InsertSphereInitialCSV : public InsertDeleteBase
 {
     /*
 
-    Inserts spheres from a CSV file at specified times.
+    Inserts spheres from a CSV file at the start of the simulation.
 
     Variables
     =========
@@ -20,17 +20,6 @@ class InsertSphereCSV : public InsertDeleteBase
         Sphere group to be inserted to.
     file_in_str_in : string
         Path to STL file with mesh to insert.
-    ts_start_in : int
-        Timestep at which particle insertion starts.
-    ts_end_in : int
-        Timestep at which particle insertion ends.
-        No insertion is made at and after this timestep.
-        Set to -1 for no end.
-        Default value is -1.
-    ts_step_in : int
-        Time interval between insertions.
-        Set to -1 to insert particles only once.
-        Default value is -1.
     scale_factor_in : double
         Scale factor multiplied to the coordinates.
         Default value is 1.
@@ -67,35 +56,20 @@ class InsertSphereCSV : public InsertDeleteBase
     std::string file_in_str;
     double scale_factor = 0.;
 
-    // timesteps
-    int ts_start = 0;
-    int ts_end = 0;
-    int ts_step = 0;
-
-    // spheres to insert
-    std::vector<Sphere> sphere_vec;
-
     // functions
     void initialize(double dt_in);
-    void update(int ts);
+    void update(int ts) {};
 
     // default constructor
-    InsertSphereCSV() {}
+    InsertSphereInitialCSV() {}
 
     // constructor
-    InsertSphereCSV(SphereGroup &spheregroup_in, std::string file_in_str_in, int ts_start_in, int ts_end_in = -1, int ts_step_in = -1, double scale_factor_in = 1.)
+    InsertSphereInitialCSV(SphereGroup &spheregroup_in, std::string file_in_str_in, double scale_factor_in = 1.)
     {
 
         // store inputs
         spheregroup_ptr = &spheregroup_in;
         file_in_str = file_in_str_in;
-
-        // store timesteps
-        ts_start = ts_start_in;
-        ts_end = ts_end_in;
-        ts_step = ts_step_in;
-
-        // store other optional inputs
         scale_factor = scale_factor_in;
 
     }
@@ -104,58 +78,7 @@ class InsertSphereCSV : public InsertDeleteBase
 
 };
 
-void InsertSphereCSV::update(int ts)
-{
-    /*
-
-    Update this object.
-
-    Arguments
-    =========
-    ts : int
-        Timestep number.
-
-    Returns
-    =======
-    (none)
-
-    */
-
-    // check if insertion is needed
-    if (ts < ts_start)  // insertion has not started yet
-    {
-        return;  
-    }
-    if (ts_end != -1 && ts >= ts_end)  // insertion has ended
-    {
-        return;  
-    }
-    if (ts_step == -1)
-    {
-        if (ts != ts_start)  // only insert once at ts_start_in
-        {
-            return;  
-        }
-    }
-    else if ((ts - ts_start) % ts_step != 0)  // insert only at defined intervals
-    {
-        return;
-    }
-
-    // insert spheres
-    for (auto sphere : sphere_vec)
-    {
-        sphere.gid = spheregroup_ptr->num_sphere_max;
-        spheregroup_ptr->tid_to_gid_vec.push_back(spheregroup_ptr->num_sphere_max);
-        spheregroup_ptr->gid_to_tid_map[spheregroup_ptr->num_sphere_max] = spheregroup_ptr->num_sphere;
-        spheregroup_ptr->sphere_vec.push_back(sphere);
-        spheregroup_ptr->num_sphere++;
-        spheregroup_ptr->num_sphere_max++;
-    }
-
-}
-
-void InsertSphereCSV::initialize(double dt_in)
+void InsertSphereInitialCSV::initialize(double dt_in)
 {
     /*
 
@@ -208,7 +131,7 @@ void InsertSphereCSV::initialize(double dt_in)
             // store values for sphere
             switch (value_num)
             {
-                case 0: sphere_sub.gid = -1; break;
+                case 0: sphere_sub.gid = spheregroup_ptr->num_sphere_max; break;
                 case 1: sphere_sub.mid = std::stoi(value_str); break;
                 case 2: sphere_sub.position.coeffRef(0) = scale_factor * std::stod(value_str); break;
                 case 3: sphere_sub.position.coeffRef(1) = scale_factor * std::stod(value_str); break;
@@ -235,8 +158,14 @@ void InsertSphereCSV::initialize(double dt_in)
 
         }
     
+        // update mapping
+        spheregroup_ptr->tid_to_gid_vec.push_back(spheregroup_ptr->num_sphere_max);
+        spheregroup_ptr->gid_to_tid_map[spheregroup_ptr->num_sphere_max] = spheregroup_ptr->num_sphere;
+
         // insert spheres
-        sphere_vec.push_back(sphere_sub);
+        spheregroup_ptr->sphere_vec.push_back(sphere_sub);
+        spheregroup_ptr->num_sphere += 1;
+        spheregroup_ptr->num_sphere_max += 1;
         
     }
 
