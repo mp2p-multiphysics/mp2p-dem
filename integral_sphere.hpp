@@ -1,7 +1,5 @@
 #ifndef INTEGRAL_SPHERE
 #define INTEGRAL_SPHERE
-#include <fstream>
-#include <sstream>
 #include "container_typedef.hpp"
 #include "group_sphere.hpp"
 #include "integral_base.hpp"
@@ -24,6 +22,9 @@ class IntegralSphere : public IntegralBase
     */
 
     public:
+
+    // memory alignment
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     // sphere group
     double dt = 0.;
@@ -69,7 +70,7 @@ void IntegralSphere::update(int ts)
     (none)
 
     */
-
+    assert(spheregroup_ptr != nullptr);
     // iterate through each sphere
     for (auto &sphere : spheregroup_ptr->sphere_vec)
     {

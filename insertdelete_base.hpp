@@ -1,6 +1,5 @@
 #ifndef INSERTDELETE_BASE
 #define INSERTDELETE_BASE
-#include <vector>
 #include "group_base.hpp"
 
 namespace DEM

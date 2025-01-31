@@ -1,6 +1,10 @@
 #ifndef COLLIDER_SPHERESPHERE_SAP1D
 #define COLLIDER_SPHERESPHERE_SAP1D
+#include <algorithm>
+#include <limits>
+#include <unordered_map>
 #include <utility>
+#include <vector>
 #include "collider_spheresphere_base.hpp"
 #include "container_typedef.hpp"
 #include "group_sphere.hpp"
@@ -36,6 +40,9 @@ class ColliderSphereSphereSAP1D : public ColliderSphereSphereBase
     */
 
     public:
+
+    // memory alignment
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     // sphere group
     SphereGroup* spheregroup_ptr;
@@ -169,11 +176,10 @@ void ColliderSphereSphereSAP1D::update(int ts)
         num_sphere_max_previous = spheregroup_ptr->num_sphere_max;
         num_sphere_previous = spheregroup_ptr->num_sphere;
 
-        // recalculate verlet distance and previous position
+        // recalculate verlet distance if spheres were added or removed
         for (auto &sphere : spheregroup_ptr->sphere_vec)
         {
             distance_verlet_map[sphere.gid] = distance_verlet_abs + distance_verlet_rel * sphere.radius;
-            position_previous_map[sphere.gid] = {std::numeric_limits<double>::max(), std::numeric_limits<double>::max(), std::numeric_limits<double>::max()};  // triggers the first collision check
         }
 
     } 
@@ -205,7 +211,7 @@ void ColliderSphereSphereSAP1D::update(int ts)
     // clear collision vector
     collision_vec.clear();
 
-    // reset previous position
+    // record previous position
     for (auto &sphere : spheregroup_ptr->sphere_vec)
     {
         position_previous_map[sphere.gid] = sphere.position;

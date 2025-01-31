@@ -1,6 +1,5 @@
 #ifndef INTEGRAL_BASE
 #define INTEGRAL_BASE
-#include <vector>
 #include "group_base.hpp"
 
 namespace DEM

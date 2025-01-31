@@ -1,5 +1,8 @@
 #ifndef FORCEMOMENT_SPHEREMESH_HERTZ
 #define FORCEMOMENT_SPHEREMESH_HERTZ
+#include <map>
+#include <utility>
+#include <vector>
 #include "collider_spheremesh_base.hpp"
 #include "container_typedef.hpp"
 #include "forcemoment_base.hpp"
@@ -36,6 +39,9 @@ class ForceMomentSphereMeshHertz : public ForceMomentBase
     */
 
     public:
+
+    // memory alignment
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     // sphere group
     double dt = 0.;
@@ -93,7 +99,7 @@ class ForceMomentSphereMeshHertz : public ForceMomentBase
     private:
 
     // functions
-    void compute_force_pair(int indx_i, int indx_j);
+    void compute_force_pair(int gid_i, int gid_j);
     double get_overlap_tangent_value(std::pair<int, int> collision_pair);
 
 };
@@ -148,9 +154,9 @@ void ForceMomentSphereMeshHertz::update(int ts)
     vertex_vec.clear();
 
     // iterate through each pair
-    for (auto indx_pair : collider_ptr->get_collision_vec())
+    for (auto gid_pair : collider_ptr->get_collision_vec())
     {
-        compute_force_pair(indx_pair.first, indx_pair.second);
+        compute_force_pair(gid_pair.first, gid_pair.second);
     }
 
 }
@@ -173,7 +179,7 @@ double ForceMomentSphereMeshHertz::get_overlap_tangent_value(std::pair<int, int>
 
 }
 
-void ForceMomentSphereMeshHertz::compute_force_pair(int indx_i, int indx_j)
+void ForceMomentSphereMeshHertz::compute_force_pair(int gid_i, int gid_j)
 {
 
     // update collider
@@ -182,8 +188,10 @@ void ForceMomentSphereMeshHertz::compute_force_pair(int indx_i, int indx_j)
     // if not edge collision -> record particle and vertex; compute assuming vertex collision and first time
 
     // get spheres and meshes
-    Sphere sphere_i = spheregroup_ptr->sphere_vec[indx_i];
-    Mesh mesh_j = meshgroup_ptr->mesh_vec[indx_j];
+    int tid_i = spheregroup_ptr->gid_to_tid_map[gid_i];
+    int tid_j = gid_j;
+    Sphere sphere_i = spheregroup_ptr->sphere_vec[tid_i];
+    Mesh mesh_j = meshgroup_ptr->mesh_vec[tid_j];
 
     // get particle geometry
     EigenVector3D pos_i = sphere_i.position;
@@ -195,7 +203,7 @@ void ForceMomentSphereMeshHertz::compute_force_pair(int indx_i, int indx_j)
     EigenVector3D pos_p2_j = mesh_j.position_p2;
 
     // get particle group ID pair
-    std::pair<int, int> collision_pair = {sphere_i.gid, indx_j};
+    std::pair<int, int> collision_pair = {sphere_i.gid, gid_j};
 
     // calculate normal vector to face
     EigenVector3D front_j = (pos_p1_j - pos_p0_j).cross(pos_p2_j - pos_p0_j);
@@ -505,7 +513,7 @@ void ForceMomentSphereMeshHertz::compute_force_pair(int indx_i, int indx_j)
     
     // add forces on sphere i
     // apply Newton's third law to get forces on j
-    spheregroup_ptr->sphere_vec[indx_i].force += force_collision_ij;
+    spheregroup_ptr->sphere_vec[tid_i].force += force_collision_ij;
     meshgroup_ptr->force += -force_collision_ij; // TODO
 
     // calculate collision moment on i
@@ -537,7 +545,7 @@ void ForceMomentSphereMeshHertz::compute_force_pair(int indx_i, int indx_j)
     EigenVector3D moment_friction_ij = moment_friction_ij_val*axis_ij;
 
     // add moments on i and j
-    spheregroup_ptr->sphere_vec[indx_i].moment += moment_collision_ij + moment_friction_ij;
+    spheregroup_ptr->sphere_vec[tid_i].moment += moment_collision_ij + moment_friction_ij;
     meshgroup_ptr->moment += moment_collision_ji;
     
 }

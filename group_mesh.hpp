@@ -2,6 +2,7 @@
 #define GROUP_MESH
 #include <fstream>
 #include <sstream>
+#include <vector>
 #include "container_typedef.hpp"
 #include "group_base.hpp"
 
@@ -10,6 +11,9 @@ namespace DEM
 
 struct Mesh
 {
+
+    // memory alignment
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     // IDs
     int gid; // group ID
@@ -20,9 +24,9 @@ struct Mesh
     int pid_p2;
 
     // positions (current step)
-    EigenVector3D position_p0;
-    EigenVector3D position_p1;
-    EigenVector3D position_p2;
+    EigenVector3D position_p0 = EigenVector3D::Zero();
+    EigenVector3D position_p1 = EigenVector3D::Zero();
+    EigenVector3D position_p2 = EigenVector3D::Zero();
 
 };
 
@@ -43,11 +47,14 @@ class MeshGroup : public BaseGroup
 
     public:
 
+    // memory alignment
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     // number of mesh triangles
     int num_mesh = 0;
 
     // vector of meshes
-    std::vector<Mesh> mesh_vec;
+    std::vector<Mesh, Eigen::aligned_allocator<Mesh>> mesh_vec;
     std::vector<EigenVector3D> point_vec;
 
     // output file
@@ -59,10 +66,10 @@ class MeshGroup : public BaseGroup
     int mid = 0;
 
     // velocity
-    EigenVector3D velocity_translate;
+    EigenVector3D velocity_translate = EigenVector3D::Zero();
     double angularvelocity_rotate = 0;
-    EigenVector3D position_rotateaxis_begin;
-    EigenVector3D position_rotateaxis_end;
+    EigenVector3D position_rotateaxis_begin = EigenVector3D::Zero();
+    EigenVector3D position_rotateaxis_end = EigenVector3D::Zero();
 
     // force and moment
     EigenVector3D force = EigenVector3D::Zero();

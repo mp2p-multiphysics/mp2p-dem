@@ -23,6 +23,9 @@ class DeleteMesh : public InsertDeleteBase
 
     public:
 
+    // memory alignment
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     // mesh group
     double dt = 0.;
     MeshGroup* meshgroup_ptr;

@@ -1,5 +1,10 @@
 #ifndef COLLIDER_SPHEREMESH_SAP1D
 #define COLLIDER_SPHEREMESH_SAP1D
+#include <algorithm>
+#include <limits>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 #include "collider_spheremesh_base.hpp"
 #include "container_typedef.hpp"
 #include "group_mesh.hpp"
@@ -37,6 +42,9 @@ class ColliderSphereMeshSAP1D : public ColliderSphereMeshBase
     */
 
     public:
+
+    // memory alignment
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     // sphere and mesh group
     SphereGroup* spheregroup_ptr;
@@ -187,15 +195,11 @@ void ColliderSphereMeshSAP1D::update(int ts)
         for (auto &sphere : spheregroup_ptr->sphere_vec)
         {
             sphere_distance_verlet_map[sphere.gid] = distance_verlet_abs + distance_verlet_rel * sphere.radius;
-            sphere_position_previous_map[sphere.gid] = {std::numeric_limits<double>::max(), std::numeric_limits<double>::max(), std::numeric_limits<double>::max()};  // triggers the first collision check
             sphere_radius_max = std::max(sphere_radius_max, sphere.radius);
         }
         for (auto &mesh : meshgroup_ptr->mesh_vec)
         {
             mesh_distance_verlet_map[mesh.gid] = distance_verlet_abs + distance_verlet_rel * sphere_radius_max;
-            mesh_position_p0_previous_map[mesh.gid] = {std::numeric_limits<double>::max(), std::numeric_limits<double>::max(), std::numeric_limits<double>::max()};  // triggers the first collision check
-            mesh_position_p1_previous_map[mesh.gid] = {std::numeric_limits<double>::max(), std::numeric_limits<double>::max(), std::numeric_limits<double>::max()};  // triggers the first collision check
-            mesh_position_p2_previous_map[mesh.gid] = {std::numeric_limits<double>::max(), std::numeric_limits<double>::max(), std::numeric_limits<double>::max()};  // triggers the first collision check
         }
 
     } 
@@ -250,7 +254,7 @@ void ColliderSphereMeshSAP1D::update(int ts)
     // clear collision vector
     collision_vec.clear();
 
-    // reset previous position
+    // record previous position
     for (auto &sphere : spheregroup_ptr->sphere_vec)
     {
         sphere_position_previous_map[sphere.gid] = sphere.position;

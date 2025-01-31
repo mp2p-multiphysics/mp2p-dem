@@ -21,17 +21,24 @@ class DeleteSphereBoxOut : public InsertDeleteBase
     position_max_in : Eigen::Vector3d
         Maximum corner of the hexahedral region.
 
+    Notes
+    =====
+    This class only deletes spheres whose centers are outside the region.
+
     */
 
     public:
+
+    // memory alignment
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     // sphere group
     double dt = 0.;
     SphereGroup* spheregroup_ptr;
 
     // region
-    EigenVector3D position_min;
-    EigenVector3D position_max;
+    EigenVector3D position_min = EigenVector3D::Zero();
+    EigenVector3D position_max = EigenVector3D::Zero();
 
     // functions
     void initialize(double dt_in) {dt = dt_in;};
@@ -75,11 +82,11 @@ void DeleteSphereBoxOut::update(int ts)
     */
 
     // iterate through each sphere
-    for (int i = 0; i < spheregroup_ptr->sphere_vec.size(); i++)
+    for (auto it = spheregroup_ptr->sphere_vec.begin(); it != spheregroup_ptr->sphere_vec.end();)
     {
-
+        
         // get sphere position
-        EigenVector3D pos = spheregroup_ptr->sphere_vec[i].position;
+        EigenVector3D pos = it->position;
 
         // check if sphere is outside region
         bool is_delete = (
@@ -92,14 +99,22 @@ void DeleteSphereBoxOut::update(int ts)
         if (is_delete)
         {
             spheregroup_ptr->num_sphere--;
-            spheregroup_ptr->gid_to_tid_map.erase(spheregroup_ptr->sphere_vec[i].gid);
-            spheregroup_ptr->tid_to_gid_vec.erase(spheregroup_ptr->tid_to_gid_vec.begin() + i);
-            spheregroup_ptr->sphere_vec.erase(spheregroup_ptr->sphere_vec.begin() + i);
-            i--; // wind back index
+            spheregroup_ptr->gid_to_tid_map.erase(it->gid);
+            auto index = std::distance(spheregroup_ptr->sphere_vec.begin(), it);
+            spheregroup_ptr->tid_to_gid_vec.erase(spheregroup_ptr->tid_to_gid_vec.begin() + index);
+            for (size_t i = index; i < spheregroup_ptr->tid_to_gid_vec.size(); ++i)
+            {
+                spheregroup_ptr->gid_to_tid_map[spheregroup_ptr->tid_to_gid_vec[i]] = i;
+            }
+            it = spheregroup_ptr->sphere_vec.erase(it);  // returns next valid iterator
+        }
+        else
+        {
+            ++it;  // Only increment if not erased
         }
 
     }
-    
+        
 }
 
 }

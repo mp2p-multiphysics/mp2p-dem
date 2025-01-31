@@ -59,6 +59,9 @@ class InsertSphereCSV : public InsertDeleteBase
 
     public:
 
+    // memory alignment
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     // sphere group
     double dt = 0.;
     SphereGroup* spheregroup_ptr;

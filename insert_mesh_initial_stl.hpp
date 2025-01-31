@@ -1,5 +1,6 @@
 #ifndef INSERT_MESH_INITIAL_STL
 #define INSERT_MESH_INITIAL_STL
+#include <algorithm>
 #include <fstream>
 #include <sstream>
 #include "insertdelete_base.hpp"
@@ -47,6 +48,9 @@ class InsertMeshInitialSTL : public InsertDeleteBase
 
     public:
 
+    // memory alignment
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     // mesh group
     double dt = 0.;
     MeshGroup* meshgroup_ptr;
@@ -59,10 +63,10 @@ class InsertMeshInitialSTL : public InsertDeleteBase
     int mid = 0;
 
     // velocity
-    EigenVector3D velocity_translate;
+    EigenVector3D velocity_translate = EigenVector3D::Zero();
     double angularvelocity_rotate = 0;
-    EigenVector3D position_rotateaxis_begin;
-    EigenVector3D position_rotateaxis_end;
+    EigenVector3D position_rotateaxis_begin = EigenVector3D::Zero();
+    EigenVector3D position_rotateaxis_end = EigenVector3D::Zero();
 
     // functions
     void initialize(double dt_in);

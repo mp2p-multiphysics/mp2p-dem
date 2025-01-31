@@ -1,5 +1,7 @@
 #ifndef COLLIDER_SPHEREMESH_NAIVE
 #define COLLIDER_SPHEREMESH_NAIVE
+#include <utility>
+#include <vector>
 #include "collider_spheremesh_base.hpp"
 #include "container_typedef.hpp"
 #include "group_mesh.hpp"

@@ -11,23 +11,26 @@ namespace DEM
 struct Sphere
 {
 
+    // memory alignment
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     // IDs
     int gid; // group ID
     int mid; // material ID
 
     // forces and moments
-    EigenVector3D force;
-    EigenVector3D moment;
+    EigenVector3D force = EigenVector3D::Zero();
+    EigenVector3D moment = EigenVector3D::Zero();
 
     // positions and velocities (current step)
-    EigenVector3D position;
-    EigenVector3D velocity;
-    EigenVector3D angularposition;
-    EigenVector3D angularvelocity;
+    EigenVector3D position = EigenVector3D::Zero();
+    EigenVector3D velocity = EigenVector3D::Zero();
+    EigenVector3D angularposition = EigenVector3D::Zero();
+    EigenVector3D angularvelocity = EigenVector3D::Zero();
 
     // positions (previous step)
-    EigenVector3D previous_position;
-    EigenVector3D previous_angularposition;
+    EigenVector3D previous_position = EigenVector3D::Zero();
+    EigenVector3D previous_angularposition = EigenVector3D::Zero();
 
     // geometry
     double radius;
@@ -49,12 +52,15 @@ class SphereGroup : public BaseGroup
 
     public:
 
+    // memory alignment
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     // number of spheres
     int num_sphere = 0;  // current number
     int num_sphere_max = 0;  // historical max
 
     // vector of spheres
-    std::vector<Sphere> sphere_vec;
+    std::vector<Sphere, Eigen::aligned_allocator<Sphere>> sphere_vec;
     VectorInt tid_to_gid_vec;  // maps temporary ID (index in sphere_vec) to group ID
     MapIntInt gid_to_tid_map;  // maps group ID to temporary ID (index in sphere_vec)
 
@@ -154,7 +160,7 @@ void SphereGroup::output_positionvelocity_csv(int ts)
     std::ofstream file_out_stream(file_out_str);
 
     // write to file
-    file_out_stream << "id,material,position_x,position_y,position_z,velocity_x,velocity_y,velocity_z,position_x,angularposition_y,angularposition_z,angularvelocity_x,angularvelocity_y,angularvelocity_z,radius\n";
+    file_out_stream << "id,material,position_x,position_y,position_z,velocity_x,velocity_y,velocity_z,angularposition_x,angularposition_y,angularposition_z,angularvelocity_x,angularvelocity_y,angularvelocity_z,radius\n";
     for (auto &sphere : sphere_vec)
     {
         file_out_stream << sphere.gid << ",";

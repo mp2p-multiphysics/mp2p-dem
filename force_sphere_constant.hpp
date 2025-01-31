@@ -24,11 +24,14 @@ class ForceSphereConstant : public ForceMomentBase
 
     public:
 
+    // memory alignment
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     // sphere group
     SphereGroup* spheregroup_ptr;
 
     // constant force
-    EigenVector3D force;
+    EigenVector3D force = EigenVector3D::Zero();
 
     // functions
     void initialize(double dt_in) {};

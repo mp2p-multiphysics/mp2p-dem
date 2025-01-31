@@ -1,7 +1,5 @@
 #ifndef INTEGRAL_MESH
 #define INTEGRAL_MESH
-#include <fstream>
-#include <sstream>
 #include "container_typedef.hpp"
 #include "group_mesh.hpp"
 #include "integral_base.hpp"
@@ -23,6 +21,9 @@ class IntegralMesh : public IntegralBase
     */
 
     public:
+
+    // memory alignment
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     // mesh group
     double dt = 0.;

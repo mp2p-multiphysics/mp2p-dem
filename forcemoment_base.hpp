@@ -1,6 +1,5 @@
 #ifndef FORCEMOMENT_BASE
 #define FORCEMOMENT_BASE
-#include <vector>
 #include "group_base.hpp"
 
 namespace DEM
