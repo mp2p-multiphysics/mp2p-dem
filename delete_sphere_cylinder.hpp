@@ -39,9 +39,10 @@ class DeleteSphereCylinder : public InsertDeleteBase
         Default value is -1.
     radius_ratio_in : double
         Expands the region by this factor multipled by the radius of each sphere.
-        Default value is 0, which deletes spheres whose centers are outside the region.
+        Can be set to 0 to delete spheres whose centers are outside the region.
         Can be set to +1 to delete spheres that partially overlap with the region.
         Can be set to -1 to delete spheres that are completely inside the region.
+        Default value is 0.
 
     */
 

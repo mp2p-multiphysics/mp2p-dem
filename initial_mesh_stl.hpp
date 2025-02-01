@@ -1,5 +1,5 @@
-#ifndef INSERT_MESH_INITIAL_STL
-#define INSERT_MESH_INITIAL_STL
+#ifndef INITIAL_MESH_STL
+#define INITIAL_MESH_STL
 #include <algorithm>
 #include <fstream>
 #include <sstream>
@@ -9,7 +9,7 @@
 namespace DEM
 {
 
-class InsertMeshInitialSTL : public InsertDeleteBase
+class InitialMeshSTL : public InsertDeleteBase
 {
     /*
 
@@ -73,10 +73,10 @@ class InsertMeshInitialSTL : public InsertDeleteBase
     void update(int ts) {};
 
     // default constructor
-    InsertMeshInitialSTL() {}
+    InitialMeshSTL() {}
 
     // constructor
-    InsertMeshInitialSTL
+    InitialMeshSTL
     (
         MeshGroup &meshgroup_in, int mid_in, std::string file_in_str_in,
         EigenVector3D velocity_translate_in = {0., 0., 0.}, double angularvelocity_rotate_in = 0.,
@@ -105,7 +105,7 @@ class InsertMeshInitialSTL : public InsertDeleteBase
 
 };
 
-void InsertMeshInitialSTL::initialize(double dt_in)
+void InitialMeshSTL::initialize(double dt_in)
 {
     /*
 
